@@ -1,0 +1,109 @@
+area_of_application,skill
+Hard skill,Обработка обращений
+Hard skill,Работа с базой знаний
+Hard skill,Отчетность и анализ
+Hard skill,Прием и передача нового функционала
+Hard skill,Навык проведения UAT
+Hard skill,Стандартное оборудование РМП
+Hard skill,Серверное/активное сетевое оборудование/СКС
+Hard skill,ВКС
+Soft skill,Критическое мышление и анализ
+Soft skill,Планирование
+Soft skill,Личная/ межличностная коммуникация
+Soft skill,Наставничество (менторство)
+Soft skill,Построение и развитие команды 
+Tool,MS Office
+Tool,Kaiten
+Tool,ТОРГ ERP/IF/CRM/HR/TM
+Tool,ТОРГ ERP/IF/EF/HR/TM/GRSL/GW/FK/FW/CN/CAR/SC/VB/VR/VS/BI/KP (Роли и полномочия)
+Tool,SQL
+Tool,Системы мониторинга - Zabbix
+Tool,Системы мониторинга - Grafana
+Tool,Системы мониторинга - Alertmanager
+Tool,Системы мониторинга - Prometheus
+Tool,JAICP/Smart Helper (поддержка)
+Tool,Работа в Linux (ОС)
+Tool,Docker
+Tool,Camunda
+Tool,Postman
+Tool,Cognos
+Tool,Outstaff/Web-табель/Личный кабинет/Портал медосмотров/Skillaz ТСХ/Портал support-hr/CAMUNDA HR
+Tool,Ролевая модель/initiatorSearchConsole.html
+Tool,Разбор логов микросервиса в SRE-Logs/OpenLens
+Tool,Понимание и настройка интеграции API (микросервисная архитектура)
+Tool,Навыки в terminal Linux (ОС)
+Tool,Навыки с Kubernetes
+Tool,Kafka/ZooKeeper
+Tool,Работа в Visual Studio Code/mRemoteNG/SSH
+Tool,Аналитические порталы
+Tool,СЭД
+Tool,rest/soap/jms/jdbc/file
+Tool,ТОРГ PO
+Tool,EDI
+Tool,ИРФП
+Tool,WMOS
+Tool,ActiveMQ
+Tool,Интеграция в ТОРГ
+Tool,MDM/Портал поставщиков
+Tool,АСУД/ТОРГ GRC
+Tool,Active Directory Users and Computers
+Tool,Функциональность системы Х5Т (портал)
+Tool,Функциональность системы YMS
+Tool,ТОРГ ERP (транспорт)
+Tool,Функциональность системы SOM/GPS
+Tool,Знание функциональности системы ORD
+Tool,Знание функциональности системы TMS LTL
+Tool,Знание функциональности системы Cargo GIS
+Tool,Знание функциональности системы Антисон
+Tool,Система YMS
+Tool,Знание архитектуры системы Х5Т
+Tool,Знание архитектуры системы:
+Tool,ZTS+ORD
+Tool,ZTS+EDI
+Tool,ORD+EXCEED
+Tool,ZTS+NQ
+Tool,ZTS+X5T
+Tool,LTL+ТОРГ\X5T\ORD
+Tool,X5T+EXCEED
+Tool,X5T+SOM
+Tool,FTL+X5T
+Tool,Знание взаимодействия X5 с другими системами
+Tool,Знание HTTP•запросов
+Tool,Понимание принципов работы брокеров сообщений
+Tool,Понимание концепции микросервисной архитектуры
+Tool,Понимание принципов удаленного подключения
+Tool,Знание команд *Unix (Linux ОС)
+Tool,Windows Server
+Tool,RDP
+Tool,СУБД
+Tool,KeyCloack
+Tool,Я.Метрика
+Tool,Инсайдер
+Tool,Kubernetes
+Tool,GPS.x5(как инструмент для работы поддержки других систем)
+Tool,JSON Formatter
+Tool,Google карты
+Tool,Putty
+Tool,DevTools в браузере
+Tool,Выполнение аварийного регламента
+Tool,Понимание триггеров создания алертов
+Tool,Аварийная коммуникация
+Tool,Dbeaver
+Tool,Админ панель портала polka
+Tool,WebSoftAdmin
+Tool,Rooms
+Tool,Платформа CVM
+Tool,Clue
+Tool,Админка Clue
+Tool,PLMX
+Tool,Админка PLMX
+Tool,Airwatch
+Tool,Windows Server
+Tool,Порталы для отправки отчётности в Гос.органы
+Tool,Сервисы управления конфигурациями
+Tool,Виртуализация (Vmware/VirtualBox)
+Tool,Пользовательское ПО
+Tool,AD. Управление каталогами на файловом сервере.
+Tool,Банк-клиенты
+Tool,МФУ/Принтер
+Tool,MacOS/iOS
