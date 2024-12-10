@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'users.apps.UsersConfig',
+    'django_bootstrap5',
     'matrix.apps.MatrixConfig',
     'core.apps.CoreConfig',
     'djangoql',
@@ -37,10 +38,12 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'competencies.urls'
 
+TEMPLATES_DIR = BASE_DIR / 'templates'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [TEMPLATES_DIR],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

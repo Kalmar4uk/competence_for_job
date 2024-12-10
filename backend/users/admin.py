@@ -48,6 +48,23 @@ class MyUserAdmin(MyDjangoQLSearchMixin, UserAdmin):
         ),
         (_("Important dates"), {"fields": ("last_login", "date_joined")}),
     )
+    add_fieldsets = (
+        (
+            None, {
+                'classes': ('wide',),
+                'fields': (
+                    'email',
+                    'password1',
+                    'password2',
+                    'first_name',
+                    'last_name',
+                    'is_superuser',
+                    'is_staff',
+                    'is_active'
+                )
+            }
+        ),
+    )
 
     def full_name(self, obj):
         if obj.middle_name:

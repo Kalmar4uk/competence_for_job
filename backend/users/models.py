@@ -47,7 +47,7 @@ class User(AbstractUser):
 
     def save(self, *args, **kwargs):
         if self.is_active is False:
-            self.email = f"{self.email} - Удален"
+            self.email = f"Этот пидор больше не работает - {self.email}"
         super(User, self).save(*args, **kwargs)
 
     def __str__(self):

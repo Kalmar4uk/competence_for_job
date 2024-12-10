@@ -3,15 +3,6 @@ from django.db import models
 
 User = get_user_model()
 
-CHOICES_GRADE = (
-    ("No Skills", "No Skills"),
-    ("Basic", "Basic"),
-    ("Good", "Good"),
-    ("Good+", "Good+"),
-    ("Strong", "Strong"),
-    ("Expert", "Expert")
-)
-
 
 class Skill(models.Model):
     area_of_application = models.CharField(
@@ -54,7 +45,18 @@ class Competence(models.Model):
         on_delete=models.CASCADE,
         verbose_name="Сотрудник"
     )
-    skill = models.ManyToManyField(Skill, through="SkillCompetence")
+    skill = models.ForeignKey(
+        Skill,
+        related_name="skill_competence",
+        verbose_name="Навык",
+        on_delete=models.CASCADE
+    )
+    grade_skill = models.ForeignKey(
+        "GradeSkill",
+        verbose_name="Оценка",
+        on_delete=models.CASCADE
+    )
+    date = models.DateTimeField("Дата оценки", auto_now_add=True)
 
     class Meta:
         ordering = ['user']
@@ -65,29 +67,12 @@ class Competence(models.Model):
         return f"{self.user}"
 
 
-class SkillCompetence(models.Model):
-    competence = models.ForeignKey(
-        Competence,
-        related_name="skill_competence",
-        verbose_name="Компетенция",
-        on_delete=models.CASCADE
-    )
-    skill = models.ForeignKey(
-        Skill,
-        related_name="skill_competence",
-        verbose_name="Навык",
-        on_delete=models.CASCADE
-    )
-    grade_skill = models.CharField(
-        "Оценка",
-        max_length=10,
-        choices=CHOICES_GRADE
-    )
-    date = models.DateTimeField("Дата оценки", auto_now_add=True)
+class GradeSkill(models.Model):
+    grade = models.CharField("Оценка", max_length=10)
 
     class Meta:
-        verbose_name = "Оценка навыка сотрудника"
-        verbose_name_plural = "Оценки навыков сотрудников"
+        verbose_name = "Шаблон оценки навыка"
+        verbose_name_plural = "Шаблон оценок навыков"
 
     def __str__(self):
-        return f"Оценка сотрудника {self.competence}"
+        return self.grade

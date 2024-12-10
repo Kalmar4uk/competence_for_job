@@ -3,13 +3,14 @@ import csv
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from matrix.models import Skill, GradeCompetenceJobTitle
+from matrix.models import Skill, GradeCompetenceJobTitle, GradeSkill
 
 PATH_TO_FILE = f'{settings.BASE_DIR}/data/'
 
 MODELS = {
     'Skill': Skill,
-    'Mingrade': GradeCompetenceJobTitle
+    'Mingrade': GradeCompetenceJobTitle,
+    'Grade': GradeSkill
 }
 
 

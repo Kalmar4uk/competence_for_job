@@ -1,13 +1,13 @@
 from django.contrib import admin
 from core.models import MyDjangoQLSearchMixin
-from matrix.models import Skill, GradeCompetenceJobTitle, Competence, SkillCompetence
+from matrix.models import Skill, GradeCompetenceJobTitle, Competence
 
 
-class SkillCompetenceInlines(admin.StackedInline):
-    model = SkillCompetence
-    extra = 0
-    min_num = 1
-    readonly_fields = ("date",)
+# class SkillCompetenceInlines(admin.StackedInline):
+#     model = SkillCompetence
+#     extra = 0
+#     min_num = 1
+#     readonly_fields = ("date",)
 
 
 @admin.register(Skill)
@@ -27,14 +27,5 @@ class GradeCompetenceJobTitleAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
 
 @admin.register(Competence)
 class CompetenceAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
-    list_display = ("user", "get_skills")
-    inlines = (SkillCompetenceInlines,)
-
-    @admin.display(description="Навык(-и)")
-    def get_skills(self, obj):
-        return ", ".join([skill.skill for skill in obj.skill.all()])
-
-
-@admin.register(SkillCompetence)
-class SkillCompetenceAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
+    list_display = ("user", "skill", "date")
     readonly_fields = ("date",)
