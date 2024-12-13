@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 
@@ -7,9 +8,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-v-g70(xg%7l*=de!efcsj4a=j(zet6ripp8zs76jhzu-+3=9-t'
 
 
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 INSTALLED_APPS = [
@@ -82,6 +83,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+   os.path.join(BASE_DIR, "static"),
+]
 
 LANGUAGE_CODE = 'ru-RU'
 

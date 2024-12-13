@@ -1,5 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import gettext_lazy as _
 from core.models import MyDjangoQLSearchMixin
 from users.models import User, JobDepartment, JobGroup, JobManagement
@@ -43,6 +45,7 @@ class MyUserAdmin(MyDjangoQLSearchMixin, UserAdmin):
                     "is_active",
                     "is_staff",
                     "is_superuser",
+                    "groups"
                 ),
             },
         ),
@@ -71,6 +74,11 @@ class MyUserAdmin(MyDjangoQLSearchMixin, UserAdmin):
             return f"{obj.first_name} {obj.last_name} {obj.middle_name}"
         return f"{obj.first_name} {obj.last_name}"
 
+    def get_queryset(self, request):
+        user = super(MyUserAdmin, self).get_queryset(request)
+        if request.user.is_superuser:
+            return user
+        return user.filter(id=request.user.id)
 
 @admin.register(JobDepartment)
 class JobDepartmentAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
@@ -84,4 +92,14 @@ class JobGroup(MyDjangoQLSearchMixin, admin.ModelAdmin):
 
 @admin.register(JobManagement)
 class JobManagementAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
+    ...
+
+
+@admin.register(ContentType)
+class ContentTypeAdmin(admin.ModelAdmin):
+    ...
+
+
+@admin.register(Permission)
+class PermissionaAdmin(admin.ModelAdmin):
     ...

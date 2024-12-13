@@ -1,9 +1,12 @@
+{% load static %}
 {% load django_bootstrap5 %}
-<html>
-  <head>
-    <title>Компетенции</title>
-    {% bootstrap_css %}
-  </head>
+<header style="background-color: greenyellow">
+  Компетенции
+</header>
+<title>
+  Компетенции
+</title>
+{% bootstrap_css %}
   <div class="container">
     <form method="post" enctype="multipart/form-data" id="skills">
       {% csrf_token %}
@@ -46,4 +49,3 @@
       <input class="btn btn-primary" type="submit" value="Отправить">
     </form>
   </div>
-</html>
