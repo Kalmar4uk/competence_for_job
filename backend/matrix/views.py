@@ -6,6 +6,7 @@ from matrix.models import Skill, Competence, GradeSkill, User
 def server_error(request):
     return render(request, "matrix/error.html", status=500)
 
+
 def page_not_found(request, exception):
     return render(request, "matrix/error.html", status=404)
 
@@ -27,12 +28,11 @@ def competence(request):
         "grade_skills": grade_skills
     }
     if request.POST:
-        # current_date = timezone.now().date()
-        # if Competence.objects.filter(user=1, date__date=current_date):
-        #     return render(request, "matrix/double.html")
+        current_date = timezone.now().date()
+        if Competence.objects.filter(user=1, date__date=current_date):
+            return render(request, "matrix/double.html")
         data = dict(request.POST)
-        data.pop("Залупа")
-        # data.pop("csrfmiddlewaretoken")
+        data.pop("csrfmiddlewaretoken")
         save_to_db(data)
         return render(request, "matrix/succesfull.html")
     return render(request, "matrix/matrix.html", context)
