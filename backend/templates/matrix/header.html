@@ -1,7 +1,13 @@
 <header class="header"">
   <h2 class="header__title">Матрица компетенций</h2>
-  <div class="header__profile">
-    <button class="header__profile-info header__button">Константин Лехт</button>
-    <button class="header__profile-button header__button">Выйти</button>
-  </div>
+  {% if user.is_authenticated %}
+    <div class="header__profile">
+      <button class="header__profile-info header__button">Константин Лехт</button>
+      <button class="header__profile-button header__button">Выйти</button>
+    </div>
+  {% else %}
+    <div class="header__profile">
+      <button class="header__profile-info header__button">Войти</button>
+    </div>
+  {% endif %}
 </header>
