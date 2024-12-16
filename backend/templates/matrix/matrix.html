@@ -1,52 +1,79 @@
 {% load static %}
-<header style="background-color: greenyellow">
-  Компетенции
-</header>
+<!DOCTYPE html>
+<html lang="ru">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{% static 'reset.css' %}">
   <link rel="stylesheet" href="{% static 'style.css' %}">
+  <link rel="stylesheet" href="{% static 'header.css' %}">
+  <link rel="stylesheet" href="{% static 'fonts.css' %}">
+  <title>Матрица компетенции</title>
 </head>
-<title>
-  Компетенции
-</title>
-  <div class="container">
-    <form method="post" enctype="multipart/form-data" id="skills">
-      {% csrf_token %}
-        <h3>
-          Hard skills
-        </h3>
-        {% for hard in skills_hard %}
-        <label class="form-label">{{ hard }}</label>
-          <select class="form-select form-select-sm" aria-label=".form-select-sm example" id="{{ hard }}" name="{{ hard }}">
-            <option selected disabled hidden></option>
-            {% for grade in grade_skills %}
-            <option value="{{ grade }}" name="{{ grade }}">{{ grade }}</option>
-            {% endfor %}
-          </select>
-        {% endfor %}
-        <h3>
-          Soft skills
-        </h3>
-        {% for soft in skills_soft %}
-        <label class="form-label">{{ soft }}</label>
-          <select class="form-select form-select-sm" aria-label=".form-select-sm example" id="{{ soft }}" name="{{ soft }}">
-            <option selected disabled hidden></option>
-            {% for grade in grade_skills %}
-            <option value="{{ grade }}" name="{{ grade }}">{{ grade }}</option>
-            {% endfor %}
-          </select>
-        {% endfor %}
-        <h3>
-          Tool skills
-        </h3>
-        {% for tool in skills_tool %}
-        <label class="form-label">{{ tool }}</label>
-          <select class="form-select form-select-sm" aria-label=".form-select-sm example" id="{{ tool }}" name="{{ tool }}">
-            <option selected disabled hidden></option>
-            {% for grade in grade_skills %}
-            <option value="{{ grade }}" name="{{ grade }}">{{ grade }}</option>
-            {% endfor %}
-          </select>
-        {% endfor %}
-      <input class="btn btn-primary" type="submit" value="Отправить">
-    </form>
-  </div>
+<body>
+  <header class="header"">
+    <h2 class="header__title">Матрица компетенций</h2>
+    <div class="header__profile">
+      <button class="header__profile-info header__button">Константин Лехт</button>
+      <button class="header__profile-button header__button">Выйти</button>
+    </div>
+  </header>
+  <title>
+    Компетенции
+  </title>
+    <div class="container">
+      <form method="post" enctype="multipart/form-data" id="skills">
+        {% csrf_token %}
+        <section class="section">
+          <h3>
+            Hard skills
+          </h3>
+          {% for hard in skills_hard %}
+          <div class="wrapper">
+          <label class="form-label">{{ hard }}</label>
+            <select class="form-select form-select-sm" aria-label=".form-select-sm example" id="{{ hard }}" name="{{ hard }}">
+              <option selected disabled hidden></option>
+              {% for grade in grade_skills %}
+              <option value="{{ grade }}" name="{{ grade }}">{{ grade }}</option>
+              {% endfor %}
+            </select>
+            </div>
+          {% endfor %}
+        </section>
+        <section class="section">
+          <h3>
+            Soft skills
+          </h3>
+          {% for soft in skills_soft %}
+          <div class="wrapper">
+          <label class="form-label">{{ soft }}</label>
+            <select class="form-select form-select-sm" aria-label=".form-select-sm example" id="{{ soft }}" name="{{ soft }}">
+              <option selected disabled hidden></option>
+              {% for grade in grade_skills %}
+              <option value="{{ grade }}" name="{{ grade }}">{{ grade }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          {% endfor %}
+        </section>
+        <section class="section">
+          <h3>
+            Tool skills
+          </h3>
+          {% for tool in skills_tool %}
+          <div class="wrapper">
+          <label class="form-label">{{ tool }}</label>
+            <select class="form-select form-select-sm" aria-label=".form-select-sm example" id="{{ tool }}" name="{{ tool }}">
+              <option selected disabled hidden></option>
+              {% for grade in grade_skills %}
+              <option value="{{ grade }}" name="{{ grade }}">{{ grade }}</option>
+              {% endfor %}
+            </select>
+            </div>
+          {% endfor %}
+        </section>
+        <button class="btn btn-primary" type="submit">Отправить</button>
+      </form>
+    </div>
+  </body>
+</html>
