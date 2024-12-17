@@ -1,5 +1,6 @@
 from django.utils import timezone
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from matrix.models import Skill, Competence, GradeSkill, User
 
 
@@ -15,6 +16,7 @@ def csrf_permission_denied(request, reason=''):
     return render(request, "matrix/error.html", status=403)
 
 
+# @login_required
 def competence(request):
     skills = Skill.objects.all()
     skills_hard = skills.filter(area_of_application="Hard skill")
@@ -28,8 +30,9 @@ def competence(request):
         "grade_skills": grade_skills
     }
     if request.POST:
+        user = get_object_or_404(User, id=request.user.id)
         current_date = timezone.now().date()
-        if Competence.objects.filter(user=1, date__date=current_date):
+        if Competence.objects.filter(user=user, date__date=current_date):
             return render(request, "matrix/double.html")
         data = dict(request.POST)
         data.pop("csrfmiddlewaretoken")
@@ -48,3 +51,10 @@ def save_to_db(data):
             skill=new_skill,
             grade_skill=grade_skill
         )
+
+
+@login_required
+def profile(request, pk):
+    user = get_object_or_404(User, id=pk)
+    context = {"user": user}
+    return render(request, "matrix/profile.html", context)

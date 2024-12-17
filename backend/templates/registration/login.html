@@ -1,0 +1,14 @@
+{% if next %}
+{% if not user.is_authenticated %}
+  <p>
+    Для прохождения компетенций необходимо авторизоваться.
+  </p>
+{% endif %}
+{% endif %}
+<div>
+  <form method="post" action="{% url 'login' %}">
+    {{ form }}
+    {% csrf_token %}
+    <button class="btn btn-primary" type="submit">Войти</button>
+  </form>
+</div>
