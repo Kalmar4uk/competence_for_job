@@ -54,7 +54,7 @@ def save_to_db(data):
 
 
 @login_required
-def profile(request, pk):
-    user = get_object_or_404(User, id=pk)
+def profile(request, personnel_number):
+    user = get_object_or_404(User, personnel_number=personnel_number)
     context = {"user": user}
     return render(request, "matrix/profile.html", context)

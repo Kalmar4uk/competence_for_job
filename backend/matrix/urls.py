@@ -5,6 +5,6 @@ app_name = 'matrix'
 
 urlpatterns = [
     path('', views.competence, name="matrix"),
-    path('profile/<int:pk>/', views.profile, name="profile")
+    path('profile/<int:personnel_number>/', views.profile, name="profile")
 
 ]
