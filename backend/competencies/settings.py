@@ -110,4 +110,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = 'matrix:matrix'
 
+LOGOUT_REDIRECT_URL = '/auth/login/'
+
 LOGIN_URL = '/auth/login/'

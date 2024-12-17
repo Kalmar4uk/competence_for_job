@@ -8,7 +8,9 @@
   <link rel="stylesheet" href="{% static 'style.css' %}">
   <link rel="stylesheet" href="{% static 'header.css' %}">
   <link rel="stylesheet" href="{% static 'fonts.css' %}">
-  <title>{% block title %}{% endblock %}</title>
+  <title>
+    {% block title %}{% endblock %}
+  </title>
   </head>
   <body>
   {% include "matrix/header.html" %}
