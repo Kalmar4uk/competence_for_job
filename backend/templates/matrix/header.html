@@ -1,11 +1,17 @@
 <header class="header">
-  <h2 class="header__title">Матрица компетенций</h2>
-  {% if user.is_authenticated %}
+  {% if user.is_authenticated and request.resolver_match.view_name == 'matrix:profile'%}
+    <h2 class="header__title">Профиль</h2>
+    <div class="header__profile">
+      <button class="header__profile-button header__button"><a href="{% url 'logout' %}">Выйти</a></button>
+    </div>
+  {% elif user.is_authenticated %}
+    <h2 class="header__title">Матрица компетенций</h2>
     <div class="header__profile">
       <button class="header__profile-info header__button"><a href="{% url 'matrix:profile' user.personnel_number %}">{{ user.first_name }} {{ user.last_name }}</a></button>
       <button class="header__profile-button header__button"><a href="{% url 'logout' %}">Выйти</a></button>
     </div>
   {% else %}
+    <h2 class="header__title">Матрица компетенций</h2>
     <div class="header__profile">
       <button class="header__profile-info header__button"><a href="{% url 'login' %}">Войти</a></button>
     </div>

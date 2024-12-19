@@ -56,7 +56,7 @@ class Competence(models.Model):
         verbose_name="Оценка",
         on_delete=models.CASCADE
     )
-    date = models.DateTimeField("Дата оценки", auto_now_add=True)
+    created_at = models.DateTimeField("Дата оценки", auto_now_add=True)
 
     class Meta:
         ordering = ['user']
@@ -69,6 +69,7 @@ class Competence(models.Model):
 
 class GradeSkill(models.Model):
     grade = models.CharField("Оценка", max_length=10)
+    evaluation_number = models.PositiveSmallIntegerField("Числовая оценка")
 
     class Meta:
         verbose_name = "Шаблон оценки навыка"

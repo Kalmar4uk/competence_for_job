@@ -1,10 +1,32 @@
 {% extends "index.html" %}
 {% block title %}
-    {{ user.first_name }} {{ user.last_name }}
+  {{ user.first_name }} {{ user.last_name }}
 {% endblock %}
 {% block content %}
-    <p>{{ user.first_name }} {{ user.last_name }}</p>
-    <p>{{ user.job_title }}</p>
-    <p>{{ user.group }}</p>
-    <p>Табельный номер: {{ user.personnel_number }}</p>
+  <p>{{ user.first_name }} {{ user.last_name }}</p>
+  <p>{{ user.job_title }}</p>
+  <p>{{ user.group }}</p>
+  <p>Табельный номер: {{ user.personnel_number }}</p>
+  <br>
+  <p>Пройденные матрицы:</p>
+  <br>
+  <table>
+    <tr>
+      <td>Навык</td>
+      <td>Оценка</td>
+    </tr>
+  {% for date in competence %}
+    {% for comp in competence %}
+      {% if date.created_at == comp.created_at %}
+        {% if forloop.first %}
+          <p>Дата проведения опроса: {{ date.created_at }}</p>
+        {% endif %}
+        <tr>
+          <td>{{ comp.skill }}</td>
+          <td>{{ comp.grade_skill }}</td>
+        </tr>
+      {% endif %}
+    {% endfor %}
+  {% endfor %}
+  </table>
 {% endblock %}

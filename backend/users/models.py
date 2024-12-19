@@ -40,7 +40,7 @@ class User(AbstractUser):
         null=True, blank=True
     )
 
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
     objects = CustomUserManager()
