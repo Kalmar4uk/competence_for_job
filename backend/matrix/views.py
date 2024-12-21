@@ -23,7 +23,7 @@ def competence(request):
     if request.POST:
         user = get_object_or_404(User, id=request.user.id)
         current_date = CURRENT_DATE
-        if Competence.objects.filter(user=user, date__date=current_date):
+        if Competence.objects.filter(user=user, created_at__date=current_date):
             return render(request, "matrix/double.html")
         data = dict(request.POST)
         data.pop("csrfmiddlewaretoken")
