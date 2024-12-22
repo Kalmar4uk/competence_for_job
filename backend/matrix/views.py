@@ -17,12 +17,12 @@ def competence(request):
         "grade_skills": grade_skills
     }
     if request.POST:
+        data = dict(request.POST)
+        data.pop("csrfmiddlewaretoken")
         user = get_object_or_404(User, id=request.user.id)
         current_date = CURRENT_DATE
         if Competence.objects.filter(user=user, created_at__date=current_date):
             return render(request, "matrix/double.html")
-        data = dict(request.POST)
-        data.pop("csrfmiddlewaretoken")
         save_to_db(data, user)
         return render(request, "matrix/succesfull.html")
     return render(request, "matrix/matrix.html", context)
