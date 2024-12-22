@@ -21,7 +21,7 @@ class Skill(models.Model):
 
 class GradeCompetenceJobTitle(models.Model):
     job_title = models.CharField("Должность сотрудника", max_length=50)
-    min_grade = models.CharField("Минимальная оценка", max_length=50)
+    min_grade = models.ForeignKey("GradeSkill", on_delete=models.CASCADE, verbose_name="Минимальная оценка")
     skill = models.ForeignKey(
         Skill,
         on_delete=models.CASCADE,
@@ -54,7 +54,7 @@ class Competence(models.Model):
     grade_skill = models.ForeignKey(
         "GradeSkill",
         verbose_name="Оценка",
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
     created_at = models.DateTimeField("Дата оценки", auto_now_add=True)
 

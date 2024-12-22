@@ -11,9 +11,11 @@ from users.models import User, JobDepartment, JobGroup, JobManagement
 class MyUserAdmin(MyDjangoQLSearchMixin, UserAdmin):
     search_fields = ("email", "first_name", "last_name", "middle_name")
     list_display = (
+        "personnel_number",
         "email",
         "full_name",
         "job_title",
+        "group",
         "date_joined"
     )
     ordering = ("date_joined",)
@@ -80,9 +82,10 @@ class MyUserAdmin(MyDjangoQLSearchMixin, UserAdmin):
             return user
         return user.filter(id=request.user.id)
 
+
 @admin.register(JobDepartment)
 class JobDepartmentAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
-    ...
+    list_display = ("title", "parent", "children", "is_delete")
 
 
 @admin.register(JobGroup)

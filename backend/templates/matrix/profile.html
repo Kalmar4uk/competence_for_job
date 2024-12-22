@@ -6,7 +6,7 @@
   <p>{{ user.first_name }} {{ user.last_name }}</p>
   <p>{{ user.job_title }}</p>
   <p>{{ user.group }}</p>
-  <p>Табельный номер: {{ user.personnel_number }}</p>
+  <p>Табельный номер: {% if user.personnel_number|slice:":1" == "0" %}{{ user.personnel_number|slice:"1:" }}{% else %}{{ user.personnel_number }}{% endif %}</p>
   <br>
   <p>Пройденные матрицы:</p>
   <br>
