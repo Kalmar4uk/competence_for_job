@@ -1,6 +1,8 @@
 from django.contrib import admin
 from core.models import MyDjangoQLSearchMixin
-from matrix.models import Skill, GradeSkill, GradeCompetenceJobTitle, Competence
+from matrix.models import (
+    Skill, GradeSkill, GradeCompetenceJobTitle, Competence
+)
 
 
 @admin.register(Skill)
