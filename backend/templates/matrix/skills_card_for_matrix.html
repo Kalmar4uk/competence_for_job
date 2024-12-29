@@ -1,6 +1,6 @@
 <div class="skills-card">
-  <label class="skills-card__label">{{ skill.skill }}</label>
-    <select class="skills-card__select" id="{{ skill.skill }}" name="{{ skill.skill }}">
+  <label class="skills-card__label">{{ skill.skill__skill }}</label>
+    <select class="skills-card__select" id="{{ skill.skill__skill }}" name="{{ skill.skill__skill }}">
       <option selected disabled hidden></option>
       {% for grade in grade_skills %}
       <option value="{{ grade.grade }}">{{ grade.grade }}</option>

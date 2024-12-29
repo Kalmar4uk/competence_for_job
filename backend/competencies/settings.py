@@ -113,3 +113,27 @@ LOGIN_REDIRECT_URL = 'matrix:matrix'
 LOGOUT_REDIRECT_URL = '/auth/login/'
 
 LOGIN_URL = '/auth/login/'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'file': {
+            'format': '%(asctime)s %(levelname)s func_name: %(funcName)s file_name: %(filename)s \nmessage: {%(message)s}'
+        }
+    },
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'formatter': 'file',
+            'filename': 'app.log'
+        }
+    },
+    'loggers': {
+        '': {
+            'level': 'DEBUG',
+            'handlers': ['file']
+        }
+    }
+}

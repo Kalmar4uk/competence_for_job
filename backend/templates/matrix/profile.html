@@ -8,25 +8,17 @@
   <p>{{ user.group }}</p>
   <p>Табельный номер: {% if user.personnel_number|slice:":1" == "0" %}{{ user.personnel_number|slice:"1:" }}{% else %}{{ user.personnel_number }}{% endif %}</p>
   <br>
-  <p>Пройденные матрицы:</p>
-  <br>
-  <table>
-    <tr>
-      <td>Навык</td>
-      <td>Оценка</td>
-    </tr>
-  {% for date in competence %}
-    {% for comp in competence %}
-      {% if date.created_at == comp.created_at %}
-        {% if forloop.first %}
-          <p>Дата проведения опроса: {{ date.created_at }}</p>
-        {% endif %}
-        <tr>
-          <td>{{ comp.skill }}</td>
-          <td>{{ comp.grade_skill }}</td>
-        </tr>
-      {% endif %}
-    {% endfor %}
+
+  Общая оценка компенции для твоей должности:
+  <p>{{ general_sum_grade }}</p>
+
+  Твоя оценка:
+  <p>{{ personal_sum_grade }} {% if general_sum_grade <= personal_sum_grade %}&#129321;{% else %}&#128542;{% endif %}</p>
+
+  <p>Компетенции по которым отсутствует навык:</p>
+  {% for competence in competence_grade %}
+    {% if competence.grade_skill__evaluation_number == 0 %}
+      <p>{{ competence.skill__skill }}</p>
+    {% endif %}
   {% endfor %}
-  </table>
 {% endblock %}

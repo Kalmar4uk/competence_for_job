@@ -1,11 +1,11 @@
-{% if next %}
-{% if not user.is_authenticated %}
-  <p>
-    Для прохождения компетенций необходимо авторизоваться.
-  </p>
-{% endif %}
-{% endif %}
 <title>Авторизация</title>
+{% if next %}
+  {% if not user.is_authenticated %}
+    <p>
+      Для продолжения необходимо авторизоваться.
+    </p>
+  {% endif %}
+{% endif %}
 <div>
   <form method="post" action="{% url 'login' %}">
     {{ form }}

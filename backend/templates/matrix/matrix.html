@@ -23,21 +23,21 @@
             <div class="skills-wrapper">
               {% if num == 1 %}
                 {% for skill in skills %}
-                  {% if skill.area_of_application == "Hard skill" %}
+                  {% if skill.skill__area_of_application == "Hard skill" %}
                     {% include "matrix/skills_card_for_matrix.html" %}
                   {% endif %}
                 {% endfor %}
               {% endif %}
               {% if num == 2 %}
                 {% for skill in skills %}
-                  {% if skill.area_of_application == "Soft skill" %}
+                  {% if skill.skill__area_of_application == "Soft skill" %}
                     {% include "matrix/skills_card_for_matrix.html" %}
                   {% endif %}
                 {% endfor %}
               {% endif %}
               {% if num == 3 %}
                 {% for skill in skills %}
-                  {% if skill.area_of_application == "Tool" %}
+                  {% if skill.skill__area_of_application == "Tool" %}
                     {% include "matrix/skills_card_for_matrix.html" %}
                   {% endif %}
                 {% endfor %}

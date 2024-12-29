@@ -21,7 +21,7 @@ class GradeCompetenceJobTitleAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
 
 @admin.register(Competence)
 class CompetenceAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
-    list_display = ("user", "skill", "created_at")
+    list_display = ("user", "skill", "grade_skill", "created_at")
     readonly_fields = ("created_at",)
 
 
