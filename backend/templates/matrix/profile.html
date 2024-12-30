@@ -7,18 +7,42 @@
   <p>{{ user.job_title }}</p>
   <p>{{ user.group }}</p>
   <p>Табельный номер: {% if user.personnel_number|slice:":1" == "0" %}{{ user.personnel_number|slice:"1:" }}{% else %}{{ user.personnel_number }}{% endif %}</p>
-  <br>
+  <hr>
 
   Общая оценка компенции для твоей должности:
   <p>{{ general_sum_grade }}</p>
 
   Твоя оценка:
   <p>{{ personal_sum_grade }} {% if general_sum_grade <= personal_sum_grade %}&#129321;{% else %}&#128542;{% endif %}</p>
+  <hr>
 
-  <p>Компетенции по которым отсутствует навык:</p>
-  {% for competence in competence_grade %}
-    {% if competence.grade_skill__evaluation_number == 0 %}
-      <p>{{ competence.skill__skill }}</p>
+  {% if not personal_competence_grade %}
+    <p>Нет пройденной матрицы или все навыки с оценкой 0</p>
+  {% else %}
+    {% if competence_with_grade_zero %}
+      <p>Компетенции по которым отсутствует навык:</p>
+        {% for competence in competence_with_grade_zero %}
+          <p>{{ competence.skill__skill }}</p>
+        {% endfor %}
+    {% else %}
+      <p>Навыков с оценкой 0 нет, красавелла &#128077;</p>
     {% endif %}
-  {% endfor %}
+    <hr>
+    <details>
+      <summary>Результат последней пройденной матрицы</summary>
+      <table>
+        <tr>
+          <td>Навык</td>
+          <td>Оценка</td>
+        </tr>
+        {% for competence in personal_competence_grade %}
+          <tr>
+            <td>{{ competence.skill__skill }}</td>
+            <td>{{ competence.grade_skill__grade }}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    </details>
+  {% endif %}
+  <hr>
 {% endblock %}

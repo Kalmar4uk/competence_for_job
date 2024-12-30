@@ -21,7 +21,11 @@ class Skill(models.Model):
 
 class GradeCompetenceJobTitle(models.Model):
     job_title = models.CharField("Должность сотрудника", max_length=50)
-    min_grade = models.ForeignKey("GradeSkill", on_delete=models.CASCADE, verbose_name="Минимальная оценка")
+    min_grade = models.ForeignKey(
+        "GradeSkill",
+        on_delete=models.CASCADE,
+        verbose_name="Минимальная оценка"
+    )
     skill = models.ForeignKey(
         Skill,
         on_delete=models.CASCADE,
