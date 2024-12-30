@@ -3,6 +3,7 @@
 Матрица компетенций
 {% endblock %}
   {% block content %}
+  {% if skills %}
     <form class="form" method="post" enctype="multipart/form-data" id="skills">
       {% csrf_token %}
       {% for num in range %}
@@ -47,4 +48,7 @@
       {% endfor %}
       <button class="button" type="submit">Отправить</button>
     </form>
+  {% else %}
+    Для вашей должности отсутствуют матрицы
+  {% endif %}
   {% endblock %}
