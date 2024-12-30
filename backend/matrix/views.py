@@ -7,6 +7,7 @@ from matrix.models import (
 )
 
 
+@login_required
 def competence(request):
     skills = GradeCompetenceJobTitle.objects.filter(
         job_title=request.user.job_title
@@ -23,7 +24,6 @@ def competence(request):
         "skills": skills,
         "grade_skills": grade_skills
     }
-    print(skills)
     if request.POST:
         data = dict(request.POST)
         data.pop("csrfmiddlewaretoken")
