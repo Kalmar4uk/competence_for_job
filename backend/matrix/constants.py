@@ -1,4 +1,5 @@
 from django.utils import timezone
+
 from matrix.models import Competence, GradeSkill, Skill
 
 CURRENT_DATE = timezone.now().date()

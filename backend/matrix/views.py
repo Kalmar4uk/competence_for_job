@@ -1,10 +1,9 @@
-from django.db.models import Sum, Q
-from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q, Sum
+from django.shortcuts import get_object_or_404, render
+
 from matrix.constants import CURRENT_DATE, CURRENT_MONTH, save_to_db
-from matrix.models import (
-    Competence, GradeSkill, GradeCompetenceJobTitle, User
-)
+from matrix.models import Competence, GradeCompetenceJobTitle, GradeSkill, User
 
 
 @login_required

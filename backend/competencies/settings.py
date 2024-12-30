@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -25,7 +24,8 @@ INSTALLED_APPS = [
     'matrix.apps.MatrixConfig',
     'core.apps.CoreConfig',
     'djangoql',
-    'debug_toolbar'
+    'debug_toolbar',
+    'drf_yasg'
 ]
 
 MIDDLEWARE = [
