@@ -4,8 +4,8 @@ from matrix.models import Competence, GradeCompetenceJobTitle, Skill, User
 from users.models import JobDepartment, JobGroup, JobManagement
 
 from .serializers import (CompetenceSerializer,
-                          GradeCompetenceJobtitleSerialier, SkillForJobSerializer,
-                          UserSerializer)
+                          GradeCompetenceJobtitleSerialier,
+                          SkillForJobSerializer, UserSerializer)
 
 
 class UserViewSet(viewsets.ModelViewSet):

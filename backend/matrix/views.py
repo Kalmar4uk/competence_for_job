@@ -3,6 +3,7 @@ from django.db.models import Q, Sum
 from django.shortcuts import get_object_or_404, render
 
 from matrix.constants import CURRENT_DATE, CURRENT_MONTH, save_to_db
+from matrix.exceptions import DoubleMatrixInCurrentDate
 from matrix.models import Competence, GradeCompetenceJobTitle, GradeSkill, User
 
 

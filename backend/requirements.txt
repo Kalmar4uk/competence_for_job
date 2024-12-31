@@ -1,5 +1,6 @@
 asgiref==3.8.1
 Django==4.2
+django-admin-rangefilter==0.13.2
 django-bootstrap5==22.2
 django-cors-headers==4.5.0
 django-filter==23.1

@@ -13,7 +13,7 @@ v1_router.register(
     GradeCompetenceJobTitleViewSet,
     basename="grade-competencies"
 )
-v1_router.register("competence", CompetenceViewSet, basename="competencies")
+v1_router.register("Заупа", CompetenceViewSet, basename="competencies")
 
 urlpatterns = [
     path('v1/', include(v1_router.urls)),

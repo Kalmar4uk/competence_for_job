@@ -66,6 +66,7 @@ class Competence(models.Model):
         ordering = ['user']
         verbose_name = "Компетенция"
         verbose_name_plural = "Компетенции"
+        ordering = ['-created_at']
 
     def __str__(self):
         return f"{self.user}"

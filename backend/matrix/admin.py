@@ -1,4 +1,5 @@
 from django.contrib import admin
+from rangefilter.filters import DateRangeFilterBuilder
 
 from core.models import MyDjangoQLSearchMixin
 from matrix.models import (Competence, GradeCompetenceJobTitle, GradeSkill,
@@ -24,6 +25,7 @@ class GradeCompetenceJobTitleAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
 @admin.register(Competence)
 class CompetenceAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
     list_display = ("user", "skill", "grade_skill", "created_at")
+    list_filter = ("user", ("created_at", DateRangeFilterBuilder()))
     readonly_fields = ("created_at",)
 
 
