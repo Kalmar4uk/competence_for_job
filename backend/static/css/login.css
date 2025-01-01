@@ -60,3 +60,14 @@ body {
 .login-button {
   grid-column: -1/1;
 }
+
+.login-error {
+  grid-column: -1/1;
+  overflow: hidden;
+  line-height: 0;
+  transition: all 0.2s ease-out;
+}
+
+.show {
+  line-height: inherit;
+}
