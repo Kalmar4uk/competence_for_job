@@ -13,14 +13,16 @@
 <body>
   <div class="login-wrapper">
     <div class="login-title">Авторизация</div>
+    {% if form.errors %}
+      <p>Email или пароль некорректны. Попробуйте еще раз.</p>
+      <br>
+    {% endif %}
     <form class="login-form" method="post" action="{% url 'login' %}">
-      {% csrf_token %}
-          {{ form.username.label_tag }}
-          {{ form.username }}
-          {{ form.password.label_tag }}
-          {{ form.password }}
-        </tr>
-      </table>
+        {% csrf_token %}
+        {{ form.username.label_tag }}
+        {{ form.username }}
+        {{ form.password.label_tag }}
+        {{ form.password }}
       <button class="login-button button" type="submit">Войти</button>
     </form>
   </div>
