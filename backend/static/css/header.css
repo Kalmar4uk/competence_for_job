@@ -30,6 +30,7 @@
   background-color: #f4f4f5;
   cursor: pointer;
   transition: background-color 0.2s linear, color 0.2s linear;
+  text-decoration: none;
 }
 
 .header__profile-info {
