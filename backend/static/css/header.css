@@ -33,7 +33,7 @@
   text-decoration: none;
 }
 
-.header__profile-info {
+.header__profile-info, .header__main-page {
   color: inherit;
   background-color: transparent;
 }
@@ -42,7 +42,7 @@
   color: #18181b;
 }
 
-.header__profile-info:hover {
+.header__profile-info:hover, .header__main-page:hover {
   color: #18181b;
   background-color: rgb(244 244 245);
 }
