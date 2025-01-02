@@ -1,11 +1,11 @@
-const URL = "http://localhost:8000/";
+const URL = window.location.host;
 
 const loginForm = document.querySelector(".login-form");
 const loginEndpoint = loginForm.action;
 const errorMessage = loginForm.querySelector(".login-error");
 
 loginForm.addEventListener("submit", (evt) => {
-  evt.preventDefault();
+  evt.preventDefault();  
 
   const data = new FormData(loginForm);
 
@@ -17,7 +17,7 @@ loginForm.addEventListener("submit", (evt) => {
     }
     errorMessage.classList.remove("show");
     errorMessage.setAttribute("aria-hidden", "true");
-    window.location.href = URL;
+    window.location.href = '/';
     return;
   });
 });

@@ -6,7 +6,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-v-g70(xg%7l*=de!efcsj4a=j(zet6ripp8zs76jhzu-+3=9-t'
 
-
 DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
@@ -21,7 +20,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "rangefilter",
     'users.apps.UsersConfig',
-    'django_bootstrap5',
     'matrix.apps.MatrixConfig',
     'core.apps.CoreConfig',
     'djangoql',
@@ -115,26 +113,26 @@ LOGOUT_REDIRECT_URL = '/auth/login/'
 
 LOGIN_URL = '/auth/login/'
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'file': {
-            'format': '%(asctime)s %(levelname)s func_name: %(funcName)s file_name: %(filename)s \nmessage: {%(message)s}'
-        }
-    },
-    'handlers': {
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'formatter': 'file',
-            'filename': 'app.log'
-        }
-    },
-    'loggers': {
-        '': {
-            'level': 'DEBUG',
-            'handlers': ['file']
-        }
-    }
-}
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'formatters': {
+#         'file': {
+#             'format': '%(asctime)s %(levelname)s func_name: %(funcName)s file_name: %(filename)s \nmessage: {%(message)s}'
+#         }
+#     },
+#     'handlers': {
+#         'file': {
+#             'level': 'DEBUG',
+#             'class': 'logging.FileHandler',
+#             'formatter': 'file',
+#             'filename': 'app.log'
+#         }
+#     },
+#     'loggers': {
+#         '': {
+#             'level': 'DEBUG',
+#             'handlers': ['file']
+#         }
+#     }
+# }

@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import gettext_lazy as _
-
+from django.contrib.sessions.models import Session
 from core.models import MyDjangoQLSearchMixin
 from users.models import JobDepartment, JobGroup, JobManagement, User
 
@@ -106,4 +106,9 @@ class ContentTypeAdmin(admin.ModelAdmin):
 
 @admin.register(Permission)
 class PermissionaAdmin(admin.ModelAdmin):
+    ...
+
+
+@admin.register(Session)
+class SessionAdmin(admin.ModelAdmin):
     ...

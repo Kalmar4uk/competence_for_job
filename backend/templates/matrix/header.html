@@ -2,7 +2,7 @@
   {% if user.is_authenticated and request.resolver_match.view_name == 'matrix:profile'%}
     <h2 class="header__title">Профиль</h2>
     <div class="header__profile">
-      <a class="header__main-page header__button" href="/">Главная страница</a>
+      <a class="header__main-page header__button" href="{% url 'matrix:matrix' %}">Главная страница</a>
       <a class="header__profile-button header__button" href="{% url 'logout' %}">Выйти</a>
     </div>
   {% elif user.is_authenticated %}
