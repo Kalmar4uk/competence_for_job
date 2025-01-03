@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q, Sum
 from django.shortcuts import get_object_or_404, render
+from django.http import HttpResponse
 
 from matrix.constants import CURRENT_DATE, CURRENT_MONTH, save_to_db
 from matrix.models import Competence, GradeCompetenceJobTitle, GradeSkill, User
@@ -10,9 +11,18 @@ from matrix.models import Competence, GradeCompetenceJobTitle, GradeSkill, User
 def for_main_page(request):
     current_month = CURRENT_MONTH
     users_same_group = User.objects.filter(group=request.user.group)
-    competence = Competence.objects.filter(user__in=users_same_group, created_at__month=current_month).values(
-        "user__first_name", "user__last_name"
-        ).annotate(sum_grade=Sum("grade_skill__evaluation_number"))
+    competence = Competence.objects.filter(
+        user__in=users_same_group,
+        created_at__month=current_month
+        ).values(
+            "user__first_name",
+            "user__last_name",
+            "user__personnel_number"
+            ).annotate(
+                sum_grade=Sum(
+                    "grade_skill__evaluation_number"
+                    )
+                )
     context = {
         "competence": competence
     }
@@ -21,8 +31,9 @@ def for_main_page(request):
 
 @login_required
 def matrix(request):
+    user = request.user
     skills = GradeCompetenceJobTitle.objects.filter(
-        job_title=request.user.job_title
+        job_title=user.job_title
     ).values(
         "skill__skill",
         "skill__area_of_application"
@@ -41,13 +52,13 @@ def matrix(request):
         data.pop("csrfmiddlewaretoken")
         current_date = CURRENT_DATE
         if Competence.objects.filter(
-            user=request.user,
+            user=user,
             created_at__date=current_date
         ):
-            return render(request, "matrix/double.html", status=204)
+            return HttpResponse(status=204)
         save_to_db(data, request.user)
-        return render(request, "matrix/succesfull.html", status=201)
-    return render(request, "matrix/matrix.html", context, status=200)
+        return HttpResponse(status=201)
+    return render(request, "matrix/matrix.html", context)
 
 
 @login_required
@@ -88,4 +99,4 @@ def profile(request, personnel_number):
         "general_sum_grade": general_sum_grade,
         "personal_sum_grade": personal_sum_grade
     }
-    return render(request, "matrix/profile.html", context, status=200)
+    return render(request, "matrix/profile.html", context)

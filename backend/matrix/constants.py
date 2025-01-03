@@ -4,6 +4,13 @@ from matrix.models import Competence, GradeSkill, Skill
 
 CURRENT_DATE = timezone.now().date()
 CURRENT_MONTH = timezone.now().month
+JOB_TITLE_USERS = [
+    "Консультант",
+    "Ведущий консультант",
+    "Старший специалист",
+    "Специалист",
+    "Старший специалист"
+]
 
 
 def save_to_db(data, user):

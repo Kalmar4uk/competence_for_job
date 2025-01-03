@@ -1,21 +1,15 @@
-import logging
+from django.shortcuts import redirect
 
-from django.shortcuts import render
+from matrix.constants import JOB_TITLE_USERS
 
-
-def matrix_assignet_to(function):
-    '''Декоратор для проверки назначения матрицы'''
+# Оказывается я уже делал эту проверку,
+# но в шаблоне и которая работает до сих пор.
+# suka blyat'
+# Оставлю, пусть будет.
+def check_job_title_for_matrix(function):
+    '''Декоратор для проверки должности челика'''
     def wrapper(request, *args, **kwargs):
-        if not request.user.is_superuser:
-            response = render(request, "matrix/error.html", status=403)
-            logging.error(
-                f"method: {request.method}, "
-                f"path: {request.path}, "
-                f"user_id: {request.user.id}, "
-                f"user_email: {request.user.email}, "
-                f"status_code: {response.status_code}, "
-                f"error: {response.reason_phrase}"
-            )
-            return response
+        if request.user.job_title not in JOB_TITLE_USERS:
+            return redirect("matrix:profile", request.user.personnel_number)
         return function(request)
     return wrapper
