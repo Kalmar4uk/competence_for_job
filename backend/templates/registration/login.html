@@ -13,7 +13,7 @@
   <body>
     <div class="login-wrapper">
       <div class="login-title">Авторизация</div>
-      <form class="login-form" method="post" action="{% url 'login' %}">
+      <form class="login-form" method="post" action="{% url 'users:login' %}">
         {% csrf_token %}
         {{ form.username.label_tag }}
         {{ form.username }}

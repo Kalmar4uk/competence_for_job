@@ -1,0 +1,10 @@
+{% extends "index.html" %}
+{% block content %}
+    <p>Тут будет инфа о прохождении компетенций сотрудников</p>
+    <br>
+    {% for comp in competence %}
+        <p>{{ comp.user__first_name }} {{ comp.user__last_name }}</p>
+        <p>Оценка компетенций в этом месяце: {{ comp.sum_grade }}</p>
+        <br>
+    {% endfor %}
+{% endblock %}

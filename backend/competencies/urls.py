@@ -8,7 +8,7 @@ from rest_framework import permissions
 
 urlpatterns = [
     path('', include("matrix.urls")),
-    path('auth/', include('django.contrib.auth.urls')),
+    path('auth/', include('users.urls')),
     path('admin/', admin.site.urls),
     path('api/', include("api.urls"))
 ]

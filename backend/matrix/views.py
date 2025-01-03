@@ -7,7 +7,20 @@ from matrix.models import Competence, GradeCompetenceJobTitle, GradeSkill, User
 
 
 @login_required
-def competence(request):
+def for_main_page(request):
+    current_month = CURRENT_MONTH
+    users_same_group = User.objects.filter(group=request.user.group)
+    competence = Competence.objects.filter(user__in=users_same_group, created_at__month=current_month).values(
+        "user__first_name", "user__last_name"
+        ).annotate(sum_grade=Sum("grade_skill__evaluation_number"))
+    context = {
+        "competence": competence
+    }
+    return render(request, "matrix/main_page.html", context)
+
+
+@login_required
+def matrix(request):
     skills = GradeCompetenceJobTitle.objects.filter(
         job_title=request.user.job_title
     ).values(

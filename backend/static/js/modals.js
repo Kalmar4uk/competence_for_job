@@ -1,4 +1,4 @@
-const URL = 'http://localhost:8000/'
+const URL = window.location;
 
 function sendMatrix(data) {
   return fetch(URL, {
@@ -11,8 +11,6 @@ function sendMatrix(data) {
       }
       return response.status;
     })
-    .catch(error => console.log(error)
-    )
 }
 
 const matrixForm = document.querySelector("#skills");
@@ -35,7 +33,7 @@ matrixForm.addEventListener("submit", (evt) => {
 
     openModals(modals);
 
-  })
+  }).catch(error => console.log(error))
 })
 
 function openModals(elem) {

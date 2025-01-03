@@ -22,27 +22,29 @@
             </h3>
           {% endif %}
             <div class="skills-wrapper">
+              {% with "includes/skills_card_for_matrix.html" as inc_for_matrix %}
               {% if num == 1 %}
                 {% for skill in skills %}
                   {% if skill.skill__area_of_application == "Hard skill" %}
-                    {% include "matrix/skills_card_for_matrix.html" %}
+                    {% include inc_for_matrix %}
                   {% endif %}
                 {% endfor %}
               {% endif %}
               {% if num == 2 %}
                 {% for skill in skills %}
                   {% if skill.skill__area_of_application == "Soft skill" %}
-                    {% include "matrix/skills_card_for_matrix.html" %}
+                    {% include inc_for_matrix %}
                   {% endif %}
                 {% endfor %}
               {% endif %}
               {% if num == 3 %}
                 {% for skill in skills %}
                   {% if skill.skill__area_of_application == "Tool" %}
-                    {% include "matrix/skills_card_for_matrix.html" %}
+                    {% include inc_for_matrix %}
                   {% endif %}
                 {% endfor %}
               {% endif %}
+              {% endwith %}
             </div>
           </form__section>
       {% endfor %}
