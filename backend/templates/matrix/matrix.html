@@ -3,62 +3,54 @@
 Матрица компетенций
 {% endblock %}
   {% block content %}
+  {% if skills %}
     <form class="form" method="post" enctype="multipart/form-data" id="skills">
       {% csrf_token %}
-      <form__section class="form__section">
-        <h3>
-          Hard skills
-        </h3>
-        <div class="skills-wrapper">
-          {% for hard in skills_hard %}
-          <div class="skills-card">
-          <label class="skills-card__label">{{ hard }}</label>
-            <select class="skills-card__select" id="{{ hard }}" name="{{ hard }}">
-              <option selected disabled hidden></option>
-              {% for grade in grade_skills %}
-              <option value="{{ grade }}">{{ grade }}</option>
-              {% endfor %}
-            </select>
+      {% for num in range %}
+        <form__section class="form__section">
+          {% if num == 1 %}
+            <h3>
+              Hard Skills
+            </h3>
+          {% elif num == 2 %}
+            <h3>
+              Soft Skills
+            </h3>
+          {% else %}
+            <h3>
+              Tool Skills
+            </h3>
+          {% endif %}
+            <div class="skills-wrapper">
+              {% with "includes/skills_card_for_matrix.html" as inc_for_matrix %}
+              {% if num == 1 %}
+                {% for skill in skills %}
+                  {% if skill.skill__area_of_application == "Hard skill" %}
+                    {% include inc_for_matrix %}
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+              {% if num == 2 %}
+                {% for skill in skills %}
+                  {% if skill.skill__area_of_application == "Soft skill" %}
+                    {% include inc_for_matrix %}
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+              {% if num == 3 %}
+                {% for skill in skills %}
+                  {% if skill.skill__area_of_application == "Tool" %}
+                    {% include inc_for_matrix %}
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+              {% endwith %}
             </div>
-          {% endfor %}
-        </div>
-      </form__section>
-      <form__section class="form__section">
-        <h3>
-          Soft skills
-        </h3>
-        <div class="skills-wrapper">
-          {% for soft in skills_soft %}
-          <div class="skills-card">
-          <label class="skills-card__label">{{ soft }}</label>
-            <select class="skills-card__select" id="{{ soft }}" name="{{ soft }}">
-              <option selected disabled hidden></option>
-              {% for grade in grade_skills %}
-              <option value="{{ grade }}">{{ grade }}</option>
-              {% endfor %}
-            </select>
-          </div>
-          {% endfor %}
-        </div>
-      </form__section>
-      <form__section class="form__section">
-        <h3>
-          Tool skills
-        </h3>
-        <div class="skills-wrapper">
-          {% for tool in skills_tool %}
-          <div class="skills-card">
-          <label class="skills-card__label">{{ tool }}</label>
-            <select class="skills-card__select" id="{{ tool }}" name="{{ tool }}">
-              <option selected disabled hidden></option>
-              {% for grade in grade_skills %}
-              <option value="{{ grade }}">{{ grade }}</option>
-              {% endfor %}
-            </select>
-            </div>
-          {% endfor %}
-        </div>
-      </form__section>
+          </form__section>
+      {% endfor %}
       <button class="button" type="submit">Отправить</button>
     </form>
+  {% else %}
+    <p>Для твоей должности отсутствуют матрицы</p>
+  {% endif %}
   {% endblock %}

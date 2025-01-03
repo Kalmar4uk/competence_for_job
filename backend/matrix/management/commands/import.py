@@ -3,14 +3,14 @@ import csv
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from matrix.models import Skill, GradeCompetenceJobTitle, GradeSkill
+from matrix.models import GradeCompetenceJobTitle, GradeSkill, Skill
 
 PATH_TO_FILE = f'{settings.BASE_DIR}/data/'
 
 MODELS = {
     'Skill': Skill,
     'Mingrade': GradeCompetenceJobTitle,
-    'Grade': GradeSkill
+    'Gradeskill': GradeSkill
 }
 
 
@@ -44,15 +44,3 @@ class Command(BaseCommand):
                 self.stdout.write(
                     self.style.SUCCESS('Данные из файла загружены')
                 )
-        # else:
-        #     with open(
-        #         f'{PATH_TO_FILE}{name_file}', 'r', encoding='utf-8'
-        #     ) as csvfile:
-        #         reader = csv.reader(csvfile)
-        #         for user, team in reader:
-        #             user = Employee.objects.get(id=user)
-        #             team = Team.objects.get(id=team)
-        #             team.employees.add(user)
-        #         self.stdout.write(
-        #             self.style.SUCCESS('Данные из файла загружены')
-        #         )

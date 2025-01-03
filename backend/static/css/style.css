@@ -77,14 +77,18 @@ body {
   border: none;
   border-radius: calc(0.5rem - 2px);
   padding: 0.5rem 1rem;
+  color: #fafafa;
   font-weight: 500;
   font-size: 0.875rem;
   line-height: 1.25rem;
-  background-color: #f4f4f5;
+  background-color: #18181b;
   cursor: pointer;
   transition: background-color 0.2s linear, color 0.2s linear;
 }
 
+.button:hover {
+  background-color: rgb(24 24 27 / 90%);
+}
 
 
 

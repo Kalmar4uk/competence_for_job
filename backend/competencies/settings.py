@@ -1,12 +1,10 @@
 import os
 from pathlib import Path
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 SECRET_KEY = 'django-insecure-v-g70(xg%7l*=de!efcsj4a=j(zet6ripp8zs76jhzu-+3=9-t'
-
 
 DEBUG = True
 
@@ -20,12 +18,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "rangefilter",
     'users.apps.UsersConfig',
-    'django_bootstrap5',
     'matrix.apps.MatrixConfig',
     'core.apps.CoreConfig',
     'djangoql',
-    'debug_toolbar'
+    'debug_toolbar',
+    'drf_yasg'
 ]
 
 MIDDLEWARE = [
@@ -113,3 +112,27 @@ LOGIN_REDIRECT_URL = 'matrix:matrix'
 LOGOUT_REDIRECT_URL = '/auth/login/'
 
 LOGIN_URL = '/auth/login/'
+
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'formatters': {
+#         'file': {
+#             'format': '%(asctime)s %(levelname)s func_name: %(funcName)s file_name: %(filename)s \nmessage: {%(message)s}'
+#         }
+#     },
+#     'handlers': {
+#         'file': {
+#             'level': 'DEBUG',
+#             'class': 'logging.FileHandler',
+#             'formatter': 'file',
+#             'filename': 'app.log'
+#         }
+#     },
+#     'loggers': {
+#         '': {
+#             'level': 'DEBUG',
+#             'handlers': ['file']
+#         }
+#     }
+# }

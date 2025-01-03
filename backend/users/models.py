@@ -1,7 +1,8 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from users.validators import validation_min_length_personnal_number
+
 from users.manager import CustomUserManager
+from users.validators import validation_min_length_personnal_number
 
 
 class User(AbstractUser):

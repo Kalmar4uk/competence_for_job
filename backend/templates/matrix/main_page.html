@@ -1,0 +1,8 @@
+{% extends "index.html" %}
+{% block content %}
+    {% for comp in competence %}
+        <a href="{% url 'matrix:profile' comp.user__personnel_number %}">{{ comp.user__first_name }} {{ comp.user__last_name }}</a>
+        <p>Оценка компетенций в этом месяце: {{ comp.sum_grade }}</p>
+        <br>
+    {% endfor %}
+{% endblock %}

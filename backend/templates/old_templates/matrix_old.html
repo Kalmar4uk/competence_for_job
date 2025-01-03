@@ -1,0 +1,64 @@
+{% extends "index.html" %}
+{% block title %}
+Матрица компетенций
+{% endblock %}
+  {% block content %}
+    <form class="form" method="post" enctype="multipart/form-data" id="skills">
+      {% csrf_token %}
+      <form__section class="form__section">
+        <h3>
+          Hard skills
+        </h3>
+        <div class="skills-wrapper">
+          {% for hard in skills_hard %}
+          <div class="skills-card">
+          <label class="skills-card__label">{{ hard }}</label>
+            <select class="skills-card__select" id="{{ hard }}" name="{{ hard }}">
+              <option selected disabled hidden></option>
+              {% for grade in grade_skills %}
+              <option value="{{ grade }}">{{ grade }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          {% endfor %}
+        </div>
+      </form__section>
+      <form__section class="form__section">
+        <h3>
+          Soft skills
+        </h3>
+        <div class="skills-wrapper">
+          {% for soft in skills_soft %}
+          <div class="skills-card">
+          <label class="skills-card__label">{{ soft }}</label>
+            <select class="skills-card__select" id="{{ soft }}" name="{{ soft }}">
+              <option selected disabled hidden></option>
+              {% for grade in grade_skills %}
+              <option value="{{ grade }}">{{ grade }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          {% endfor %}
+        </div>
+      </form__section>
+      <form__section class="form__section">
+        <h3>
+          Tool skills
+        </h3>
+        <div class="skills-wrapper">
+          {% for tool in skills_tool %}
+          <div class="skills-card">
+          <label class="skills-card__label">{{ tool }}</label>
+            <select class="skills-card__select" id="{{ tool }}" name="{{ tool }}">
+              <option selected disabled hidden></option>
+              {% for grade in grade_skills %}
+              <option value="{{ grade }}">{{ grade }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          {% endfor %}
+        </div>
+      </form__section>
+      <button class="button" type="submit">Отправить</button>
+    </form>
+  {% endblock %}
