@@ -10,7 +10,12 @@ from matrix.models import Competence, GradeCompetenceJobTitle, GradeSkill, User
 @login_required
 def for_main_page(request):
     current_month = CURRENT_MONTH
-    users_same_group = User.objects.filter(group=request.user.group)
+    users_same_group = User.objects.filter(
+        group=request.user.group
+        ).exclude(
+            id=request.user.id
+            )
+    print(users_same_group)
     competence = Competence.objects.filter(
         user__in=users_same_group,
         created_at__month=current_month
