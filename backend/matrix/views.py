@@ -15,7 +15,6 @@ def for_main_page(request):
         ).exclude(
             id=request.user.id
             )
-    print(users_same_group)
     competence = Competence.objects.filter(
         user__in=users_same_group,
         created_at__month=current_month
