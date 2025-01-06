@@ -35,9 +35,7 @@ class MyUserAdmin(MyDjangoQLSearchMixin, UserAdmin):
                 "fields": (
                     "personnel_number",
                     "job_title",
-                    "group",
-                    "department",
-                    "management"
+                    "group"
                 )
             }
         ),
@@ -54,21 +52,34 @@ class MyUserAdmin(MyDjangoQLSearchMixin, UserAdmin):
         ),
         (_("Important dates"), {"fields": ("last_login", "date_joined")}),
     )
+
     add_fieldsets = (
+        (None, {"fields": ("email", "password1", "password2")}),
+        (_("Personal info"), {
+            "fields": (
+                "first_name", "last_name", "middle_name"
+            )
+        }
+        ),
         (
-            None, {
-                'classes': ('wide',),
-                'fields': (
-                    'email',
-                    'password1',
-                    'password2',
-                    'first_name',
-                    'last_name',
-                    'is_superuser',
-                    'is_staff',
-                    'is_active'
+            _("Сотрудник"),
+            {
+                "fields": (
+                    "personnel_number",
+                    "job_title",
+                    "group"
                 )
             }
+        ),
+        (
+            _("Permissions"),
+            {
+                "fields": (
+                    "is_active",
+                    "is_staff",
+                    "is_superuser"
+                ),
+            },
         ),
     )
 
@@ -86,17 +97,26 @@ class MyUserAdmin(MyDjangoQLSearchMixin, UserAdmin):
 
 @admin.register(JobDepartment)
 class JobDepartmentAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
-    list_display = ("title", "parent", "children", "is_delete")
+    fieldsets = (
+        (None, {"fields": ("title", "parent", "children", "is_deleted")}),
+    )
+    list_display = ("title", "parent", "children", "is_deleted")
 
 
 @admin.register(JobGroup)
 class JobGroup(MyDjangoQLSearchMixin, admin.ModelAdmin):
-    ...
+    fieldsets = (
+        (None, {"fields": ("title", "parent", "is_deleted")}),
+    )
+    list_display = ("title", "parent", "is_deleted")
 
 
 @admin.register(JobManagement)
 class JobManagementAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
-    ...
+    fieldsets = (
+        (None, {"fields": ("title", "children", "is_deleted")}),
+    )
+    list_display = ("title", "children", "is_deleted")
 
 
 @admin.register(ContentType)

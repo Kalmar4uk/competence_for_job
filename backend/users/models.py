@@ -28,18 +28,6 @@ class User(AbstractUser):
         on_delete=models.CASCADE,
         null=True, blank=True
     )
-    department = models.ForeignKey(
-        "JobDepartment",
-        verbose_name="Департамент",
-        on_delete=models.CASCADE,
-        null=True, blank=True
-    )
-    management = models.ForeignKey(
-        "JobManagement",
-        verbose_name="Управление",
-        on_delete=models.CASCADE,
-        null=True, blank=True
-    )
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
@@ -59,14 +47,14 @@ class User(AbstractUser):
 
 class GeneralHierarchy(models.Model):
     title = models.CharField("Название", max_length=150)
-    parent = None
-    children = None
-    is_delete = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(
+        "Удален", default=False, help_text="Отметить если удален"
+    )
 
     def save(self, *args, **kwargs):
         if self.is_delete is True and not self.title.endswith("Удален"):
             self.title = f"{self.title} - Удален"
-        else:
+        elif self.is_delete is False:
             self.title = self.title.replace("- Удален", "")
         super(GeneralHierarchy, self).save(*args, **kwargs)
 
@@ -81,6 +69,7 @@ class JobGroup(GeneralHierarchy):
     parent = models.ForeignKey(
         "JobDepartment",
         on_delete=models.SET_NULL,
+        verbose_name="Департамент",
         null=True,
         blank=True
     )
