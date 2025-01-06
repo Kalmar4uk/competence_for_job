@@ -13,7 +13,7 @@
   <p>{{ general_sum_grade }}</p>
 
   Твоя оценка:
-  <p>{{ personal_sum_grade }} {% if general_sum_grade <= personal_sum_grade %}&#129321;{% else %}&#128542;{% endif %}</p>
+  <p>{{ personal_sum_grade }} {% if general_sum_grade <= personal_sum_grade or general_sum_grade is None %}&#129321;{% else %}&#128542;{% endif %}</p>
   <hr>
 
   {% if not personal_competence_grade %}
@@ -46,4 +46,7 @@
     </details>
   {% endif %}
   <hr>
+  {% if general_sum_grade %}
+    <button><a href="{% url 'matrix:matrix' %}">Пройти матрицу</a></button>
+  {% endif %}
 {% endblock %}
