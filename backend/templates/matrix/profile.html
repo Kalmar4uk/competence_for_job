@@ -46,18 +46,22 @@
     </details>
   {% endif %}
   <hr>
-  {% if general_sum_grade and request.user == user and not check_passing %}
-    <button><a href="{% url 'matrix:matrix' %}">Пройти матрицу</a></button>
-  {% endif %}
   {% if old_personal_competence %}
     <details>
       <summary>Ранее пройденные компетенции за последние 3 месяца</summary>
+      <br>
       {% for competence in old_personal_competence %}
         <details>
         <summary>{{ competence.created_at|date:"d.m.y" }}</summary>
-        <p>Оценка: {{ competence.sum_grade }}</p>
+        <br>
+        <p>Оценка: {{ competence.sum_grade }} {% if general_sum_grade <= competence.sum_grade or general_sum_grade is None %}&#129321;{% else %}&#128542;{% endif %}</p>
+        <br>
         </details>
       {% endfor %}
     </details>
+  {% endif %}
+  <hr>
+  {% if general_sum_grade and request.user == user and not check_passing %}
+    <button><a href="{% url 'matrix:matrix' %}">Пройти матрицу</a></button>
   {% endif %}
 {% endblock %}
