@@ -12,7 +12,7 @@
   Общая оценка компенции для твоей должности:
   <p>{{ general_sum_grade }}</p>
 
-  Твоя оценка:
+  Твоя оценка в этом месяце:
   <p>{{ personal_sum_grade }} {% if general_sum_grade <= personal_sum_grade or general_sum_grade is None %}&#129321;{% else %}&#128542;{% endif %}</p>
   <hr>
 
@@ -48,5 +48,16 @@
   <hr>
   {% if general_sum_grade and request.user == user and not check_passing %}
     <button><a href="{% url 'matrix:matrix' %}">Пройти матрицу</a></button>
-  {% endif %}}
+  {% endif %}
+  {% if old_personal_competence %}
+    <details>
+      <summary>Ранее пройденные компетенции за последние 3 месяца</summary>
+      {% for competence in old_personal_competence %}
+        <details>
+        <summary>{{ competence.created_at|date:"d.m.y" }}</summary>
+        <p>Оценка: {{ competence.sum_grade }}</p>
+        </details>
+      {% endfor %}
+    </details>
+  {% endif %}
 {% endblock %}

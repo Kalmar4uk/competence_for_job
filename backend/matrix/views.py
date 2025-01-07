@@ -2,8 +2,9 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q, Sum
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse
+from dateutil.relativedelta import relativedelta
 
-from matrix.constants import CURRENT_MONTH
+from matrix.constants import CURRENT_MONTH, CURRENT_DATE
 from matrix.functions import check_passing_date, save_to_db
 from matrix.models import Competence, GradeCompetenceJobTitle, GradeSkill, User
 
@@ -23,9 +24,7 @@ def for_main_page(request):
             "user__last_name",
             "user__personnel_number"
             ).annotate(
-                sum_grade=Sum(
-                    "grade_skill__evaluation_number"
-                    )
+                sum_grade=Sum("grade_skill__evaluation_number")
                 )
     context = {
         "competence": competence
@@ -56,13 +55,14 @@ def matrix(request):
     if request.POST:
         data = dict(request.POST)
         data.pop("csrfmiddlewaretoken")
-        save_to_db(data, request.user)
+        save_to_db(data, user)
         return HttpResponse(status=201)
     return render(request, "matrix/matrix.html", context)
 
 
 @login_required
 def profile(request, personnel_number):
+    current_date = CURRENT_DATE.replace(day=1)
     user = get_object_or_404(User, personnel_number=personnel_number)
     personal_competence = Competence.objects.filter(
         user=user,
@@ -73,10 +73,14 @@ def profile(request, personnel_number):
     ).values(
         "skill__skill",
         "grade_skill__grade"
-    ).order_by("grade_skill__evaluation_number")
+        ).order_by(
+            "grade_skill__evaluation_number"
+            )
     competence_with_grade_zero = personal_competence.filter(
         grade_skill__evaluation_number=0
-    ).values("skill__skill")
+    ).values(
+        "skill__skill"
+        )
     personal_sum_grade = personal_competence_grade.aggregate(
         sum_grade=Sum(
             "grade_skill__evaluation_number"
@@ -85,12 +89,21 @@ def profile(request, personnel_number):
     general_sum_grade = GradeCompetenceJobTitle.objects.filter(
         Q(job_title=user.job_title) & ~Q(min_grade__evaluation_number=0)
     ).aggregate(
-        sum_grade=Sum(
-            "min_grade__evaluation_number"
-            )
-        )["sum_grade"]
+        sum_grade=Sum("min_grade__evaluation_number")
+    )["sum_grade"]
+    old_personal_competence = Competence.objects.filter(
+        user=user,
+        created_at__date__range=(
+            current_date - relativedelta(months=3),
+            (current_date - relativedelta(months=1))+relativedelta(day=31)
+        )
+    ).values("created_at").annotate(
+        sum_grade=Sum("grade_skill__evaluation_number")
+    ).order_by("-created_at")
+
     context = {
         "user": user,
+        "old_personal_competence": old_personal_competence,
         "check_passing": check_passing_date(user),
         "competence_with_grade_zero": competence_with_grade_zero,
         "personal_competence_grade": personal_competence_grade,
