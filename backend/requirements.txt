@@ -16,9 +16,11 @@ pillow==11.0.0
 ply==3.11
 psycopg2-binary==2.9.9
 PyJWT==2.9.0
+python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
 pytz==2024.2
 PyYAML==6.0.2
+six==1.17.0
 sqlparse==0.5.1
 tzdata==2024.2
 uritemplate==4.1.1

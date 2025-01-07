@@ -10,7 +10,6 @@ from matrix.models import Competence, GradeCompetenceJobTitle, GradeSkill, User
 
 @login_required
 def for_main_page(request):
-    current_month = CURRENT_MONTH
     users_same_group = User.objects.filter(
         group=request.user.group
         ).exclude(
@@ -18,7 +17,7 @@ def for_main_page(request):
             )
     competence = Competence.objects.filter(
         user__in=users_same_group,
-        created_at__month=current_month
+        created_at__month=CURRENT_MONTH
         ).values(
             "user__first_name",
             "user__last_name",
@@ -64,11 +63,10 @@ def matrix(request):
 
 @login_required
 def profile(request, personnel_number):
-    current_month = CURRENT_MONTH
     user = get_object_or_404(User, personnel_number=personnel_number)
     personal_competence = Competence.objects.filter(
         user=user,
-        created_at__month=current_month
+        created_at__month=CURRENT_MONTH
     )
     personal_competence_grade = personal_competence.exclude(
         grade_skill__evaluation_number=0

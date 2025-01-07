@@ -1,8 +1,13 @@
 from matrix.models import Competence, GradeSkill, Skill
-from matrix.constants import CURRENT_DATE
+from matrix.constants import CURRENT_DATE, CURRENT_MONTH
 
 
 def save_to_db(data, user):
+    Competence.objects.filter(
+        user=user,
+        created_at__month=CURRENT_MONTH
+    ).delete()
+
     for skill, grade in data.items():
         new_skill = Skill.objects.get(skill=skill)
         grade_skill = GradeSkill.objects.get(grade=grade[0])

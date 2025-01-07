@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+from core.models import GeneralHierarchy
 from users.manager import CustomUserManager
 from users.validators import validation_min_length_personnal_number
 
@@ -43,26 +44,6 @@ class User(AbstractUser):
         if self.middle_name:
             return f"{self.first_name} {self.last_name} {self.middle_name}"
         return f"{self.first_name} {self.last_name}"
-
-
-class GeneralHierarchy(models.Model):
-    title = models.CharField("Название", max_length=150)
-    is_deleted = models.BooleanField(
-        "Удален", default=False, help_text="Отметить если удален"
-    )
-
-    def save(self, *args, **kwargs):
-        if self.is_delete is True and not self.title.endswith("Удален"):
-            self.title = f"{self.title} - Удален"
-        elif self.is_delete is False:
-            self.title = self.title.replace("- Удален", "")
-        super(GeneralHierarchy, self).save(*args, **kwargs)
-
-    def __str__(self):
-        return self.title
-
-    class Meta:
-        abstract = True
 
 
 class JobGroup(GeneralHierarchy):
