@@ -107,7 +107,7 @@ AUTH_USER_MODEL = 'users.User'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_REDIRECT_URL = 'matrix:matrix'
+LOGIN_REDIRECT_URL = 'matrix:main'
 
 LOGOUT_REDIRECT_URL = '/auth/login/'
 

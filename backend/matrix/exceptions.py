@@ -1,2 +1,0 @@
-class DoubleMatrixInCurrentDate(Exception):
-    pass
