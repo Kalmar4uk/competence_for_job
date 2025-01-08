@@ -36,7 +36,7 @@ class User(AbstractUser):
     objects = CustomUserManager()
 
     def save(self, *args, **kwargs):
-        if self.is_active is False:
+        if self.is_active is False and not self.email.startswith("Этот"):
             self.email = f"Этот пидор больше не работает - {self.email}"
         super(User, self).save(*args, **kwargs)
 
