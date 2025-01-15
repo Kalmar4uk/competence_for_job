@@ -7,14 +7,12 @@
   <p>{{ user.job_title }}</p>
   <p>{{ user.group }}</p>
   <p>Табельный номер: {% if user.personnel_number|slice:":1" == "0" %}{{ user.personnel_number|slice:"1:" }}{% else %}{{ user.personnel_number }}{% endif %}</p>
-  <hr>
 
   Общая оценка компенции для твоей должности:
   <p>{{ general_sum_grade }}</p>
 
   Твоя оценка в этом месяце:
   <p>{{ personal_sum_grade }} {% if general_sum_grade <= personal_sum_grade or general_sum_grade is None %}&#129321;{% else %}&#128542;{% endif %}</p>
-  <hr>
 
   {% if not personal_competence_grade %}
     <p>Нет пройденной матрицы или все навыки с оценкой 0</p>
@@ -27,10 +25,8 @@
     {% else %}
       <p>Навыков с оценкой 0 нет, красавелла &#128077;</p>
     {% endif %}
-    <hr>
     <details>
       <summary>Уровень компетенций за текущий месяц</summary>
-      <br>
       <table>
         <tr>
           <td>Навык</td>
@@ -45,23 +41,18 @@
       </table>
     </details>
   {% endif %}
-  <hr>
   {% if old_personal_competence %}
     <details>
       <summary>Ранее пройденные компетенции за последние 3 месяца</summary>
-      <br>
       {% for competence in old_personal_competence %}
         <details>
         <summary>{{ competence.created_at|date:"d.m.y" }}</summary>
-        <br>
         <p>Оценка: {{ competence.sum_grade }} {% if general_sum_grade <= competence.sum_grade or general_sum_grade is None %}&#129321;{% else %}&#128542;{% endif %}</p>
-        <br>
         </details>
       {% endfor %}
     </details>
   {% endif %}
-  <hr>
   {% if general_sum_grade and request.user == user and not check_passing %}
-    <button><a href="{% url 'matrix:matrix' %}">Пройти матрицу</a></button>
+    <a href="{% url 'matrix:matrix' %}">Пройти матрицу</a>
   {% endif %}
 {% endblock %}
