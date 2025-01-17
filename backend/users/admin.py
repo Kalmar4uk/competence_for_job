@@ -85,9 +85,7 @@ class MyUserAdmin(MyDjangoQLSearchMixin, UserAdmin):
     )
 
     def full_name(self, obj):
-        if obj.middle_name:
-            return f"{obj.first_name} {obj.last_name} {obj.middle_name}"
-        return f"{obj.first_name} {obj.last_name}"
+        return obj.__str__()
 
     def get_queryset(self, request):
         user = super(MyUserAdmin, self).get_queryset(request)

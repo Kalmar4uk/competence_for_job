@@ -1,5 +1,4 @@
 from django.utils import timezone
-from dateutil.relativedelta import relativedelta
 
 CURRENT_DATE = timezone.now().date()
 CURRENT_MONTH = timezone.now().month
