@@ -100,7 +100,6 @@ def profile(request, personnel_number):
     ).values("created_at").annotate(
         sum_grade=Sum("grade_skill__evaluation_number")
     ).order_by("-created_at")
-
     context = {
         "user": user,
         "old_personal_competence": old_personal_competence,
