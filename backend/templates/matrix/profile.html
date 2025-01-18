@@ -78,8 +78,8 @@
             {% for competence in old_personal_competence %}
             <tbody>
               <tr>
-                <td>{{ competence.created_at|date:"d.m.Y" }}</td>
-                <td>{{ competence.sum_grade }} {% if general_sum_grade <= competence.sum_grade or general_sum_grade is None %}&#129321;{% else %}&#128542;{% endif %}</td>
+                <td>{{ competence.created_at|date:"F Y" }}</td>
+                <td>{{ competence.sum_grade }}</td>
               </tr>
             </tbody>
             {% endfor %}
