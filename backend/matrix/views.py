@@ -63,9 +63,9 @@ def matrix(request):
 @login_required
 def profile(request, personnel_number):
     current_date = CURRENT_DATE.replace(day=1)
-    user = get_object_or_404(User, personnel_number=personnel_number)
+    user_for_profile = get_object_or_404(User, personnel_number=personnel_number)
     personal_competence = Competence.objects.filter(
-        user=user,
+        user=user_for_profile,
         created_at__month=CURRENT_MONTH
     )
     personal_competence_grade = personal_competence.exclude(
@@ -87,12 +87,13 @@ def profile(request, personnel_number):
         )
     )["sum_grade"]
     general_sum_grade = GradeCompetenceJobTitle.objects.filter(
-        Q(job_title=user.job_title) & ~Q(min_grade__evaluation_number=0)
+        Q(job_title=user_for_profile.job_title) &
+        ~Q(min_grade__evaluation_number=0)
     ).aggregate(
         sum_grade=Sum("min_grade__evaluation_number")
     )["sum_grade"]
     old_personal_competence = Competence.objects.filter(
-        user=user,
+        user=user_for_profile,
         created_at__date__range=(
             current_date - relativedelta(months=3),
             (current_date - relativedelta(months=1))+relativedelta(day=31)
@@ -101,9 +102,9 @@ def profile(request, personnel_number):
         sum_grade=Sum("grade_skill__evaluation_number")
     ).order_by("-created_at")
     context = {
-        "user": user,
+        "user_for_profile": user_for_profile,
         "old_personal_competence": old_personal_competence,
-        "check_passing": check_passing_date(user),
+        "check_passing": check_passing_date(user_for_profile),
         "competence_with_grade_zero": competence_with_grade_zero,
         "personal_competence_grade": personal_competence_grade,
         "general_sum_grade": general_sum_grade,

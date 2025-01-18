@@ -1,6 +1,6 @@
 {% extends "index.html" %}
 {% block title %}
-  {{ user.first_name }} {{ user.last_name }}
+  {{ user_for_profile.first_name }} {{ user_for_profile.last_name }}
 {% endblock %}
 {% block content %}
 <div class="profile-section">
@@ -8,19 +8,19 @@
   <div class="profile-info">
     <div>
       <p class="profile-info__category">ФИО:</p>
-      <p>{{ user.first_name }} {{ user.last_name }} {% if user.middle_name %}{{ user.middle_name }}{% endif %}</p>
+      <p>{{ user_for_profile.first_name }} {{ user_for_profile.last_name }} {% if user_for_profile.middle_name %}{{ user_for_profile.middle_name }}{% endif %}</p>
     </div>
     <div>
       <p class="profile-info__category">Должность:</p>
-      <p>{{ user.job_title }}</p>
+      <p>{{ user_for_profile.job_title }}</p>
     </div>
     <div>
       <p class="profile-info__category">Группа</p>
-      <p>{{ user.group }}</p>
+      <p>{{ user_for_profile.group }}</p>
     </div>
     <div>
       <p class="profile-info__category">Табельный номер:</p>
-      <p>{% if user.personnel_number|slice:":1" == "0" %}{{ user.personnel_number|slice:"1:" }}{% else %}{{ user.personnel_number }}{% endif %}</p>
+      <p>{% if user_for_profile.personnel_number|slice:":1" == "0" %}{{ user_for_profile.personnel_number|slice:"1:" }}{% else %}{{ user_for_profile.personnel_number }}{% endif %}</p>
     </div>
   </div>
 </div>
@@ -89,7 +89,7 @@
     {% endif %}
   </div>
 {% endif %}
-{% if general_sum_grade and request.user == user and not check_passing %}
+{% if general_sum_grade and request.user_for_profile == user_for_profile and not check_passing %}
   <a class="button" href="{% url 'matrix:matrix' %}">Пройти матрицу</a>
 {% endif %}
 {% endblock %}
