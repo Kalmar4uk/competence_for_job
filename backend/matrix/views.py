@@ -83,14 +83,14 @@ def profile(request, personnel_number):
         )
     personal_sum_grade = personal_competence_grade.aggregate(
         sum_grade=Sum(
-            "grade_skill__evaluation_number"
+            "grade_skill__evaluation_number", default=0
         )
     )["sum_grade"]
     general_sum_grade = GradeCompetenceJobTitle.objects.filter(
         Q(job_title=user_for_profile.job_title) &
         ~Q(min_grade__evaluation_number=0)
     ).aggregate(
-        sum_grade=Sum("min_grade__evaluation_number")
+        sum_grade=Sum("min_grade__evaluation_number", default=0)
     )["sum_grade"]
     old_personal_competence = Competence.objects.filter(
         user=user_for_profile,
@@ -99,7 +99,7 @@ def profile(request, personnel_number):
             (current_date - relativedelta(months=1))+relativedelta(day=31)
         )
     ).values("created_at").annotate(
-        sum_grade=Sum("grade_skill__evaluation_number")
+        sum_grade=Sum("grade_skill__evaluation_number", default=0)
     ).order_by("-created_at")
     context = {
         "user_for_profile": user_for_profile,
