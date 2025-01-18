@@ -78,7 +78,7 @@
             {% for competence in old_personal_competence %}
             <tbody>
               <tr>
-                <td>{{ competence.created_at|date:"F Y" }}</td>
+                <td>{{ competence.created_at|date:"d E" }}</td>
                 <td>{{ competence.sum_grade }}</td>
               </tr>
             </tbody>
@@ -89,7 +89,7 @@
     {% endif %}
   </div>
 {% endif %}
-{% if general_sum_grade and request.user_for_profile == user_for_profile and not check_passing %}
+{% if general_sum_grade and request.user == user_for_profile and not check_passing %}
   <a class="button" href="{% url 'matrix:matrix' %}">Пройти матрицу</a>
 {% endif %}
 {% endblock %}

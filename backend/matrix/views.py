@@ -63,7 +63,10 @@ def matrix(request):
 @login_required
 def profile(request, personnel_number):
     current_date = CURRENT_DATE.replace(day=1)
-    user_for_profile = get_object_or_404(User, personnel_number=personnel_number)
+    user_for_profile = get_object_or_404(
+        User,
+        personnel_number=personnel_number
+    )
     personal_competence = Competence.objects.filter(
         user=user_for_profile,
         created_at__month=CURRENT_MONTH
