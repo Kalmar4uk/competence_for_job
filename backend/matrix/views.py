@@ -1,3 +1,4 @@
+import redis
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q, Sum
 from django.shortcuts import get_object_or_404, render
@@ -8,6 +9,7 @@ from matrix.constants import CURRENT_MONTH, CURRENT_DATE
 from matrix.functions import check_passing_date
 from matrix.models import Competence, GradeCompetenceJobTitle, GradeSkill, User
 from matrix.tasks import save_to_db
+from competencies.settings import REDIS_HOST, REDIS_PORT
 
 
 @login_required
@@ -56,7 +58,13 @@ def matrix(request):
     if request.POST:
         data = dict(request.POST)
         data.pop("csrfmiddlewaretoken")
-        save_to_db.delay(data, user.id)
+        try:
+            con = redis.Redis(host=REDIS_HOST, port=REDIS_PORT)
+            con.ping()
+        except redis.exceptions.RedisError:
+            save_to_db(data, user.id)
+        else:
+            save_to_db.delay(data, user.id)
         return HttpResponse(status=201)
     return render(request, "matrix/matrix.html", context)
 
