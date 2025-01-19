@@ -87,6 +87,7 @@
         </table>
       </details>
     {% endif %}
+    <a class="button" href="{% url 'matrix:competence_file' request.resolver_match.kwargs.personnel_number%}">Загрузить компетенции</a>
   </div>
 {% endif %}
 {% if general_sum_grade and request.user == user_for_profile and not check_passing %}

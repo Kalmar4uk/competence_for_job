@@ -1,9 +1,14 @@
+import csv
+import openpyxl
+import openpyxl.workbook
+import os
 import redis
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q, Sum
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse
 from dateutil.relativedelta import relativedelta
+from tempfile import NamedTemporaryFile
 
 from matrix.constants import CURRENT_MONTH, CURRENT_DATE
 from matrix.functions import check_passing_date
@@ -123,3 +128,34 @@ def profile(request, personnel_number):
         "personal_sum_grade": personal_sum_grade
     }
     return render(request, "matrix/profile.html", context)
+
+
+@login_required
+def competence_file(request, personnel_number):
+    user = User.objects.get(personnel_number=personnel_number)
+    competencies = Competence.objects.filter(
+        user=user
+    ).values_list(
+        "skill__skill",
+        "grade_skill__grade",
+        "created_at__date"
+    )
+    wb = openpyxl.Workbook()
+    sheet = wb.active
+    sheet.append(["Навык", "Оценка", "Дата"])
+    for competence in competencies:
+        sheet.append(competence)
+    with NamedTemporaryFile(delete=False) as tmp:
+        wb.save(tmp.name)
+        tmp.seek(0)
+        stream = tmp.read()
+        response = HttpResponse(
+            content=stream,
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={
+                "Content-Disposition": 'attachment; filename="competence.xlsx"'
+            },
+        )
+        tmp.close()
+        os.unlink(tmp.name)
+    return response
