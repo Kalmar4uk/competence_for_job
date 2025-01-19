@@ -1,6 +1,10 @@
+import os
+from celery import shared_task
+from tempfile import NamedTemporaryFile
+from openpyxl import Workbook
+
 from matrix.models import Competence, GradeSkill, Skill, User
 from matrix.constants import CURRENT_MONTH
-from celery import shared_task
 
 
 @shared_task
@@ -19,3 +23,27 @@ def save_to_db(data, user_id):
             skill=new_skill,
             grade_skill=grade_skill
         )
+
+
+@shared_task
+def download_file(personnel_number):
+    user = User.objects.get(personnel_number=personnel_number)
+    competencies = Competence.objects.filter(
+        user=user
+    ).values_list(
+        "skill__skill",
+        "grade_skill__grade",
+        "created_at__date"
+    )
+    wb = Workbook()
+    sheet = wb.active
+    sheet.append(["Навык", "Оценка", "Дата"])
+    for competence in competencies:
+        sheet.append(competence)
+    with NamedTemporaryFile(delete=False) as tmp:
+        wb.save(tmp.name)
+        tmp.seek(0)
+        stream = tmp.read()
+        tmp.close()
+        os.unlink(tmp.name)
+    return stream

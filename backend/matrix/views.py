@@ -1,4 +1,3 @@
-import csv
 import openpyxl
 import openpyxl.workbook
 import os
@@ -13,7 +12,7 @@ from tempfile import NamedTemporaryFile
 from matrix.constants import CURRENT_MONTH, CURRENT_DATE
 from matrix.functions import check_passing_date
 from matrix.models import Competence, GradeCompetenceJobTitle, GradeSkill, User
-from matrix.tasks import save_to_db
+from matrix.tasks import download_file, save_to_db
 from competencies.settings import REDIS_HOST, REDIS_PORT
 
 
@@ -132,30 +131,18 @@ def profile(request, personnel_number):
 
 @login_required
 def competence_file(request, personnel_number):
-    user = User.objects.get(personnel_number=personnel_number)
-    competencies = Competence.objects.filter(
-        user=user
-    ).values_list(
-        "skill__skill",
-        "grade_skill__grade",
-        "created_at__date"
+    try:
+        con = redis.Redis(host=REDIS_HOST, port=REDIS_PORT)
+        con.ping()
+    except redis.exceptions.RedisError:
+        stream = download_file(personnel_number)
+    else:
+        stream = download_file.delay(personnel_number).get()
+    response = HttpResponse(
+        content=stream,
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={
+            "Content-Disposition": 'attachment; filename="competence.xlsx"'
+        },
     )
-    wb = openpyxl.Workbook()
-    sheet = wb.active
-    sheet.append(["Навык", "Оценка", "Дата"])
-    for competence in competencies:
-        sheet.append(competence)
-    with NamedTemporaryFile(delete=False) as tmp:
-        wb.save(tmp.name)
-        tmp.seek(0)
-        stream = tmp.read()
-        response = HttpResponse(
-            content=stream,
-            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            headers={
-                "Content-Disposition": 'attachment; filename="competence.xlsx"'
-            },
-        )
-        tmp.close()
-        os.unlink(tmp.name)
     return response
