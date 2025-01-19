@@ -25,10 +25,19 @@ class GradeCompetenceJobTitleAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
 @admin.register(Competence)
 class CompetenceAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
     list_display = ("user", "skill", "grade_skill", "created_at")
-    list_filter = ("user", ("created_at", DateRangeFilterBuilder()))
+    list_filter = (
+        ("created_at", DateRangeFilterBuilder()),
+        "user",
+        "grade_skill"
+    )
     readonly_fields = ("created_at",)
 
 
 @admin.register(GradeSkill)
-class GardeSkillAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
+class GardeSkillAdmin(admin.ModelAdmin):
+    actions = None
+    list_display = ("grade", "evaluation_number")
     readonly_fields = ("grade", "evaluation_number")
+
+    def has_delete_permission(self, request, obj=None):
+        return False

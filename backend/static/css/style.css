@@ -84,6 +84,7 @@ body {
   background-color: #18181b;
   cursor: pointer;
   transition: background-color 0.2s linear, color 0.2s linear;
+  text-decoration: none;
 }
 
 .button:hover {

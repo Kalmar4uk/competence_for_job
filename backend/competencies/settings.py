@@ -18,6 +18,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_celery_results',
     "rangefilter",
     'users.apps.UsersConfig',
     'matrix.apps.MatrixConfig',
@@ -107,11 +108,20 @@ AUTH_USER_MODEL = 'users.User'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_REDIRECT_URL = 'matrix:matrix'
+LOGIN_REDIRECT_URL = 'matrix:main'
 
 LOGOUT_REDIRECT_URL = '/auth/login/'
 
 LOGIN_URL = '/auth/login/'
+
+# celery settings
+CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+
+BROKER_HOST = "localhost"
+BROKER_BACKEND = "redis"
+REDIS_PORT = 6379
+REDIS_HOST = "localhost"
 
 # LOGGING = {
 #     'version': 1,

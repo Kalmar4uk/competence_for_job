@@ -1,49 +1,96 @@
 {% extends "index.html" %}
 {% block title %}
-  {{ user.first_name }} {{ user.last_name }}
+  {{ user_for_profile.first_name }} {{ user_for_profile.last_name }}
 {% endblock %}
 {% block content %}
-  <p>{{ user.first_name }} {{ user.last_name }}</p>
-  <p>{{ user.job_title }}</p>
-  <p>{{ user.group }}</p>
-  <p>Табельный номер: {% if user.personnel_number|slice:":1" == "0" %}{{ user.personnel_number|slice:"1:" }}{% else %}{{ user.personnel_number }}{% endif %}</p>
-  <hr>
-
-  Общая оценка компенции для твоей должности:
-  <p>{{ general_sum_grade }}</p>
-
-  Твоя оценка:
-  <p>{{ personal_sum_grade }} {% if general_sum_grade <= personal_sum_grade %}&#129321;{% else %}&#128542;{% endif %}</p>
-  <hr>
-
-  {% if not personal_competence_grade %}
-    <p>Нет пройденной матрицы или все навыки с оценкой 0</p>
-  {% else %}
-    {% if competence_with_grade_zero %}
-      <p>Компетенции по которым отсутствует навык:</p>
-        {% for competence in competence_with_grade_zero %}
-          <p>{{ competence.skill__skill }}</p>
-        {% endfor %}
-    {% else %}
-      <p>Навыков с оценкой 0 нет, красавелла &#128077;</p>
+<div class="profile-section">
+  <h2 class="section-title">Данные профиля</h2>
+  <div class="profile-info">
+    <div>
+      <p class="profile-info__category">ФИО:</p>
+      <p>{{ user_for_profile.first_name }} {{ user_for_profile.last_name }} {% if user_for_profile.middle_name %}{{ user_for_profile.middle_name }}{% endif %}</p>
+    </div>
+    <div>
+      <p class="profile-info__category">Должность:</p>
+      <p>{{ user_for_profile.job_title }}</p>
+    </div>
+    <div>
+      <p class="profile-info__category">Группа</p>
+      <p>{{ user_for_profile.group }}</p>
+    </div>
+    <div>
+      <p class="profile-info__category">Табельный номер:</p>
+      <p>{% if user_for_profile.personnel_number|slice:":1" == "0" %}{{ user_for_profile.personnel_number|slice:"1:" }}{% else %}{{ user_for_profile.personnel_number }}{% endif %}</p>
+    </div>
+  </div>
+</div>
+{% if personal_competence_grade or competence_with_grade_zero or old_personal_competence %}
+  <div class="competence-section">
+    <h2 class="section-title">Компетенции</h2>
+      {% if personal_competence_grade %}
+        <div class="competence__category">
+          <h3 class="competence__category-title">Оценка за текущий месяц:</h3>
+          <p class="competence__category-value">{{ personal_sum_grade }} {% if general_sum_grade <= personal_sum_grade or general_sum_grade is None %}&#129321;{% else %}&#128542;{% endif %}</p>
+        </div>
+        <div class="competence__category">
+          <h3 class="competence__category-title">Общая оценка компенции для твоей должности:</h3>
+          <p class="competence__category-value">{{ general_sum_grade }}</p>
+        </div>
+      {% endif %}
+        {% if competence_with_grade_zero %}
+          <details class="competence-details">
+            <summary>Компетенции без оценки за текущий месяц</summary>
+              {% for competence in competence_with_grade_zero %}
+                <span class="competence-skill">{{ competence.skill__skill }}</span>
+              {% endfor %}
+          </details>
+        {% endif %}
+        {% if personal_competence_grade %}
+          <details class="competence-details">
+            <summary>Уровень компетенций за текущий месяц</summary>
+            <table class="competence-table">
+              <thead>
+                <tr>
+                  <th>Навык</th>
+                  <th>Оценка</th>
+                </tr>
+              </thead>
+              {% for competence in personal_competence_grade %}
+              <tbody>
+                <tr>
+                  <td>{{ competence.skill__skill }}</td>
+                  <td>{{ competence.grade_skill__grade }}</td>
+                </tr>
+              </tbody>
+              {% endfor %}
+            </table>
+          </details>
+        {% endif %}
+    {% if old_personal_competence %}
+      <details class="competence-details">
+        <summary>Ранее пройденные компетенции за последние 3 месяца</summary>
+        <table class="competence-table">
+          <thead>
+            <tr>
+              <th>Дата</th>
+              <th>Оценка</th>
+            </tr>
+            {% for competence in old_personal_competence %}
+            <tbody>
+              <tr>
+                <td>{{ competence.created_at|date:"d E" }}</td>
+                <td>{{ competence.sum_grade }}</td>
+              </tr>
+            </tbody>
+            {% endfor %}
+          </thead>
+        </table>
+      </details>
     {% endif %}
-    <hr>
-    <details>
-      <summary>Результат последней пройденной матрицы</summary>
-      <br>
-      <table>
-        <tr>
-          <td>Навык</td>
-          <td>Оценка</td>
-        </tr>
-        {% for competence in personal_competence_grade %}
-          <tr>
-            <td>{{ competence.skill__skill }}</td>
-            <td>{{ competence.grade_skill__grade }}</td>
-          </tr>
-        {% endfor %}
-      </table>
-    </details>
-  {% endif %}
-  <hr>
+    <a class="button" href="{% url 'matrix:competence_file' request.resolver_match.kwargs.personnel_number%}">Загрузить компетенции</a>
+  </div>
+{% endif %}
+{% if general_sum_grade and request.user == user_for_profile and not check_passing %}
+  <a class="button" href="{% url 'matrix:matrix' %}">Пройти матрицу</a>
+{% endif %}
 {% endblock %}

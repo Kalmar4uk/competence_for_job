@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+from core.models import GeneralHierarchy
 from users.manager import CustomUserManager
 from users.validators import validation_min_length_personnal_number
 
@@ -28,18 +29,6 @@ class User(AbstractUser):
         on_delete=models.CASCADE,
         null=True, blank=True
     )
-    department = models.ForeignKey(
-        "JobDepartment",
-        verbose_name="Департамент",
-        on_delete=models.CASCADE,
-        null=True, blank=True
-    )
-    management = models.ForeignKey(
-        "JobManagement",
-        verbose_name="Управление",
-        on_delete=models.CASCADE,
-        null=True, blank=True
-    )
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
@@ -47,7 +36,7 @@ class User(AbstractUser):
     objects = CustomUserManager()
 
     def save(self, *args, **kwargs):
-        if self.is_active is False:
+        if self.is_active is False and not self.email.startswith("Этот"):
             self.email = f"Этот пидор больше не работает - {self.email}"
         super(User, self).save(*args, **kwargs)
 
@@ -57,30 +46,11 @@ class User(AbstractUser):
         return f"{self.first_name} {self.last_name}"
 
 
-class GeneralHierarchy(models.Model):
-    title = models.CharField("Название", max_length=150)
-    parent = None
-    children = None
-    is_delete = models.BooleanField(default=False)
-
-    def save(self, *args, **kwargs):
-        if self.is_delete is True and not self.title.endswith("Удален"):
-            self.title = f"{self.title} - Удален"
-        else:
-            self.title = self.title.replace("- Удален", "")
-        super(GeneralHierarchy, self).save(*args, **kwargs)
-
-    def __str__(self):
-        return self.title
-
-    class Meta:
-        abstract = True
-
-
 class JobGroup(GeneralHierarchy):
     parent = models.ForeignKey(
         "JobDepartment",
         on_delete=models.SET_NULL,
+        verbose_name="Департамент",
         null=True,
         blank=True
     )
