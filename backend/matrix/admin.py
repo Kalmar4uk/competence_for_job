@@ -34,5 +34,10 @@ class CompetenceAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
 
 
 @admin.register(GradeSkill)
-class GardeSkillAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
+class GardeSkillAdmin(admin.ModelAdmin):
+    actions = None
+    list_display = ("grade", "evaluation_number")
     readonly_fields = ("grade", "evaluation_number")
+
+    def has_delete_permission(self, request, obj=None):
+        return False
