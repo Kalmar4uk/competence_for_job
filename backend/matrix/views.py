@@ -1,13 +1,9 @@
-import openpyxl
-import openpyxl.workbook
-import os
 import redis
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q, Sum
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse
 from dateutil.relativedelta import relativedelta
-from tempfile import NamedTemporaryFile
 
 from matrix.constants import CURRENT_MONTH, CURRENT_DATE
 from matrix.functions import check_passing_date
@@ -42,6 +38,8 @@ def for_main_page(request):
 @login_required
 def matrix(request):
     user = request.user
+    if check_passing_date(user):
+        return render(request, "matrix/double.html")
     skills = GradeCompetenceJobTitle.objects.filter(
         job_title=user.job_title
     ).values(
@@ -57,8 +55,6 @@ def matrix(request):
         "skills": skills,
         "grade_skills": grade_skills
     }
-    if check_passing_date(user):
-        return render(request, "matrix/double.html")
     if request.POST:
         data = dict(request.POST)
         data.pop("csrfmiddlewaretoken")
