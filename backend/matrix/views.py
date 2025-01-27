@@ -58,6 +58,8 @@ def matrix(request):
     if request.POST:
         data = dict(request.POST)
         data.pop("csrfmiddlewaretoken")
+        if not data:
+            return HttpResponse(status=404)
         try:
             con = redis.Redis(host=REDIS_HOST, port=REDIS_PORT)
             con.ping()
