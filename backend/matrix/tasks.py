@@ -2,6 +2,7 @@ import os
 from celery import shared_task
 from tempfile import NamedTemporaryFile
 from openpyxl import Workbook
+from django.shortcuts import get_object_or_404
 
 from matrix.models import Competence, GradeSkill, Skill, User
 from matrix.constants import CURRENT_MONTH
@@ -16,8 +17,8 @@ def save_to_db(data, user_id):
     ).delete()
 
     for skill, grade in data.items():
-        new_skill = Skill.objects.get(skill=skill)
-        grade_skill = GradeSkill.objects.get(grade=grade[0])
+        new_skill = get_object_or_404(Skill, skill=skill)
+        grade_skill = get_object_or_404(GradeSkill, grade=grade[0])
         Competence.objects.create(
             user=user,
             skill=new_skill,
