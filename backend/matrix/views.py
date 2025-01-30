@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q, Sum
 from django.shortcuts import get_object_or_404, render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from dateutil.relativedelta import relativedelta
 
 from matrix.constants import CURRENT_MONTH, CURRENT_DATE
@@ -62,7 +62,9 @@ def matrix(request):
             save_to_db.delay(data, user.id)
         else:
             save_to_db(data, user.id)
-        return HttpResponse(status=201)
+        return JsonResponse({
+            "personnel_number": user.personnel_number
+        }, status=201)
     return render(request, "matrix/matrix.html", context)
 
 
