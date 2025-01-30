@@ -1,5 +1,5 @@
 import os
-from celery import shared_task
+from celery import current_task, shared_task
 from tempfile import NamedTemporaryFile
 from openpyxl import Workbook
 from django.shortcuts import get_object_or_404
@@ -38,6 +38,7 @@ def download_file(personnel_number):
     )
     wb = Workbook()
     sheet = wb.active
+    sheet.title = 'competence'
     sheet.append(["Навык", "Оценка", "Дата"])
     for competence in competencies:
         sheet.append(competence)
