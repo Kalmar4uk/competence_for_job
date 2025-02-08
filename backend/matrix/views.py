@@ -1,19 +1,13 @@
-import openpyxl
-import openpyxl.workbook
-import os
-import redis
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q, Sum
 from django.shortcuts import get_object_or_404, render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from dateutil.relativedelta import relativedelta
-from tempfile import NamedTemporaryFile
 
 from matrix.constants import CURRENT_MONTH, CURRENT_DATE
-from matrix.functions import check_passing_date
+from matrix.functions import check_passing_date, check_connect_redis
 from matrix.models import Competence, GradeCompetenceJobTitle, GradeSkill, User
 from matrix.tasks import download_file, save_to_db
-from competencies.settings import REDIS_HOST, REDIS_PORT
 
 
 @login_required
@@ -42,6 +36,8 @@ def for_main_page(request):
 @login_required
 def matrix(request):
     user = request.user
+    if check_passing_date(user):
+        return render(request, "matrix/double.html")
     skills = GradeCompetenceJobTitle.objects.filter(
         job_title=user.job_title
     ).values(
@@ -57,19 +53,18 @@ def matrix(request):
         "skills": skills,
         "grade_skills": grade_skills
     }
-    if check_passing_date(user):
-        return render(request, "matrix/double.html")
     if request.POST:
         data = dict(request.POST)
         data.pop("csrfmiddlewaretoken")
-        try:
-            con = redis.Redis(host=REDIS_HOST, port=REDIS_PORT)
-            con.ping()
-        except redis.exceptions.RedisError:
-            save_to_db(data, user.id)
-        else:
+        if not data:
+            return HttpResponse(status=404)
+        if check_connect_redis():
             save_to_db.delay(data, user.id)
-        return HttpResponse(status=201)
+        else:
+            save_to_db(data, user.id)
+        return JsonResponse({
+            "personnel_number": user.personnel_number
+        }, status=201)
     return render(request, "matrix/matrix.html", context)
 
 
@@ -131,13 +126,10 @@ def profile(request, personnel_number):
 
 @login_required
 def competence_file(request, personnel_number):
-    try:
-        con = redis.Redis(host=REDIS_HOST, port=REDIS_PORT)
-        con.ping()
-    except redis.exceptions.RedisError:
-        stream = download_file(personnel_number)
-    else:
+    if check_connect_redis():
         stream = download_file.delay(personnel_number).get()
+    else:
+        stream = download_file(personnel_number)
     response = HttpResponse(
         content=stream,
         content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

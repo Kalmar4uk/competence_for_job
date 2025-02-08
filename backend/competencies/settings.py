@@ -1,10 +1,15 @@
 import os
+import sentry_sdk
+from dotenv import load_dotenv
 from pathlib import Path
+from sentry_sdk.integrations.django import DjangoIntegration
+
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-SECRET_KEY = 'django-insecure-v-g70(xg%7l*=de!efcsj4a=j(zet6ripp8zs76jhzu-+3=9-t'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 DEBUG = True
 
@@ -114,14 +119,20 @@ LOGOUT_REDIRECT_URL = '/auth/login/'
 
 LOGIN_URL = '/auth/login/'
 
-# celery settings
-CELERY_BROKER_URL = "redis://localhost:6379/0"
-CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND')
 
-BROKER_HOST = "localhost"
-BROKER_BACKEND = "redis"
-REDIS_PORT = 6379
-REDIS_HOST = "localhost"
+BROKER_HOST = os.getenv('BROKER_HOST')
+BROKER_BACKEND = os.getenv('BROKER_BACKEND')
+REDIS_PORT = os.getenv('REDIS_PORT')
+REDIS_HOST = os.getenv('REDIS_HOST')
+
+sentry_sdk.init(
+    dsn=os.getenv('DSN'),
+    integrations=[DjangoIntegration()],
+    auto_session_tracking=False,
+    traces_sample_rate=0
+)
 
 # LOGGING = {
 #     'version': 1,
