@@ -3,7 +3,11 @@
     <select class="skills-card__select" id="{{ skill.skill__skill }}" name="{{ skill.skill__skill }}">
       <option selected disabled hidden></option>
       {% for grade in grade_skills %}
+      {% if grade.grade == skill.min_grade__grade %}
+        <option value="{{ grade.grade }}" data-base>{{ grade.grade }}</option>
+      {% else %}
       <option value="{{ grade.grade }}">{{ grade.grade }}</option>
+      {% endif %}
       {% endfor %}
     </select>
 </div>

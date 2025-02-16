@@ -27,44 +27,54 @@ def for_main_page(request):
             ).annotate(
                 sum_grade=Sum("grade_skill__evaluation_number")
                 )
+
     context = {
         "competence": competence
     }
+
     return render(request, "matrix/main_page.html", context)
 
 
 @login_required
 def matrix(request):
     user = request.user
+
     if check_passing_date(user):
         return render(request, "matrix/double.html")
+
     skills = GradeCompetenceJobTitle.objects.filter(
         job_title=user.job_title
     ).values(
         "skill__skill",
-        "skill__area_of_application"
+        "skill__area_of_application",
+        "min_grade__grade"
         ).exclude(
             min_grade__evaluation_number=0
             ).order_by("skill__skill")
     grade_skills = GradeSkill.objects.values("grade")
     for_cycle = [1, 2, 3]
+
     context = {
         "range": for_cycle,
         "skills": skills,
         "grade_skills": grade_skills
     }
+
     if request.POST:
         data = dict(request.POST)
         data.pop("csrfmiddlewaretoken")
         if not data:
             return HttpResponse(status=404)
+
         if check_connect_redis():
             save_to_db.delay(data, user.id)
         else:
             save_to_db(data, user.id)
+
         return JsonResponse({
             "personnel_number": user.personnel_number
         }, status=201)
+
     return render(request, "matrix/matrix.html", context)
 
 
@@ -112,6 +122,7 @@ def profile(request, personnel_number):
     ).values("created_at").annotate(
         sum_grade=Sum("grade_skill__evaluation_number", default=0)
     ).order_by("-created_at")
+
     context = {
         "user_for_profile": user_for_profile,
         "old_personal_competence": old_personal_competence,
@@ -121,6 +132,7 @@ def profile(request, personnel_number):
         "general_sum_grade": general_sum_grade,
         "personal_sum_grade": personal_sum_grade
     }
+
     return render(request, "matrix/profile.html", context)
 
 
