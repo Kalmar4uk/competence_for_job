@@ -1,11 +1,16 @@
 import os
-from celery import current_task, shared_task
+from celery import shared_task
 from tempfile import NamedTemporaryFile
 from openpyxl import Workbook
 from django.shortcuts import get_object_or_404
 
 from matrix.models import Competence, GradeSkill, Skill, User
 from matrix.constants import CURRENT_MONTH
+
+
+@shared_task
+def my_monthly_task():
+    print(3211)
 
 
 @shared_task

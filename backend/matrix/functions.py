@@ -17,5 +17,4 @@ def check_connect_redis():
         con.ping()
     except redis.exceptions.RedisError:
         return False
-    else:
-        return True
+    return True
