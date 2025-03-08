@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import BaseModel
 from typing import List
 
@@ -51,10 +52,11 @@ class ApiSkillsGradeMatrixResponse(BaseModel):
     Скилл и оценка в виде объекта."""
     skills: ApiSkills
     grade: ApiGradeSkill
+    created_at: datetime
 
 
 class ApiMatrixCreateResponse(BaseModel):
     """Модель для ответа на пост запрос матрицы.
     Юзер в виде объекта и список объектов силла и оценки."""
     user: ApiUser
-    matrix: list[ApiSkillsGradeMatrixResponse]
+    competence: list[ApiSkillsGradeMatrixResponse]
