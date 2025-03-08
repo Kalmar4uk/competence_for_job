@@ -130,3 +130,5 @@ dmypy.json
 
 # .idea
 .idea
+
+backend/collected_static/

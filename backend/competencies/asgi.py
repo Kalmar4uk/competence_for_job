@@ -1,16 +1,24 @@
-"""
-ASGI config for competencies project.
-
-It exposes the ASGI callable as a module-level variable named ``application``.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/4.2/howto/deployment/asgi/
-"""
-
+# uvicorn competencies.asgi:application --reload
 import os
-
-from django.core.asgi import get_asgi_application
+import django
+from django.core.wsgi import get_wsgi_application
+from fastapi import FastAPI
+from fastapi.middleware.wsgi import WSGIMiddleware
+from fastapi.staticfiles import StaticFiles
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'competencies.settings')
+django.setup()
 
-application = get_asgi_application()
+from .fastapi_competencies import fastapi_competencies
+django_application = get_wsgi_application()
+
+application = FastAPI()
+
+application.mount(
+    "/static",
+    StaticFiles(directory="collected_static"),
+    name="static"
+)
+
+application.mount("/api", fastapi_competencies)
+application.mount("/", WSGIMiddleware(django_application))
