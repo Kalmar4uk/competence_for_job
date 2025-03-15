@@ -8,6 +8,7 @@ from api.models_for_api.model_request import ApiMatrixCreate
 from api.models_for_api.models_response import (
     ApiMatrixCreateResponse,
     ApiMatrixGet,
+    ApiMatrixListSkillsAndGrade,
     ApiSkillsGradeMatrixResponse
 )
 
@@ -18,12 +19,31 @@ router_grade = APIRouter(prefix="/grade", tags=["grade"])
 
 
 @router_matrix.get("/", response_model=ApiMatrixGet)
-def matrix_list():
-    skills_data = Skill.objects.all().values()
-    grade_data = GradeSkill.objects.all().values()
-    skills = [ApiSkills(**skill) for skill in skills_data]
-    grades = [ApiGradeSkill(**grade) for grade in grade_data]
-    return ApiMatrixGet(skills=skills, grade=grades)
+def matrix_list(area_of_application: str | None = None):
+    skills_data = Skill.objects.all()
+    grade_data = GradeSkill.objects.all()
+    grades = [ApiGradeSkill.from_django_model(grade) for grade in grade_data]
+    basic_area_of_application = list(
+        Skill.objects.values_list("area_of_application", flat=True).distinct()
+    )
+    if (
+        area_of_application and
+        area_of_application.capitalize() in basic_area_of_application
+    ):
+        skills_data = Skill.objects.filter(
+            area_of_application=area_of_application.capitalize()
+        )
+    matrix = []
+    for skill in skills_data:
+        matrix.append(
+            ApiMatrixListSkillsAndGrade(
+                id=skill.id,
+                area_of_application=skill.area_of_application,
+                skill=skill.skill,
+                grade=grades
+            )
+        )
+    return ApiMatrixGet(matrix=matrix)
 
 
 @router_matrix.post(
@@ -53,11 +73,9 @@ def matrix_create(matrix: ApiMatrixCreate):
                 skill=skill,
                 grade_skill=grade
             )
-            skill_response = ApiSkills(**model_to_dict(competence.skill))
-            grade_response = ApiGradeSkill(
-                **model_to_dict(
-                    competence.grade_skill
-                )
+            skill_response = ApiSkills.from_django_model(competence.skill)
+            grade_response = ApiGradeSkill.from_django_model(
+                competence.grade_skill
             )
             response_list.append(ApiSkillsGradeMatrixResponse(
                 skills=skill_response,
@@ -83,24 +101,40 @@ def matrix_create(matrix: ApiMatrixCreate):
 
 
 @router_skills.get("/", response_model=list[ApiSkills])
-def skills_list():
-    skills_data = Skill.objects.all().values()
-    return [ApiSkills(**skill) for skill in skills_data]
+def skills_list(area_of_application: str | None = None):
+    basic_area_of_application = list(
+        Skill.objects.values_list("area_of_application", flat=True).distinct()
+    )
+    if (
+        area_of_application and
+        area_of_application.capitalize() in basic_area_of_application
+    ):
+        skills_data = Skill.objects.filter(
+            area_of_application=area_of_application.capitalize()
+        )
+        return [ApiSkills.from_django_model(skill) for skill in skills_data]
+    skills_data = Skill.objects.all()
+    return [ApiSkills.from_django_model(skill) for skill in skills_data]
 
 
 @router_skills.get("/{skill_id}", response_model=ApiSkills)
 def one_skill(skill_id: int):
     try:
-        skill = model_to_dict(get_object_or_404(Skill, id=skill_id))
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    return ApiSkills(**skill)
+        skill = get_object_or_404(Skill, id=skill_id)
+        return ApiSkills.from_django_model(skill)
+    except Http404 as e:
+        raise HTTPException(
+            status_code=404, detail=f"{str(e)}({str(skill_id)})"
+        )
 
 
 @router_grade.get("/", response_model=list[ApiGradeSkill])
 def grade_list():
-    grade_data = GradeSkill.objects.all().values()
-    return [ApiGradeSkill(**grade) for grade in grade_data]
+    try:
+        grade_data = GradeSkill.objects.all()
+        return [ApiGradeSkill.from_django_model(grade) for grade in grade_data]
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router_grade.get("/{grade_id}", response_model=ApiGradeSkill)

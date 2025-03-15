@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from api.core.base_from_django_model import ApiBaseModelIfFieldsMatch
 
 
 class ApiUser(BaseModel):
@@ -10,15 +11,20 @@ class ApiUser(BaseModel):
     job_title: str
 
 
-class ApiSkills(BaseModel):
+class ApiSkills(ApiBaseModelIfFieldsMatch):
     """Модель скиллов для ответа"""
     id: int
     area_of_application: str
     skill: str
 
 
-class ApiGradeSkill(BaseModel):
+class ApiGradeSkill(ApiBaseModelIfFieldsMatch):
     """Модель оценки для ответа"""
     id: int
     grade: str
     evaluation_number: int
+
+
+class ApiMatrixListSkillsAndGrade(ApiSkills):
+    """Модель скиллов с оценками для ответа"""
+    grade: list[ApiGradeSkill]
