@@ -1,8 +1,16 @@
 from fastapi import APIRouter, HTTPException, status
+from django.http.response import Http404
 from django.forms.models import model_to_dict
 from django.shortcuts import get_object_or_404
 from matrix.models import Skill, GradeSkill, User, Competence
-from api.models_for_api import ApiGradeSkill, ApiMatrixGet, ApiMatrixCreate, ApiSkills, ApiMatrixCreateResponse, ApiSkillsGradeMatrixResponse, ApiUser
+from api.models_for_api.base_model import ApiGradeSkill, ApiSkills, ApiUser
+from api.models_for_api.model_request import ApiMatrixCreate
+from api.models_for_api.models_response import (
+    ApiMatrixCreateResponse,
+    ApiMatrixGet,
+    ApiSkillsGradeMatrixResponse
+)
+
 
 router_matrix = APIRouter(prefix="/matrix", tags=["matrix"])
 router_skills = APIRouter(prefix="/skills", tags=["skills"])
@@ -27,24 +35,40 @@ def matrix_create(matrix: ApiMatrixCreate):
     response_list = []
     try:
         user = get_object_or_404(User, id=matrix.user)
-        for mat in matrix.matrix:
+    except Http404 as e:
+        raise HTTPException(
+            status_code=404, detail=str(e)
+        )
+    for mat in matrix.matrix:
+        try:
             skill = get_object_or_404(Skill, skill=mat.skills)
             grade = get_object_or_404(GradeSkill, grade=mat.grade)
+        except Http404 as e:
+            raise HTTPException(
+                status_code=404, detail=str(e)
+            )
+        try:
             competence = Competence.objects.create(
                 user=user,
                 skill=skill,
                 grade_skill=grade
             )
-            skill_response = ApiSkills(**model_to_dict(skill))
-            grade_response = ApiGradeSkill(**model_to_dict(grade))
+            skill_response = ApiSkills(**model_to_dict(competence.skill))
+            grade_response = ApiGradeSkill(
+                **model_to_dict(
+                    competence.grade_skill
+                )
+            )
             response_list.append(ApiSkillsGradeMatrixResponse(
                 skills=skill_response,
                 grade=grade_response,
                 created_at=competence.created_at
                 )
             )
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        except Exception as e:
+            HTTPException(
+                status_code=400, detail=str(e)
+            )
     user_response = ApiUser(
         id=user.id,
         email=user.email,
