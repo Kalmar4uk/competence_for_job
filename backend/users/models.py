@@ -78,7 +78,7 @@ class JobDepartment(GeneralHierarchy):
 
     class Meta:
         verbose_name = "Департамент"
-        verbose_name_plural = "Департамент"
+        verbose_name_plural = "Департаменты"
 
 
 class JobManagement(GeneralHierarchy):
@@ -92,4 +92,17 @@ class JobManagement(GeneralHierarchy):
 
     class Meta:
         verbose_name = "Управление"
-        verbose_name_plural = "Управление"
+        verbose_name_plural = "Управления"
+
+
+class RefreshToken(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Пользователь")
+    refresh_token = models.CharField(max_length=255, verbose_name="Refresh Token")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Refresh Token"
+        verbose_name_plural = "Refresh Tokens"
+
+    def __str__(self):
+        return self.refresh_token

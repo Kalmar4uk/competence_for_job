@@ -25,6 +25,16 @@ class ApiGradeSkill(ApiBaseModelIfFieldsMatch):
     evaluation_number: int
 
 
-class ApiMatrixListSkillsAndGrade(ApiSkills):
-    """Модель скиллов с оценками для ответа"""
-    grade: list[ApiGradeSkill]
+class Token(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    email: str
+
+
+class UserLogin(BaseModel):
+    email: str
+    password: str

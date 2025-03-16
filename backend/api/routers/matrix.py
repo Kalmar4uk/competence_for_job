@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException, status
+from django.contrib.auth import get_user_model
 from django.http.response import Http404
-from django.forms.models import model_to_dict
 from django.shortcuts import get_object_or_404
-from matrix.models import Skill, GradeSkill, User, Competence
+from matrix.models import Skill, GradeSkill, Competence
 from api.models_for_api.base_model import ApiGradeSkill, ApiSkills, ApiUser
 from api.models_for_api.model_request import ApiMatrixCreate
 from api.models_for_api.models_response import (
@@ -11,6 +11,8 @@ from api.models_for_api.models_response import (
     ApiMatrixListSkillsAndGrade,
     ApiSkillsGradeMatrixResponse
 )
+
+User = get_user_model()
 
 
 router_matrix = APIRouter(prefix="/matrix", tags=["matrix"])
@@ -140,7 +142,7 @@ def grade_list():
 @router_grade.get("/{grade_id}", response_model=ApiGradeSkill)
 def one_grade(grade_id: int):
     try:
-        grade = model_to_dict(get_object_or_404(GradeSkill, id=grade_id))
+        grade = get_object_or_404(GradeSkill, id=grade_id)
+        return ApiGradeSkill.from_django_model(grade)
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    return ApiGradeSkill(**grade)
+        raise HTTPException(status_code=404, detail=str(e))

@@ -7,7 +7,7 @@ from django.contrib.sessions.models import Session
 from django.contrib import messages
 from django.utils.translation import ngettext
 from core.models import MyDjangoQLSearchMixin
-from users.models import JobDepartment, JobGroup, JobManagement, User
+from users.models import JobDepartment, JobGroup, JobManagement, User, RefreshToken
 
 
 @admin.register(User)
@@ -147,3 +147,8 @@ class PermissionaAdmin(admin.ModelAdmin):
 @admin.register(Session)
 class SessionAdmin(admin.ModelAdmin):
     ...
+
+
+@admin.register(RefreshToken)
+class RefreshTokenAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
+    readonly_fields = ("user", "refresh_token", "created_at")
