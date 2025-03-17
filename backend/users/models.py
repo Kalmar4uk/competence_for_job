@@ -97,7 +97,7 @@ class JobManagement(GeneralHierarchy):
 
 class RefreshToken(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Пользователь")
-    refresh_token = models.CharField(max_length=255, verbose_name="Refresh Token")
+    refresh_token = models.CharField(max_length=255, unique=True, verbose_name="Refresh Token")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

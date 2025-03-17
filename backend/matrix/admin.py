@@ -2,8 +2,13 @@ from django.contrib import admin
 from rangefilter.filters import DateRangeFilterBuilder
 
 from core.models import MyDjangoQLSearchMixin
-from matrix.models import (Competence, GradeCompetenceJobTitle, GradeSkill,
+from matrix.models import (Matrix, Competence, GradeCompetenceJobTitle, GradeSkill,
                            Skill)
+
+
+class CompetenceInline(admin.TabularInline):
+    model = Competence
+    extra = 1
 
 
 @admin.register(Skill)
@@ -22,15 +27,13 @@ class GradeCompetenceJobTitleAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
     readonly_fields = ("job_title", "skill", "min_grade")
 
 
-@admin.register(Competence)
-class CompetenceAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
-    list_display = ("user", "skill", "grade_skill", "created_at")
-    list_filter = (
-        ("created_at", DateRangeFilterBuilder()),
-        "user",
-        "grade_skill"
-    )
-    readonly_fields = ("created_at",)
+@admin.register(Matrix)
+class MatrixAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
+    inlines = (CompetenceInline,)
+    list_display = ("name", "user", "created_at", "completed_at")
+    list_filter = ("user",)
+    search_fields = ("user",)
+    readonly_fields = ("created_at", "completed_at")
 
 
 @admin.register(GradeSkill)

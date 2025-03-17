@@ -151,4 +151,5 @@ class SessionAdmin(admin.ModelAdmin):
 
 @admin.register(RefreshToken)
 class RefreshTokenAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
+    actions = None
     readonly_fields = ("user", "refresh_token", "created_at")

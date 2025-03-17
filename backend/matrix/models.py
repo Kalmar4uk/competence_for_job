@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
+from matrix.constants import NAME_FOR_TASK_MATRIX
+
 User = get_user_model()
 
 
@@ -43,12 +45,6 @@ class GradeCompetenceJobTitle(models.Model):
 
 
 class Competence(models.Model):
-    user = models.ForeignKey(
-        User,
-        related_name="competence",
-        on_delete=models.CASCADE,
-        verbose_name="Сотрудник"
-    )
     skill = models.ForeignKey(
         Skill,
         related_name="skill_competence",
@@ -59,17 +55,13 @@ class Competence(models.Model):
         "GradeSkill",
         verbose_name="Оценка",
         on_delete=models.CASCADE,
+        null=True
     )
-    created_at = models.DateTimeField("Дата оценки", auto_now_add=True)
+    matrix = models.ForeignKey("Matrix", on_delete=models.CASCADE)
 
     class Meta:
-        ordering = ['user']
         verbose_name = "Компетенция"
         verbose_name_plural = "Компетенции"
-        ordering = ['-created_at']
-
-    def __str__(self):
-        return f"{self.user}"
 
 
 class GradeSkill(models.Model):
@@ -82,3 +74,23 @@ class GradeSkill(models.Model):
 
     def __str__(self):
         return self.grade
+
+
+class Matrix(models.Model):
+    CHOICES = (
+        ("Новая", "Новая"),
+        ("Завершена", "Завершена"),
+        ("Просрочена", "Просрочена")
+    )
+    name = models.CharField("Наименование", max_length=20, default=NAME_FOR_TASK_MATRIX)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Сотрудник")
+    status = models.CharField("Статус", max_length=10, default="Новая", choices=CHOICES)
+    created_at = models.DateTimeField("Дата создания", auto_now_add=True)
+    completed_at = models.DateTimeField("Дата завершения", null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Матрица"
+        verbose_name_plural = "Матрицы"
+
+    def __str__(self):
+        return self.name
