@@ -153,3 +153,6 @@ class SessionAdmin(admin.ModelAdmin):
 class RefreshTokenAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
     actions = None
     readonly_fields = ("user", "refresh_token", "created_at")
+
+    def has_delete_permission(self, request, obj=None):
+        return False

@@ -4,16 +4,20 @@ from tempfile import NamedTemporaryFile
 from openpyxl import Workbook
 from django.shortcuts import get_object_or_404
 
-from matrix.models import Competence, GradeSkill, Skill, User, Matrix
+from matrix.models import Competence, GradeSkill, Skill, User, Matrix, GradeCompetenceJobTitle
 from matrix.constants import CURRENT_MONTH, NAME_FOR_TASK_MATRIX
 
 
 @shared_task
 def generate_matrix_for_user():
     users = User.objects.filter(is_active=True)
-    skills = Skill.objects.all()
     for user in users:
         matrix = Matrix.objects.create(user=user)
+        skills = Skill.objects.filter(
+            grade_competence__job_title=user.job_title
+        ).exclude(
+            grade_competence__min_grade__evaluation_number=0
+        )
         for skill in skills:
             Competence.objects.create(skill=skill, matrix=matrix)
 

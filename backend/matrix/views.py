@@ -5,8 +5,8 @@ from django.http import HttpResponse, JsonResponse
 from dateutil.relativedelta import relativedelta
 
 from matrix.constants import CURRENT_MONTH, CURRENT_DATE
-from matrix.functions import check_passing_date, check_connect_redis
-from matrix.models import Competence, GradeCompetenceJobTitle, GradeSkill, User
+from matrix.functions import check_connect_redis
+from matrix.models import Competence, GradeCompetenceJobTitle, GradeSkill, Matrix, User
 from matrix.tasks import download_file, save_to_db
 
 
@@ -17,19 +17,19 @@ def for_main_page(request):
         ).exclude(
             id=request.user.id
             )
-    competence = Competence.objects.filter(
+    matrix = Matrix.objects.filter(
         user__in=users_same_group,
-        created_at__month=CURRENT_MONTH
-        ).values(
-            "user__first_name",
-            "user__last_name",
-            "user__personnel_number"
-            ).annotate(
-                sum_grade=Sum("grade_skill__evaluation_number")
-                )
-
+        created_at__month=CURRENT_MONTH,
+        status="Завершена"
+    ).values(
+        "user__first_name",
+        "user__last_name",
+        "user__personnel_number"
+        ).annotate(
+            sum_grade=Sum("competencies__grade_skill__evaluation_number")
+        )
     context = {
-        "competence": competence
+        "matrix": matrix
     }
 
     return render(request, "matrix/main_page.html", context)
@@ -38,9 +38,6 @@ def for_main_page(request):
 @login_required
 def matrix(request):
     user = request.user
-
-    if check_passing_date(user):
-        return render(request, "matrix/double.html")
 
     skills = GradeCompetenceJobTitle.objects.filter(
         job_title=user.job_title
@@ -126,7 +123,6 @@ def profile(request, personnel_number):
     context = {
         "user_for_profile": user_for_profile,
         "old_personal_competence": old_personal_competence,
-        "check_passing": check_passing_date(user_for_profile),
         "competence_with_grade_zero": competence_with_grade_zero,
         "personal_competence_grade": personal_competence_grade,
         "general_sum_grade": general_sum_grade,

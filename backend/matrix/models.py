@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
-from matrix.constants import NAME_FOR_TASK_MATRIX
+from matrix.constants import CHOICES, NAME_FOR_TASK_MATRIX
 
 User = get_user_model()
 
@@ -57,7 +57,7 @@ class Competence(models.Model):
         on_delete=models.CASCADE,
         null=True
     )
-    matrix = models.ForeignKey("Matrix", on_delete=models.CASCADE)
+    matrix = models.ForeignKey("Matrix", on_delete=models.CASCADE, related_name="competencies")
 
     class Meta:
         verbose_name = "Компетенция"
@@ -77,11 +77,6 @@ class GradeSkill(models.Model):
 
 
 class Matrix(models.Model):
-    CHOICES = (
-        ("Новая", "Новая"),
-        ("Завершена", "Завершена"),
-        ("Просрочена", "Просрочена")
-    )
     name = models.CharField("Наименование", max_length=20, default=NAME_FOR_TASK_MATRIX)
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Сотрудник")
     status = models.CharField("Статус", max_length=10, default="Новая", choices=CHOICES)

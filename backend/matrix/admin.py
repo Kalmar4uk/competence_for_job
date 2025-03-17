@@ -30,7 +30,7 @@ class GradeCompetenceJobTitleAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
 @admin.register(Matrix)
 class MatrixAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
     inlines = (CompetenceInline,)
-    list_display = ("name", "user", "created_at", "completed_at")
+    list_display = ("name", "user", "status", "created_at", "completed_at")
     list_filter = ("user",)
     search_fields = ("user",)
     readonly_fields = ("created_at", "completed_at")
