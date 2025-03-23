@@ -1,8 +1,8 @@
 from django.utils import timezone
 
-
-CURRENT_DATE = timezone.now().date()
-CURRENT_MONTH = timezone.now().month
+CURRENT_DATETIME = timezone.now()
+CURRENT_DATE = CURRENT_DATETIME.date()
+CURRENT_MONTH = CURRENT_DATETIME.month
 JOB_TITLE_USERS = [
     "Консультант",
     "Ведущий консультант",

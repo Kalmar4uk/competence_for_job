@@ -63,14 +63,18 @@ def matrix(request):
         if not data:
             return HttpResponse(status=404)
 
-        if check_connect_redis():
-            save_to_db.delay(data, user.id)
-        else:
-            save_to_db(data, user.id)
+        try:
+            if check_connect_redis():
+                save_to_db.delay(data, user.id)
+            else:
+                save_to_db(data, user.id)
 
-        return JsonResponse({
-            "personnel_number": user.personnel_number
-        }, status=201)
+            return JsonResponse({
+                "personnel_number": user.personnel_number
+            }, status=201)
+
+        except Exception as e:
+            return JsonResponse({"except": str(e)}, status=400)
 
     return render(request, "matrix/matrix.html", context)
 

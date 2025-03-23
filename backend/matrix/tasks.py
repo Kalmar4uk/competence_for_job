@@ -7,7 +7,8 @@ from django.shortcuts import get_object_or_404
 from dateutil.relativedelta import relativedelta
 
 from matrix.models import Competence, GradeSkill, Skill, User, Matrix, GradeCompetenceJobTitle
-from matrix.constants import CURRENT_MONTH, NAME_FOR_TASK_MATRIX, CURRENT_DATE
+from matrix.constants import CURRENT_MONTH, NAME_FOR_TASK_MATRIX, CURRENT_DATE, CURRENT_DATETIME
+from matrix.exceptions import NotNull
 
 
 @shared_task
@@ -26,21 +27,25 @@ def generate_matrix_for_user():
 
 @shared_task
 def save_to_db(data, user_id):
-    pass
-    # user = User.objects.get(id=user_id)
-    # Competence.objects.filter(
-    #     user=user,
-    #     created_at__month=CURRENT_MONTH
-    # ).delete()
+    user = User.objects.get(id=user_id)
+    matrix = Matrix.objects.get(user=user, status="Новая")
+    competence = Competence.objects.filter(matrix=matrix)
 
-    # for skill, grade in data.items():
-    #     new_skill = get_object_or_404(Skill, skill=skill)
-    #     grade_skill = get_object_or_404(GradeSkill, grade=grade[0])
-    #     Competence.objects.create(
-    #         user=user,
-    #         skill=new_skill,
-    #         grade_skill=grade_skill
-    #     )
+    for comp in competence:
+        for skill, grade in data.items():
+            obj_grade_skill = GradeSkill.objects.get(grade=grade[0])
+            if comp.skill.skill == skill:
+                comp.grade_skill = obj_grade_skill
+                comp.save()
+
+    for check_none in competence:
+        if check_none.grade_skill is None:
+            raise NotNull(
+                "Не все навыки оценены!"
+            )
+    matrix.status = "Завершена"
+    matrix.completed_at = CURRENT_DATETIME
+    matrix.save()
 
 
 @shared_task
