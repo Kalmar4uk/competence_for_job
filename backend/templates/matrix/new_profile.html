@@ -1,0 +1,211 @@
+{% extends "index.html" %}
+{% block title %}
+  {{ user_for_profile.first_name }} {{ user_for_profile.last_name }}
+{% endblock %}
+{% block content %}
+<div class="profile-section">
+    <h2 class="section-title">Данные профиля</h2>
+    <div class="profile-info">
+        <div>
+            <p class="profile-info__category">ФИО:</p>
+            <p>{{ user_for_profile.first_name }} {{ user_for_profile.last_name }} {% if user_for_profile.middle_name %}{{ user_for_profile.middle_name }}{% endif %}</p>
+        </div>
+        <div>
+            <p class="profile-info__category">Должность:</p>
+            <p>{{ user_for_profile.job_title }}</p>
+        </div>
+        <div>
+            <p class="profile-info__category">Группа</p>
+            <p>{{ user_for_profile.group }}</p>
+        </div>
+        <div>
+            <p class="profile-info__category">Табельный номер:</p>
+            <p>{% if user_for_profile.personnel_number|slice:":1" == "0" %}{{ user_for_profile.personnel_number|slice:"1:" }}{% else %}{{ user_for_profile.personnel_number }}{% endif %}</p>
+        </div>
+    </div>
+</div>
+{% if not_completed_personal_matrix %}
+    <div class="competence-section">
+        <h3 class="section-title">Есть назначенные матрицы</h3>
+        <a class="button" href="{% url 'matrix:matrix' %}">Пройти</a>
+    </div>
+{% endif %}
+<div class="competence-section">
+    <h2 class="section-title">Статистика</h2>
+    <div class="blocks-container">
+        <!-- Блок для "Последняя пройденная матрица" -->
+        <div class="block" onclick="openModal('modalLastMatrix', lastMatrixData, 'table-body-last')">
+            <p>Последняя пройденная матрица:</p>
+            <p>Оценка: {{ last_personal_sum_grade }}</p>
+        </div>
+
+        <!-- Блок для "Пройденные матрицы за текущий месяц" -->
+        <div class="block" onclick="openModal('modalCurrentMonth', currentMonthData, 'table-body-current')">
+            <p>Пройденные матрицы за текущий месяц:</p>
+            <p>Оценка: {{ current_month_sum_grade }}</p>
+        </div>
+
+        <!-- Блок для "Пройденные матрицы за последние 3 месяца" -->
+        <div class="block" onclick="openModal('modalLastThreeMonths', lastThreeMonthsData, 'table-body-three')">
+            <p>Пройденные матрицы за последние три месяца:</p>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для "Последняя пройденная матрица" -->
+<div id="modalLastMatrix" class="modal">
+    <div class="modal-content">
+        <div class="sticky-button-container">
+            <input type="text" id="search-skill-last" placeholder="Поиск по навыку" class="search-input">
+            <a class="modal-button" href="{% url 'matrix:competence_file' request.resolver_match.kwargs.personnel_number 'last' %}">Скачать</a>
+        </div>
+        <div id="details-table-last">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Навык</th>
+                        <th>Оценка</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body-last">
+                    <!-- Данные будут добавлены сюда через JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для "Пройденные матрицы за текущий месяц" -->
+<div id="modalCurrentMonth" class="modal">
+    <div class="modal-content">
+        <div class="sticky-button-container">
+            <input type="text" id="search-skill-current" placeholder="Поиск по навыку" class="search-input">
+            <a class="modal-button" href="{% url 'matrix:competence_file' request.resolver_match.kwargs.personnel_number 'current_month' %}">Скачать</a>
+        </div>
+        <div id="details-table-last">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Навык</th>
+                        <th>Оценка</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body-current">
+                    <!-- Данные будут добавлены сюда через JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для "Пройденные матрицы за последние 3 месяца" -->
+<div id="modalLastThreeMonths" class="modal">
+    <div class="modal-content">
+        <div class="sticky-button-container">
+            <a class="modal-button" href="{% url 'matrix:competence_file' request.resolver_match.kwargs.personnel_number 'last_three_month' %}">Скачать</a>
+        </div>
+        <div id="details-table-last">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Месяц</th>
+                        <th>Общая оценка</th>
+                        <th>Статус</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body-three">
+                    <!-- Данные будут добавлены сюда через JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+// Данные для таблиц (пример)
+const lastMatrixData = [
+    {% for last in last_competence %}
+    { skill: "{{ last.skill__skill }}", grade: "{{ last.grade_skill__grade }}" },
+    {% endfor %}
+];
+
+const currentMonthData = [
+    // Данные для "Пройденные матрицы за текущий месяц"
+    {% for current in competence_for_current_month %}
+    { skill: "{{ current.skill__skill }}", grade: "{{ current.grade_skill__grade }}" },
+    {% endfor %}
+];
+
+const lastThreeMonthsData = [
+    // Данные для "Пройденные матрицы за последние 3 месяца"
+    {% for old in old_personal_competence %}
+    { skill: "{{ old.matrix__created_at|date:'F' }}", grade: "{{ old.sum_grade }}", state: "{{ old.matrix__status }}" },
+    {% endfor %}
+];
+
+// Функция для открытия модального окна
+function openModal(modalId, data, tableBodyId) {
+    const modal = document.getElementById(modalId);
+    const tableBody = document.getElementById(tableBodyId);
+
+    // Очищаем таблицу перед заполнением
+    tableBody.innerHTML = "";
+
+    data.forEach(item => {
+        const row = document.createElement("tr");
+        if(modalId == 'modalLastThreeMonths'){
+            row.innerHTML = `<td>${item.skill}</td><td>${item.grade}</td><td>${item.state}</td>`;
+        } else {
+            row.innerHTML = `<td>${item.skill}</td><td>${item.grade}</td>`;
+        }
+        tableBody.appendChild(row);
+        });
+
+    // Показываем модальное окно
+    modal.style.display = "block";
+}
+
+// Функция для поиска по навыку
+function searchSkill(inputId, tableBodyId) {
+    const searchText = document.getElementById(inputId).value.toLowerCase(); // Получаем текст из поля ввода
+    const rows = document.querySelectorAll(`#${tableBodyId} tr`); // Получаем все строки таблицы
+
+    rows.forEach(row => {
+        const skillCell = row.querySelector('td:first-child'); // Первая ячейка (навык)
+        if (skillCell) {
+            const skillText = skillCell.textContent.toLowerCase(); // Текст навыка
+            if (skillText.includes(searchText)) {
+                row.style.display = ''; // Показываем строку, если навык совпадает
+            } else {
+                row.style.display = 'none'; // Скрываем строку, если навык не совпадает
+            }
+        }
+    });
+}
+
+// Добавляем обработчики событий для каждого поля ввода
+document.getElementById('search-skill-last').addEventListener('input', () => {
+    searchSkill('search-skill-last', 'table-body-last');
+});
+
+document.getElementById('search-skill-current').addEventListener('input', () => {
+    searchSkill('search-skill-current', 'table-body-current');
+});
+
+// Функция для закрытия модального окна
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    modal.style.display = "none";
+}
+
+
+// Закрытие модального окна при клике вне его области
+window.onclick = function(event) {
+    if (event.target.classList.contains('modal')) {
+        event.target.style.display = "none";
+    }
+}
+</script>
+</body>
+</html>
+{% endblock %}

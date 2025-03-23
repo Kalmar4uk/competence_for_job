@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.utils.translation import ngettext
+from django.contrib import messages
 from rangefilter.filters import DateRangeFilterBuilder
 
 from core.models import MyDjangoQLSearchMixin
@@ -29,11 +31,29 @@ class GradeCompetenceJobTitleAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
 
 @admin.register(Matrix)
 class MatrixAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
+    actions = ("change_status",)
     inlines = (CompetenceInline,)
     list_display = ("name", "user", "status", "created_at", "completed_at")
     list_filter = ("user",)
     search_fields = ("user",)
     readonly_fields = ("created_at", "completed_at")
+
+    @admin.action(description="Перевести в Завершено")
+    def change_status(self, request, queryset):
+        change_status_tasck = queryset.update(status="Завершена")
+        for matrix in queryset:
+            matrix.save()
+        self.message_user(
+            request,
+            ngettext(
+                ("%d Успешно изменен"),
+                ("%d Успешно изменены"),
+                change_status_tasck
+            )
+            % change_status_tasck,
+            messages.SUCCESS
+        )
+
 
 
 @admin.register(GradeSkill)

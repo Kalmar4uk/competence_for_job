@@ -76,30 +76,56 @@ def matrix(request):
 
 
 @login_required
-def profile(request, personnel_number):
+def competence_file(request, personnel_number, period):
+    if check_connect_redis():
+        stream = download_file.delay(personnel_number, period).get()
+    else:
+        stream = download_file(personnel_number, period)
+    response = HttpResponse(
+        content=stream,
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={
+            "Content-Disposition": 'attachment; filename="competence.xlsx"'
+        },
+    )
+    return response
+
+
+@login_required
+def new_profile(request, personnel_number):
     current_date = CURRENT_DATE.replace(day=1)
     user_for_profile = get_object_or_404(
         User,
         personnel_number=personnel_number
     )
-    personal_competence = Competence.objects.filter(
+    personal_matrix = Matrix.objects.filter(
         user=user_for_profile,
         created_at__month=CURRENT_MONTH
+    ).order_by(
+        "-created_at"
+    ).prefetch_related(
+        "competencies"
     )
-    personal_competence_grade = personal_competence.exclude(
-        grade_skill__evaluation_number=0
+    not_completed_personal_matrix = personal_matrix.filter(status="Новая")
+    last_completed_personal_matrix = personal_matrix.filter(status="Завершена")[0]
+    last_competence = Competence.objects.filter(
+        matrix=last_completed_personal_matrix
     ).values(
         "skill__skill",
         "grade_skill__grade"
-        ).order_by(
-            "grade_skill__evaluation_number"
-            )
-    competence_with_grade_zero = personal_competence.filter(
-        grade_skill__evaluation_number=0
+    )
+    competence_for_current_month = Competence.objects.filter(
+        matrix__in=personal_matrix
     ).values(
-        "skill__skill"
+        "skill__skill",
+        "grade_skill__grade"
+    )
+    last_personal_sum_grade = last_competence.aggregate(
+        sum_grade=Sum(
+            "grade_skill__evaluation_number", default=0
         )
-    personal_sum_grade = personal_competence_grade.aggregate(
+    )["sum_grade"]
+    current_month_sum_grade = competence_for_current_month.aggregate(
         sum_grade=Sum(
             "grade_skill__evaluation_number", default=0
         )
@@ -110,39 +136,32 @@ def profile(request, personnel_number):
     ).aggregate(
         sum_grade=Sum("min_grade__evaluation_number", default=0)
     )["sum_grade"]
-    old_personal_competence = Competence.objects.filter(
+    old_personal_matrix = Matrix.objects.filter(
         user=user_for_profile,
         created_at__date__range=(
             current_date - relativedelta(months=3),
             (current_date - relativedelta(months=1))+relativedelta(day=31)
         )
-    ).values("created_at").annotate(
-        sum_grade=Sum("grade_skill__evaluation_number", default=0)
-    ).order_by("-created_at")
+    ).order_by(
+        "-created_at"
+    ).prefetch_related(
+        "competencies"
+    )
+    old_personal_competence = Competence.objects.filter(
+        matrix__in=old_personal_matrix
+        ).values("matrix__created_at", "matrix__status").annotate(
+            sum_grade=Sum("grade_skill__evaluation_number", default=0)
+        ).order_by("-matrix__created_at")
 
     context = {
         "user_for_profile": user_for_profile,
-        "old_personal_competence": old_personal_competence,
-        "competence_with_grade_zero": competence_with_grade_zero,
-        "personal_competence_grade": personal_competence_grade,
+        "not_completed_personal_matrix": not_completed_personal_matrix,
+        "last_competence": last_competence,
+        "competence_for_current_month": competence_for_current_month,
+        "last_personal_sum_grade": last_personal_sum_grade,
+        "current_month_sum_grade": current_month_sum_grade,
         "general_sum_grade": general_sum_grade,
-        "personal_sum_grade": personal_sum_grade
+        "old_personal_competence": old_personal_competence
     }
 
-    return render(request, "matrix/profile.html", context)
-
-
-@login_required
-def competence_file(request, personnel_number):
-    if check_connect_redis():
-        stream = download_file.delay(personnel_number).get()
-    else:
-        stream = download_file(personnel_number)
-    response = HttpResponse(
-        content=stream,
-        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers={
-            "Content-Disposition": 'attachment; filename="competence.xlsx"'
-        },
-    )
-    return response
+    return render(request, "matrix/new_profile.html", context)
