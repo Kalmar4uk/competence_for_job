@@ -1,6 +1,8 @@
 from datetime import datetime
+
 from pydantic import BaseModel
-from .base_model import ApiSkills, ApiGradeSkill, ApiUser
+
+from .base_model import ApiGradeSkill, ApiSkills, ApiUser
 
 
 class ApiMatrixListSkillsAndGrade(ApiSkills):

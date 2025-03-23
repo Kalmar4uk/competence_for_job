@@ -1,7 +1,6 @@
+from core.models import GeneralHierarchy
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-
-from core.models import GeneralHierarchy
 from users.manager import CustomUserManager
 from users.validators import validation_min_length_personnal_number
 

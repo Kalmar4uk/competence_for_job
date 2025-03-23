@@ -1,13 +1,13 @@
-from django.contrib import admin
+from core.models import MyDjangoQLSearchMixin
+from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-from django.utils.translation import gettext_lazy as _
 from django.contrib.sessions.models import Session
-from django.contrib import messages
+from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ngettext
-from core.models import MyDjangoQLSearchMixin
-from users.models import JobDepartment, JobGroup, JobManagement, User, RefreshToken
+from users.models import (JobDepartment, JobGroup, JobManagement, RefreshToken,
+                          User)
 
 
 @admin.register(User)

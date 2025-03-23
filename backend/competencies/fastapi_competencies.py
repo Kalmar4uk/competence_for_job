@@ -1,8 +1,9 @@
 import os
+
+from api.routers.matrix import router_grade, router_matrix, router_skills
+from api.routers.users import router_auth, router_users
 from dotenv import load_dotenv
 from fastapi import FastAPI
-from api.routers.matrix import router_matrix, router_skills, router_grade
-from api.routers.users import router_auth, router_users
 
 load_dotenv()
 

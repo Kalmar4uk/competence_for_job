@@ -1,5 +1,6 @@
 # uvicorn competencies.asgi:application --reload
 import os
+
 import django
 from django.core.wsgi import get_wsgi_application
 from fastapi import FastAPI
@@ -10,6 +11,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'competencies.settings')
 django.setup()
 
 from .fastapi_competencies import fastapi_competencies
+
 django_application = get_wsgi_application()
 
 application = FastAPI()

@@ -1,13 +1,14 @@
-import jwt
-from django.contrib.auth import get_user_model, authenticate
-from django.conf import settings
-from django.shortcuts import get_object_or_404
-from django.http.response import Http404
 from datetime import datetime, timedelta, timezone
+
+import jwt
+from api.models_for_api.base_model import ApiUser, TokenData
+from django.conf import settings
+from django.contrib.auth import authenticate, get_user_model
+from django.http.response import Http404
+from django.shortcuts import get_object_or_404
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
-from api.models_for_api.base_model import ApiUser, TokenData
 
 User = get_user_model()
 

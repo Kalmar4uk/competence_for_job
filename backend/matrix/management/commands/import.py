@@ -2,7 +2,6 @@ import csv
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
-
 from matrix.models import GradeCompetenceJobTitle, GradeSkill, Skill
 
 PATH_TO_FILE = f'{settings.BASE_DIR}/data/'

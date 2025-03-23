@@ -1,12 +1,12 @@
+from dateutil.relativedelta import relativedelta
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q, Sum
-from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse, JsonResponse
-from dateutil.relativedelta import relativedelta
-
-from matrix.constants import CURRENT_MONTH, CURRENT_DATE
+from django.shortcuts import get_object_or_404, render
+from matrix.constants import CURRENT_DATE, CURRENT_MONTH
 from matrix.functions import check_connect_redis
-from matrix.models import Competence, GradeCompetenceJobTitle, GradeSkill, Matrix, User
+from matrix.models import (Competence, GradeCompetenceJobTitle, GradeSkill,
+                           Matrix, User)
 from matrix.tasks import download_file, save_to_db
 
 
@@ -77,22 +77,6 @@ def matrix(request):
             return JsonResponse({"except": str(e)}, status=400)
 
     return render(request, "matrix/matrix.html", context)
-
-
-@login_required
-def competence_file(request, personnel_number, period):
-    if check_connect_redis():
-        stream = download_file.delay(personnel_number, period).get()
-    else:
-        stream = download_file(personnel_number, period)
-    response = HttpResponse(
-        content=stream,
-        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers={
-            "Content-Disposition": 'attachment; filename="competence.xlsx"'
-        },
-    )
-    return response
 
 
 @login_required
@@ -169,3 +153,19 @@ def new_profile(request, personnel_number):
     }
 
     return render(request, "matrix/new_profile.html", context)
+
+
+@login_required
+def competence_file(request, personnel_number, period):
+    if check_connect_redis():
+        stream = download_file.delay(personnel_number, period).get()
+    else:
+        stream = download_file(personnel_number, period)
+    response = HttpResponse(
+        content=stream,
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={
+            "Content-Disposition": 'attachment; filename="competence.xlsx"'
+        },
+    )
+    return response

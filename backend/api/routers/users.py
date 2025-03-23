@@ -1,13 +1,11 @@
 from datetime import timedelta
+
+from api.auth import (authenticate_user, get_access_and_refresh_tekens,
+                      get_current_active_user)
+from api.models_for_api.base_model import ApiUser, Token, UserLogin
 from django.conf import settings
 from django.contrib.auth import authenticate
 from fastapi import APIRouter, Depends, HTTPException, status
-from api.auth import (
-    authenticate_user,
-    get_access_and_refresh_tekens,
-    get_current_active_user
-)
-from api.models_for_api.base_model import Token, UserLogin, ApiUser
 from users.models import RefreshToken
 
 router_auth = APIRouter(prefix="/token", tags=["auth"])

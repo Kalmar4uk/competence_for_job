@@ -1,16 +1,14 @@
-from fastapi import APIRouter, HTTPException, status
+from api.models_for_api.base_model import ApiGradeSkill, ApiSkills, ApiUser
+from api.models_for_api.model_request import ApiMatrixCreate
+from api.models_for_api.models_response import (ApiMatrixCreateResponse,
+                                                ApiMatrixGet,
+                                                ApiMatrixListSkillsAndGrade,
+                                                ApiSkillsGradeMatrixResponse)
 from django.contrib.auth import get_user_model
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
-from matrix.models import Skill, GradeSkill, Competence
-from api.models_for_api.base_model import ApiGradeSkill, ApiSkills, ApiUser
-from api.models_for_api.model_request import ApiMatrixCreate
-from api.models_for_api.models_response import (
-    ApiMatrixCreateResponse,
-    ApiMatrixGet,
-    ApiMatrixListSkillsAndGrade,
-    ApiSkillsGradeMatrixResponse
-)
+from fastapi import APIRouter, HTTPException, status
+from matrix.models import Competence, GradeSkill, Skill
 
 User = get_user_model()
 

@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model
 from django.db import models
-
 from matrix.constants import CHOICES, NAME_FOR_TASK_MATRIX
 
 User = get_user_model()

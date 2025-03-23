@@ -1,14 +1,14 @@
 import os
-from celery import shared_task
 from tempfile import NamedTemporaryFile
-from openpyxl import Workbook
-from django.db.models import F
-from django.shortcuts import get_object_or_404
-from dateutil.relativedelta import relativedelta
 
-from matrix.models import Competence, GradeSkill, Skill, User, Matrix, GradeCompetenceJobTitle
-from matrix.constants import CURRENT_MONTH, NAME_FOR_TASK_MATRIX, CURRENT_DATE, CURRENT_DATETIME
+from celery import shared_task
+from dateutil.relativedelta import relativedelta
+from django.shortcuts import get_object_or_404
+from matrix.constants import CURRENT_DATE, CURRENT_DATETIME, CURRENT_MONTH
 from matrix.exceptions import NotNull
+from matrix.models import (Competence, GradeSkill,
+                           Matrix, Skill, User)
+from openpyxl import Workbook
 
 
 @shared_task
@@ -27,8 +27,8 @@ def generate_matrix_for_user():
 
 @shared_task
 def save_to_db(data, user_id):
-    user = User.objects.get(id=user_id)
-    matrix = Matrix.objects.get(user=user, status="Новая")
+    user = get_object_or_404(User, id=user_id)
+    matrix = get_object_or_404(Matrix, user=user, status="Новая")
     competence = Competence.objects.filter(matrix=matrix)
 
     for comp in competence:

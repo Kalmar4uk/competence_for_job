@@ -1,5 +1,5 @@
-from pydantic import BaseModel
 from api.core.base_from_django_model import ApiBaseModelIfFieldsMatch
+from pydantic import BaseModel
 
 
 class ApiUser(BaseModel):

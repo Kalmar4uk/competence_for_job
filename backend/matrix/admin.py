@@ -1,11 +1,9 @@
-from django.contrib import admin
-from django.utils.translation import ngettext
-from django.contrib import messages
-from rangefilter.filters import DateRangeFilterBuilder
-
 from core.models import MyDjangoQLSearchMixin
-from matrix.models import (Matrix, Competence, GradeCompetenceJobTitle, GradeSkill,
-                           Skill)
+from django.contrib import admin, messages
+from django.utils.translation import ngettext
+from matrix.models import (Competence, GradeCompetenceJobTitle, GradeSkill,
+                           Matrix, Skill)
+from rangefilter.filters import DateRangeFilterBuilder
 
 
 class CompetenceInline(admin.TabularInline):

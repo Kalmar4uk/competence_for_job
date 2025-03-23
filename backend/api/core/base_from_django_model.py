@@ -1,5 +1,5 @@
-from pydantic import BaseModel
 from django.forms.models import model_to_dict
+from pydantic import BaseModel
 
 
 class ApiBaseModelIfFieldsMatch(BaseModel):
