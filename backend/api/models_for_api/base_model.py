@@ -6,6 +6,7 @@ class ApiUser(BaseModel):
     """Модель юзера для ответа"""
     id: int
     email: str
+    personnel_number: str
     first_name: str
     last_name: str
     job_title: str

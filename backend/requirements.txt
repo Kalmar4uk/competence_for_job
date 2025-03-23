@@ -7,11 +7,13 @@ attrs==24.3.0
 billiard==4.2.1
 celery==5.4.0
 certifi==2024.12.14
+cffi==1.17.1
 click==8.1.8
 click-didyoumean==0.3.1
 click-plugins==1.1.1
 click-repl==0.3.0
 colorama==0.4.6
+cryptography==44.0.2
 Django==4.2
 django-admin-rangefilter==0.13.2
 django-celery-results==2.5.1
@@ -38,6 +40,7 @@ prometheus_client==0.21.1
 prompt_toolkit==3.0.48
 psycopg2-binary==2.9.9
 py==1.11.0
+pycparser==2.22
 pydantic==2.10.6
 pydantic_core==2.27.2
 PyJWT==2.9.0
@@ -46,6 +49,7 @@ pytest-django==4.5.2
 pytest-lazy-fixture==0.6.3
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
+python-multipart==0.0.20
 pytz==2024.2
 PyYAML==6.0.2
 redis==5.2.1

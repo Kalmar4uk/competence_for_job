@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'matrix.apps.MatrixConfig',
     'core.apps.CoreConfig',
+    'tokens.apps.TokensConfig',
     'api.apps.ApiConfig',
     'djangoql',
     'debug_toolbar',

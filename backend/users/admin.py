@@ -6,8 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sessions.models import Session
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ngettext
-from users.models import (JobDepartment, JobGroup, JobManagement, RefreshToken,
-                          User)
+from users.models import JobDepartment, JobGroup, JobManagement, User
 
 
 @admin.register(User)
@@ -147,12 +146,3 @@ class PermissionaAdmin(admin.ModelAdmin):
 @admin.register(Session)
 class SessionAdmin(admin.ModelAdmin):
     ...
-
-
-@admin.register(RefreshToken)
-class RefreshTokenAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
-    actions = None
-    readonly_fields = ("user", "refresh_token", "created_at")
-
-    def has_delete_permission(self, request, obj=None):
-        return False

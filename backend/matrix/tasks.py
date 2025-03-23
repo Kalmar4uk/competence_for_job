@@ -6,8 +6,7 @@ from dateutil.relativedelta import relativedelta
 from django.shortcuts import get_object_or_404
 from matrix.constants import CURRENT_DATE, CURRENT_DATETIME, CURRENT_MONTH
 from matrix.exceptions import NotNull
-from matrix.models import (Competence, GradeSkill,
-                           Matrix, Skill, User)
+from matrix.models import Competence, GradeSkill, Matrix, Skill, User
 from openpyxl import Workbook
 
 
