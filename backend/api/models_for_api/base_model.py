@@ -7,7 +7,7 @@ class ApiUser(ApiUserFromDjangoModel):
     """Модель юзера для ответа"""
     id: int
     email: str
-    personnel_number: str
+    personnel_number: str | None
     first_name: str
     last_name: str
     job_title: str
@@ -49,5 +49,14 @@ class TokenData(BaseModel):
 
 
 class UserLogin(BaseModel):
+    """Модель для получения токена"""
     email: str
     password: str
+
+
+class UserRegistration(BaseModel):
+    email: str
+    password: str
+    first_name: str
+    last_name: str
+    job_title: str

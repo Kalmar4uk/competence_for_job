@@ -2,10 +2,12 @@ from datetime import timedelta
 
 from api.auth import (get_access_and_refresh_tekens, get_current_user,
                       oauth2_scheme)
-from api.models_for_api.base_model import ApiUser, Token, UserLogin
+from api.models_for_api.base_model import ApiUser, Token, UserLogin, UserRegistration
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
 from django.utils import timezone
+from django.core.exceptions import ValidationError
+from django.contrib.auth.password_validation import validate_password
 from fastapi import APIRouter, Depends, HTTPException, status
 from tokens.models import (BlackListAccessToken, BlackListRefreshToken,
                            RefreshToken)
@@ -14,8 +16,31 @@ from tokens.models import (BlackListAccessToken, BlackListRefreshToken,
 router_login = APIRouter(prefix="/login", tags=["login"])
 router_logout = APIRouter(prefix="/logout", tags=["logout"])
 router_users = APIRouter(prefix="/users", tags=["users"])
+router_register = APIRouter(prefix="/registration", tags=["registration"])
 
 User = get_user_model()
+
+
+@router_register.post("/users", response_model=ApiUser)
+def registration_user(from_data: UserRegistration):
+    try:
+        validate_password(from_data.password)
+    except ValidationError as error:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(error)
+        )
+    if User.objects.filter(email=from_data.email).exists():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Пользователь с таким email уже зарегестрирован."
+        )
+    user_data = from_data.model_dump()
+    password = user_data.pop("password")
+    new_user = User.objects.create(**user_data)
+    new_user.set_password(password)
+    new_user.save()
+    return ApiUser.from_django_model(new_user)
 
 
 @router_login.post("/", response_model=Token)

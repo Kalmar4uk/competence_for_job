@@ -28,7 +28,14 @@ class User(AbstractUser):
         default=False,
         help_text="Проставить если сотрудник является директором компании"
     )
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, verbose_name="Компания", related_name="users", null=True, blank=True)
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.CASCADE,
+        verbose_name="Компания",
+        related_name="users",
+        null=True,
+        blank=True
+    )
     group = models.ForeignKey(
         "JobGroup",
         verbose_name="Группа",
