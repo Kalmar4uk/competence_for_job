@@ -1,16 +1,16 @@
 from pydantic import BaseModel
+from .models_response import ApiMatrixSkillsGrade
 
 
-class ApiSkillsGradeMatrix(BaseModel):
-    """Модель для post запросов матрицы.
-    Получение скилла и оценки по одному полю."""
-    skills: str
+class ApiGradeForCreateMatrix(BaseModel):
     grade: str
 
 
+class ApiSkillsForCreateMatrix(BaseModel):
+    skill: str
+    grade: ApiGradeForCreateMatrix
+
+
 class ApiMatrixCreate(BaseModel):
-    """Модель для post запросов матрицы.
-    Получение юзера по id и модели получения скилла и оценки
-    в виде списка объекта."""
-    user: int
-    matrix: list[ApiSkillsGradeMatrix]
+    """Модель для patch запроса матрицы"""
+    matrix: list[ApiSkillsForCreateMatrix]

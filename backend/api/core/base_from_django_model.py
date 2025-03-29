@@ -1,5 +1,6 @@
 from django.forms.models import model_to_dict
 from pydantic import BaseModel
+from api.models_for_api import base_model
 
 
 class ApiBaseModelIfFieldsMatch(BaseModel):
@@ -8,6 +9,21 @@ class ApiBaseModelIfFieldsMatch(BaseModel):
     def from_django_model(cls, model):
         data = model_to_dict(model)
         return cls(**data)
+
+
+class ApiMatrixFromDjangoModel(BaseModel):
+
+    @classmethod
+    def from_django_model(cls, matrix, user, skills):
+        return cls(
+            id=matrix.id,
+            name=matrix.name,
+            user=user,
+            status=matrix.status,
+            skills=skills,
+            created_at=matrix.created_at,
+            completed_at=matrix.completed_at
+        )
 
 
 class ApiUserFromDjangoModel(BaseModel):

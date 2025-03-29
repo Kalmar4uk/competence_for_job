@@ -1,6 +1,7 @@
 from core.models import GeneralHierarchy
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from companies.models import Company
 from users.manager import CustomUserManager
 from users.validators import validation_min_length_personnal_number
 
@@ -22,6 +23,12 @@ class User(AbstractUser):
         validators=[validation_min_length_personnal_number]
     )
     job_title = models.CharField("Должность", max_length=50, null=True)
+    is_director = models.BooleanField(
+        "Статус директора",
+        default=False,
+        help_text="Проставить если сотрудник является директором компании"
+    )
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, verbose_name="Компания", related_name="users", null=True, blank=True)
     group = models.ForeignKey(
         "JobGroup",
         verbose_name="Группа",
@@ -37,7 +44,7 @@ class User(AbstractUser):
     def save(self, *args, **kwargs):
         if self.is_active is False and not self.email.startswith("Этот"):
             self.email = f"Этот пидор больше не работает - {self.email}"
-        super(User, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         if self.middle_name:

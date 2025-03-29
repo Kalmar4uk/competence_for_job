@@ -8,7 +8,7 @@ from rangefilter.filters import DateRangeFilterBuilder
 
 class CompetenceInline(admin.TabularInline):
     model = Competence
-    extra = 1
+    extra = 0
 
 
 @admin.register(Skill)
@@ -34,7 +34,7 @@ class MatrixAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
     list_display = ("name", "user", "status", "created_at", "completed_at")
     list_filter = ("user",)
     search_fields = ("user",)
-    readonly_fields = ("created_at", "completed_at")
+    readonly_fields = ("created_at",)
 
     @admin.action(description="Перевести в Завершено")
     def change_status(self, request, queryset):

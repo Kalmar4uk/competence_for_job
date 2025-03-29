@@ -2,17 +2,22 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
-from .base_model import ApiGradeSkill, ApiSkills, ApiUser
+from .base_model import ApiGradeSkill, ApiSkills, ApiUser, ApiMatrix
+from api.core.base_from_django_model import ApiMatrixFromDjangoModel
 
 
-class ApiMatrixListSkillsAndGrade(ApiSkills):
-    """Модель скиллов с оценками для ответа"""
-    grade: list[ApiGradeSkill]
+class ApiMatrixSkillsGrade(ApiSkills):
+    grade: ApiGradeSkill
 
 
-class ApiMatrixGet(BaseModel):
-    """Модель для get запроса матрицы"""
-    matrix: list[ApiMatrixListSkillsAndGrade]
+class ApiMatrixListSkills(ApiMatrix):
+    """Модель скиллов для ответа"""
+    skills: list[ApiSkills]
+
+
+class ApiMatrixWithGrade(ApiMatrix):
+    """Модель для запроса матрицы c оценками"""
+    skills: list[ApiMatrixSkillsGrade]
 
 
 class ApiSkillsGradeMatrixResponse(BaseModel):

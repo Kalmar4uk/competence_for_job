@@ -1,8 +1,9 @@
-from api.core.base_from_django_model import ApiBaseModelIfFieldsMatch
+from datetime import datetime
+from api.core.base_from_django_model import ApiBaseModelIfFieldsMatch, ApiUserFromDjangoModel, ApiMatrixFromDjangoModel
 from pydantic import BaseModel
 
 
-class ApiUser(BaseModel):
+class ApiUser(ApiUserFromDjangoModel):
     """Модель юзера для ответа"""
     id: int
     email: str
@@ -17,6 +18,17 @@ class ApiSkills(ApiBaseModelIfFieldsMatch):
     id: int
     area_of_application: str
     skill: str
+
+
+class ApiMatrix(ApiMatrixFromDjangoModel):
+    """Базова модель матрицы для ответа"""
+    id: int
+    name: str
+    user: ApiUser
+    status: str
+    skills: list[ApiSkills]
+    created_at: datetime
+    completed_at: datetime | None
 
 
 class ApiGradeSkill(ApiBaseModelIfFieldsMatch):

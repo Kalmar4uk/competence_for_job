@@ -1,16 +1,17 @@
-from api.models_for_api.base_model import ApiGradeSkill, ApiSkills, ApiUser
+from api.models_for_api.base_model import ApiGradeSkill, ApiSkills, ApiUser, ApiMatrix
 from api.models_for_api.model_request import ApiMatrixCreate
 from api.models_for_api.models_response import (ApiMatrixCreateResponse,
-                                                ApiMatrixGet,
-                                                ApiMatrixListSkillsAndGrade,
-                                                ApiSkillsGradeMatrixResponse)
+                                                ApiMatrixWithGrade,
+                                                ApiMatrixListSkills,
+                                                ApiSkillsGradeMatrixResponse,
+                                                ApiMatrixSkillsGrade)
 from django.contrib.auth import get_user_model
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
-from fastapi import APIRouter, HTTPException, status
-from matrix.models import Competence, GradeSkill, Skill
-
-User = get_user_model()
+from fastapi import APIRouter, HTTPException, status, Depends
+from matrix.models import Competence, GradeSkill, Skill, Matrix
+from users.models import User
+from api.auth import get_current_user
 
 
 router_matrix = APIRouter(prefix="/matrix", tags=["matrix"])
@@ -18,86 +19,61 @@ router_skills = APIRouter(prefix="/skills", tags=["skills"])
 router_grade = APIRouter(prefix="/grade", tags=["grade"])
 
 
-@router_matrix.get("/", response_model=ApiMatrixGet)
-def matrix_list(area_of_application: str | None = None):
-    skills_data = Skill.objects.all()
-    grade_data = GradeSkill.objects.all()
-    grades = [ApiGradeSkill.from_django_model(grade) for grade in grade_data]
-    basic_area_of_application = list(
-        Skill.objects.values_list("area_of_application", flat=True).distinct()
-    )
-    if (
-        area_of_application and
-        area_of_application.capitalize() in basic_area_of_application
-    ):
-        skills_data = Skill.objects.filter(
-            area_of_application=area_of_application.capitalize()
-        )
-    matrix = []
+@router_matrix.get("/", response_model=ApiMatrix)
+def matrix_for_passing(
+    current_user: User = Depends(get_current_user)
+):
+    user = ApiUser.from_django_model(current_user)
+    matrix_data = Matrix.objects.get(user=current_user, status="Новая")
+    skills_data = Skill.objects.filter(skill_competence__matrix=matrix_data)
+    skills_list = []
     for skill in skills_data:
-        matrix.append(
-            ApiMatrixListSkillsAndGrade(
-                id=skill.id,
-                area_of_application=skill.area_of_application,
-                skill=skill.skill,
-                grade=grades
-            )
-        )
-    return ApiMatrixGet(matrix=matrix)
-
-
-@router_matrix.post(
-        "/",
-        response_model=ApiMatrixCreateResponse,
-        status_code=status.HTTP_201_CREATED
+        skills_list.append(ApiSkills.from_django_model(skill))
+    matrix = ApiMatrix.from_django_model(
+        matrix=matrix_data,
+        user=user,
+        skills=skills_list
     )
-def matrix_create(matrix: ApiMatrixCreate):
-    response_list = []
-    try:
-        user = get_object_or_404(User, id=matrix.user)
-    except Http404 as e:
+    return matrix
+
+
+@router_matrix.patch("/{matrix_id}", response_model=ApiMatrixWithGrade)
+def matrix_for_passing_update(
+    matrix_id: int,
+    matrix_obj: ApiMatrixCreate,
+    current_user: User = Depends(get_current_user),
+):
+    matrix_data = get_object_or_404(Matrix, id=matrix_id)
+    if matrix_data.user != current_user:
         raise HTTPException(
-            status_code=404, detail=str(e)
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Матрица не соответствует сотруднику"
         )
-    for mat in matrix.matrix:
-        try:
-            skill = get_object_or_404(Skill, skill=mat.skills)
-            grade = get_object_or_404(GradeSkill, grade=mat.grade)
-        except Http404 as e:
-            raise HTTPException(
-                status_code=404, detail=str(e)
-            )
-        try:
-            competence = Competence.objects.create(
-                user=user,
-                skill=skill,
-                grade_skill=grade
-            )
-            skill_response = ApiSkills.from_django_model(competence.skill)
-            grade_response = ApiGradeSkill.from_django_model(
-                competence.grade_skill
-            )
-            response_list.append(ApiSkillsGradeMatrixResponse(
-                skills=skill_response,
-                grade=grade_response,
-                created_at=competence.created_at
-                )
-            )
-        except Exception as e:
-            HTTPException(
-                status_code=400, detail=str(e)
-            )
-    user_response = ApiUser(
-        id=user.id,
-        email=user.email,
-        first_name=user.first_name,
-        last_name=user.last_name,
-        job_title=user.job_title
+    user = ApiUser.from_django_model(current_user)
+    skills_grade_list = []
+    for matrix in matrix_obj.matrix:
+        skill_data = get_object_or_404(Skill, skill=matrix.skill)
+        grade_data = get_object_or_404(GradeSkill, grade=matrix.grade.grade)
+        Competence.objects.filter(
+            matrix=matrix_data,
+            skill=skill_data
+        ).update(
+            grade_skill=grade_data
+        )
+        api_grade = ApiGradeSkill.from_django_model(grade_data)
+        api_skill = ApiMatrixSkillsGrade(
+            id=skill_data.id,
+            area_of_application=skill_data.area_of_application,
+            skill=skill_data.skill,
+            grade=api_grade
+        )
+        skills_grade_list.append(api_skill)
+    api_matrix = ApiMatrixWithGrade.from_django_model(
+        matrix=matrix_data,
+        user=user,
+        skills=skills_grade_list
     )
-    return ApiMatrixCreateResponse(
-        user=user_response,
-        competence=response_list
-    )
+    return api_matrix
 
 
 @router_skills.get("/", response_model=list[ApiSkills])

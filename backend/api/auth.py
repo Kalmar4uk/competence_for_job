@@ -89,9 +89,3 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
         credentials_exception
 
     return user
-
-
-def get_current_active_user(
-        current_user: ApiUser = Depends(get_current_user)
-):
-    return current_user

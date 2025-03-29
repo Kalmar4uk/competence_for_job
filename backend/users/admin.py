@@ -21,6 +21,7 @@ class MyUserAdmin(MyDjangoQLSearchMixin, UserAdmin):
         "group",
         "date_joined"
     )
+    raw_id_fields = ("company",)
     ordering = ("date_joined",)
     fieldsets = (
         (None, {"fields": ("email", "password")}),
@@ -36,6 +37,7 @@ class MyUserAdmin(MyDjangoQLSearchMixin, UserAdmin):
                 "fields": (
                     "personnel_number",
                     "job_title",
+                    "company",
                     "group"
                 )
             }
@@ -46,6 +48,7 @@ class MyUserAdmin(MyDjangoQLSearchMixin, UserAdmin):
                 "fields": (
                     "is_active",
                     "is_staff",
+                    "is_director",
                     "is_superuser",
                     "groups"
                 ),

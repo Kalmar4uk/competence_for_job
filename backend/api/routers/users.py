@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from api.auth import (get_access_and_refresh_tekens, get_current_active_user,
+from api.auth import (get_access_and_refresh_tekens, get_current_user,
                       oauth2_scheme)
 from api.models_for_api.base_model import ApiUser, Token, UserLogin
 from django.conf import settings
@@ -47,7 +47,10 @@ def login_for_access_token(form_data: UserLogin):
 
 
 @router_logout.post("/", status_code=status.HTTP_204_NO_CONTENT)
-def logout_user(current_user: ApiUser = Depends(get_current_active_user), token: str = Depends(oauth2_scheme)):
+def logout_user(
+    current_user: ApiUser = Depends(get_current_user),
+    token: str = Depends(oauth2_scheme)
+):
     user = User.objects.get(email=current_user.email)
     refresh_tokens = RefreshToken.objects.filter(user=user)
     for refresh in refresh_tokens:
@@ -65,5 +68,5 @@ def logout_user(current_user: ApiUser = Depends(get_current_active_user), token:
 
 
 @router_users.get("/me", response_model=ApiUser)
-def read_users_me(current_user: ApiUser = Depends(get_current_active_user)):
+def read_users_me(current_user: ApiUser = Depends(get_current_user)):
     return current_user
