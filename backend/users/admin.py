@@ -14,15 +14,16 @@ class MyUserAdmin(MyDjangoQLSearchMixin, UserAdmin):
     actions = ["shutdown_user"]
     search_fields = ("email", "first_name", "last_name", "middle_name")
     list_display = (
-        "personnel_number",
         "email",
         "full_name",
         "job_title",
         "group",
+        "company",
+        "is_director",
         "date_joined"
     )
     raw_id_fields = ("company",)
-    ordering = ("date_joined",)
+    ordering = ("-date_joined",)
     fieldsets = (
         (None, {"fields": ("email", "password")}),
         (_("Personal info"), {

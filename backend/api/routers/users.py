@@ -2,15 +2,20 @@ from datetime import timedelta
 
 from api.auth import (get_access_and_refresh_tekens, get_current_user,
                       oauth2_scheme)
-from api.models_for_api.base_model import ApiUser, Token, UserLogin, UserRegistration
+from api.models_for_api.base_model import ApiUser, Token, UserLogin, ApiCompany
+from api.models_for_api.model_request import UserRegistration, CompanyRegistration
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
 from django.utils import timezone
+from django.db.utils import IntegrityError
+from django.http.response import Http404
+from django.shortcuts import get_object_or_404
 from django.core.exceptions import ValidationError
 from django.contrib.auth.password_validation import validate_password
 from fastapi import APIRouter, Depends, HTTPException, status
 from tokens.models import (BlackListAccessToken, BlackListRefreshToken,
                            RefreshToken)
+from companies.models import Company
 
 
 router_login = APIRouter(prefix="/login", tags=["login"])
@@ -41,6 +46,45 @@ def registration_user(from_data: UserRegistration):
     new_user.set_password(password)
     new_user.save()
     return ApiUser.from_django_model(new_user)
+
+
+@router_register.post("/company", response_model=ApiCompany)
+def registration_company(from_data: CompanyRegistration):
+    try:
+        user = get_object_or_404(User, id=from_data.director)
+    except Http404 as error:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(error)
+        )
+    if user.company:
+        if user.is_director:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Сотрудник уже является директором компании"
+            )
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Сотруднику необходимо сначала выйти из компании"
+            )
+    try:
+        company = Company.objects.create(name=from_data.name)
+    except IntegrityError:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Такое название компании уже используется"
+        )
+    user.company = company
+    user.is_director = True
+    user.save()
+    user_api = ApiUser.from_django_model(user)
+    return ApiCompany(
+        id=company.id,
+        name=company.name,
+        director=user_api,
+        created_at=company.created_at
+    )
 
 
 @router_login.post("/", response_model=Token)

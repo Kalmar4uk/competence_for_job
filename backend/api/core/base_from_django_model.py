@@ -33,7 +33,6 @@ class ApiUserFromDjangoModel(BaseModel):
         return cls(
             id=model.id,
             email=model.email,
-            personnel_number=model.personnel_number,
             first_name=model.first_name,
             last_name=model.last_name,
             job_title=model.job_title

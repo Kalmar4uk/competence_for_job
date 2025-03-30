@@ -7,10 +7,20 @@ class ApiUser(ApiUserFromDjangoModel):
     """Модель юзера для ответа"""
     id: int
     email: str
-    personnel_number: str | None
     first_name: str
     last_name: str
     job_title: str
+
+
+class ApiCompany(BaseModel):
+    """Модель компании для ответа"""
+    id: int
+    name: str
+    director: ApiUser
+    employees: list[ApiUser] | None = None
+    created_at: datetime
+    closed_at: datetime | None = None
+    is_active: bool = True
 
 
 class ApiSkills(ApiBaseModelIfFieldsMatch):
@@ -54,9 +64,4 @@ class UserLogin(BaseModel):
     password: str
 
 
-class UserRegistration(BaseModel):
-    email: str
-    password: str
-    first_name: str
-    last_name: str
-    job_title: str
+
