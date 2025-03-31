@@ -1,9 +1,9 @@
 from datetime import datetime
 
+from api.core.base_from_django_model import ApiMatrixFromDjangoModel
 from pydantic import BaseModel
 
-from .base_model import ApiGradeSkill, ApiSkills, ApiUser, ApiMatrix
-from api.core.base_from_django_model import ApiMatrixFromDjangoModel
+from .base_model import ApiGradeSkill, ApiMatrix, ApiSkills, ApiUser
 
 
 class ApiMatrixSkillsGrade(ApiSkills):

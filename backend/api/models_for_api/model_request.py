@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from .models_response import ApiMatrixSkillsGrade
 
 
 class ApiGradeForCreateMatrix(BaseModel):
@@ -29,3 +28,4 @@ class CompanyRegistration(BaseModel):
     """Модель регистрации компании"""
     name: str
     director: int
+    employees: list[int] | None = None

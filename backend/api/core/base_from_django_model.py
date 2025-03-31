@@ -1,6 +1,6 @@
+from api.models_for_api import base_model
 from django.forms.models import model_to_dict
 from pydantic import BaseModel
-from api.models_for_api import base_model
 
 
 class ApiBaseModelIfFieldsMatch(BaseModel):

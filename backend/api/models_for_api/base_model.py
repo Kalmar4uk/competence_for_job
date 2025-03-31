@@ -1,26 +1,35 @@
 from datetime import datetime
-from api.core.base_from_django_model import ApiBaseModelIfFieldsMatch, ApiUserFromDjangoModel, ApiMatrixFromDjangoModel
+
+from api.core.base_from_django_model import (ApiBaseModelIfFieldsMatch,
+                                             ApiMatrixFromDjangoModel,
+                                             ApiUserFromDjangoModel)
 from pydantic import BaseModel
 
 
 class ApiUser(ApiUserFromDjangoModel):
-    """Модель юзера для ответа"""
+    """Базовая модель юзера"""
     id: int
     email: str
     first_name: str
     last_name: str
     job_title: str
+    is_director: bool
 
 
-class ApiCompany(BaseModel):
-    """Модель компании для ответа"""
+class ApiCompanyUpdate(BaseModel):
+    """Модель компании для обновления"""
     id: int
     name: str
     director: ApiUser
     employees: list[ApiUser] | None = None
-    created_at: datetime
-    closed_at: datetime | None = None
     is_active: bool = True
+    closed_at: datetime | None = None
+
+
+class ApiCompany(ApiCompanyUpdate):
+    """Модель компании для ответа"""
+    closed_at: None
+    created_at: datetime
 
 
 class ApiSkills(ApiBaseModelIfFieldsMatch):
@@ -62,6 +71,3 @@ class UserLogin(BaseModel):
     """Модель для получения токена"""
     email: str
     password: str
-
-
-

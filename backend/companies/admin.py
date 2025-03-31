@@ -1,6 +1,8 @@
 from django.contrib import admin
-from .models import Company, LegalDetailsCompany
 from users.models import User
+
+from .models import Company, LegalDetailsCompany
+
 
 class UserInlines(admin.TabularInline):
     model = User

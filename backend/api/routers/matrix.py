@@ -1,22 +1,19 @@
-from api.models_for_api.base_model import ApiGradeSkill, ApiSkills, ApiUser, ApiMatrix
+from api.auth import get_current_user
+from api.models_for_api.base_model import (ApiGradeSkill, ApiMatrix, ApiSkills,
+                                           ApiUser)
 from api.models_for_api.model_request import ApiMatrixCreate
 from api.models_for_api.models_response import (ApiMatrixCreateResponse,
-                                                ApiMatrixWithGrade,
                                                 ApiMatrixListSkills,
-                                                ApiSkillsGradeMatrixResponse,
-                                                ApiMatrixSkillsGrade)
+                                                ApiMatrixSkillsGrade,
+                                                ApiMatrixWithGrade,
+                                                ApiSkillsGradeMatrixResponse)
+from api.routers.routers import router_grade, router_matrix, router_skills
 from django.contrib.auth import get_user_model
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
-from fastapi import APIRouter, HTTPException, status, Depends
-from matrix.models import Competence, GradeSkill, Skill, Matrix
+from fastapi import Depends, HTTPException, status
+from matrix.models import Competence, GradeSkill, Matrix, Skill
 from users.models import User
-from api.auth import get_current_user
-
-
-router_matrix = APIRouter(prefix="/matrix", tags=["matrix"])
-router_skills = APIRouter(prefix="/skills", tags=["skills"])
-router_grade = APIRouter(prefix="/grade", tags=["grade"])
 
 
 @router_matrix.get("/", response_model=ApiMatrix)

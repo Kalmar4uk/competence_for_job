@@ -1,6 +1,5 @@
 from django.core.exceptions import ValidationError
 
-
 statuses = ["Новая", "Завершена", "Просрочена"]
 
 
