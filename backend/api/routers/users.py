@@ -2,8 +2,11 @@ from datetime import timedelta
 
 from api.auth import (get_access_and_refresh_tekens, get_current_user,
                       oauth2_scheme)
-from api.models_for_api.base_model import ApiUser, Token, UserLogin
+from api.models_for_api.auth_models import Token, UserLogin
+from api.models_for_api.base_model import ApiUser
 from api.models_for_api.model_request import UserRegistration
+from api.models_for_api.models_response import (ApiCompanyForUserList,
+                                                ApiUserResponse)
 from api.routers.routers import router_token, router_users
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
@@ -13,28 +16,48 @@ from django.db.utils import IntegrityError
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from fastapi import Depends, Query, HTTPException, status
+from fastapi import Depends, HTTPException, Query, status
 from tokens.models import (BlackListAccessToken, BlackListRefreshToken,
                            RefreshToken)
 
 User = get_user_model()
 
 
-@router_users.get("/", response_model=list[ApiUser])
+@router_users.get("/", response_model=list[ApiUserResponse])
 def get_users_list(
-    is_director: bool | None = Query(None, description="True Если нужны только директора"),
-    is_company: bool | None = Query(None, description="True Если нужны сотрудники которые привязаны к компаниям")
+    is_director: bool | None = Query(
+        None,
+        description="True Если нужны только директора"
+    ),
+    is_company: bool | None = Query(
+        None,
+        description="True Если нужны сотрудники которые привязаны к компаниям"
+    )
 ):
     """По умолчанию выдает сотрудников которые не связаны с компанией"""
     if is_director and is_company:
-        users = User.objects.filter(company__isnull=False)
+        users = User.objects.filter(is_active=True, company__isnull=False)
     elif is_director:
-        users = User.objects.filter(is_director=True)
+        users = User.objects.filter(is_active=True, is_director=True)
     elif is_company:
-        users = User.objects.filter(is_director=False, company__isnull=False)
+        users = User.objects.filter(
+            is_active=True,
+            is_director=False,
+            company__isnull=False
+        )
     else:
-        users = User.objects.filter(is_director=False, company__isnull=True)
-    return [ApiUser.from_django_model(user) for user in users]
+        users = User.objects.filter(
+            is_active=True,
+            is_director=False,
+            company__isnull=True
+        )
+    return [
+        ApiUserResponse.from_django_model(
+            user, ApiCompanyForUserList(
+                id=user.company.id, name=user.company.name
+            ) if user.company else None
+        ) for user in users
+    ]
 
 
 @router_users.get("/me", response_model=ApiUser)

@@ -1,5 +1,6 @@
-from api.models_for_api.base_model import ApiCompany, ApiUser, ApiCompanyUpdate
+from api.models_for_api.base_model import ApiCompanyUpdate, ApiUser
 from api.models_for_api.model_request import CompanyRegistration
+from api.models_for_api.models_response import ApiCompany
 from api.routers.routers import router_companies
 from companies.models import Company
 from django.contrib.auth import get_user_model
