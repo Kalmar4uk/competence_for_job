@@ -22,7 +22,6 @@ django-filter==23.1
 django_debug_toolbar==3.8.1
 djangoql==0.18.1
 et_xmlfile==2.0.0
-fastapi==0.115.8
 flower==2.0.1
 h11==0.14.0
 humanize==4.11.0
@@ -64,6 +63,5 @@ typing_extensions==4.12.2
 tzdata==2024.2
 uritemplate==4.1.1
 urllib3==2.3.0
-uvicorn==0.34.0
 vine==5.1.0
 wcwidth==0.2.13
