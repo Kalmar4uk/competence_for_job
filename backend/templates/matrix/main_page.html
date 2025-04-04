@@ -1,8 +1,0 @@
-{% extends "index.html" %}
-{% block content %}
-    {% for mat in matrix %}
-        <a href="{% url 'matrix:profile' mat.user__personnel_number %}">{{ mat.user__first_name }} {{ mat.user__last_name }}</a>
-        <p>Оценка компетенций в этом месяце: {{ mat.sum_grade }}</p>
-        <br>
-    {% endfor %}
-{% endblock %}
