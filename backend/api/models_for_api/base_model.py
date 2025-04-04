@@ -14,11 +14,8 @@ class ApiUser(ApiUserFromDjangoModel):
     is_director: bool
 
 
-class ApiCompanyUpdate(BaseModel):
-    """Модель компании для обновления"""
+class ApiCompany(BaseModel):
+    """Базовая модель компании"""
     id: int
     name: str
-    director: ApiUser
-    employees: list[ApiUser] | None = None
     is_active: bool = True
-    closed_at: datetime | None = None

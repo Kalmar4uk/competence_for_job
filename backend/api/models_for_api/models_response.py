@@ -1,12 +1,16 @@
 from datetime import datetime
 
-from api.models_for_api.base_model import ApiCompanyUpdate, ApiUser
+from api.core.base_from_django_model import ApiCompanyUpdateFromDkangoModel
+from api.models_for_api.base_model import ApiCompany, ApiUser
 from pydantic import BaseModel
 
 
-class ApiCompany(ApiCompanyUpdate):
+class ApiCompanyBaseGet(ApiCompany, ApiCompanyUpdateFromDkangoModel):
     """Модель компании для ответа"""
+    director: ApiUser
+    employees: list[ApiUser] | None = None
     created_at: datetime
+    closed_at: datetime | None = None
 
 
 class ApiCompanyForUserList(BaseModel):
@@ -15,5 +19,5 @@ class ApiCompanyForUserList(BaseModel):
 
 
 class ApiUserResponse(ApiUser):
-    """Модель юзера для ответа"""
+    """Модель юзера с компанией для ответа"""
     company: ApiCompanyForUserList | None = None

@@ -32,3 +32,18 @@ class ApiUserFromDjangoModel(BaseModel):
             job_title=model.job_title,
             is_director=model.is_director
         )
+
+
+class ApiCompanyUpdateFromDkangoModel(BaseModel):
+
+    @classmethod
+    def from_django_model(cls, model, director, employees=None):
+        return cls(
+            id=model.id,
+            name=model.name,
+            is_active=model.is_active,
+            director=director,
+            employees=employees,
+            created_at=model.created_at,
+            closed_at=model.closed_at
+        )

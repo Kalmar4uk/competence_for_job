@@ -93,7 +93,7 @@ def login_for_access_token(form_data: UserLogin):
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
+            detail="Некорректный логин или пароль",
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token, refresh_token = get_access_and_refresh_tekens(

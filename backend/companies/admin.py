@@ -13,7 +13,8 @@ class UserInlines(admin.TabularInline):
 @admin.register(Company)
 class CompanyAdmin(admin.ModelAdmin):
     inlines = [UserInlines]
-    readonly_fields = ("created_at", "closed_at")
+    list_display = ("name", "is_active", "created_at", "closed_at")
+    readonly_fields = ("created_at",)
 
 
 @admin.register(LegalDetailsCompany)

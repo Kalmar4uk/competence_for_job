@@ -1,5 +1,7 @@
 from pydantic import BaseModel
 
+from .base_model import ApiCompany, ApiUser
+
 
 class UserRegistration(BaseModel):
     """Модель для регистрации юзера"""
@@ -13,5 +15,15 @@ class UserRegistration(BaseModel):
 class CompanyRegistration(BaseModel):
     """Модель регистрации компании"""
     name: str
-    director: int
     employees: list[int] | None = None
+
+
+class ApiCompanyUpdate(BaseModel):
+    """Модель запроса обновления компании"""
+    name: str
+    employees: list[int] | None = None
+    is_active: bool
+
+
+class ApiCompanyUpdateEmployees(BaseModel):
+    pass
