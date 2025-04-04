@@ -132,3 +132,4 @@ dmypy.json
 .idea
 
 backend/collected_static/
+db.sqlite3

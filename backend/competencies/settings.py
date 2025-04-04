@@ -100,10 +100,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = [
-   os.path.join(BASE_DIR, "static"),
-]
-
 STATIC_ROOT = BASE_DIR / 'collected_static'
 
 LANGUAGE_CODE = 'ru-RU'
