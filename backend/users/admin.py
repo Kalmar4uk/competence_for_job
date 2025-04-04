@@ -1,12 +1,11 @@
-from django.contrib import admin
+from core.models import MyDjangoQLSearchMixin
+from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-from django.utils.translation import gettext_lazy as _
 from django.contrib.sessions.models import Session
-from django.contrib import messages
+from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ngettext
-from core.models import MyDjangoQLSearchMixin
 from users.models import JobDepartment, JobGroup, JobManagement, User
 
 
@@ -15,14 +14,16 @@ class MyUserAdmin(MyDjangoQLSearchMixin, UserAdmin):
     actions = ["shutdown_user"]
     search_fields = ("email", "first_name", "last_name", "middle_name")
     list_display = (
-        "personnel_number",
         "email",
         "full_name",
         "job_title",
         "group",
+        "company",
+        "is_director",
         "date_joined"
     )
-    ordering = ("date_joined",)
+    raw_id_fields = ("company",)
+    ordering = ("-date_joined",)
     fieldsets = (
         (None, {"fields": ("email", "password")}),
         (_("Personal info"), {
@@ -37,6 +38,7 @@ class MyUserAdmin(MyDjangoQLSearchMixin, UserAdmin):
                 "fields": (
                     "personnel_number",
                     "job_title",
+                    "company",
                     "group"
                 )
             }
@@ -47,6 +49,7 @@ class MyUserAdmin(MyDjangoQLSearchMixin, UserAdmin):
                 "fields": (
                     "is_active",
                     "is_staff",
+                    "is_director",
                     "is_superuser",
                     "groups"
                 ),

@@ -1,6 +1,6 @@
 from django.shortcuts import redirect
-
 from matrix.constants import JOB_TITLE_USERS
+
 
 # Оказывается я уже делал эту проверку,
 # но в шаблоне и которая работает до сих пор.

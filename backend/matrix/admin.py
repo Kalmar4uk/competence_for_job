@@ -1,9 +1,14 @@
-from django.contrib import admin
+from core.models import MyDjangoQLSearchMixin
+from django.contrib import admin, messages
+from django.utils.translation import ngettext
+from matrix.models import (Competence, GradeCompetenceJobTitle, GradeSkill,
+                           Matrix, Skill)
 from rangefilter.filters import DateRangeFilterBuilder
 
-from core.models import MyDjangoQLSearchMixin
-from matrix.models import (Competence, GradeCompetenceJobTitle, GradeSkill,
-                           Skill)
+
+class CompetenceInline(admin.TabularInline):
+    model = Competence
+    extra = 0
 
 
 @admin.register(Skill)
@@ -22,15 +27,31 @@ class GradeCompetenceJobTitleAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
     readonly_fields = ("job_title", "skill", "min_grade")
 
 
-@admin.register(Competence)
-class CompetenceAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
-    list_display = ("user", "skill", "grade_skill", "created_at")
-    list_filter = (
-        ("created_at", DateRangeFilterBuilder()),
-        "user",
-        "grade_skill"
-    )
+@admin.register(Matrix)
+class MatrixAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
+    actions = ("change_status",)
+    inlines = (CompetenceInline,)
+    list_display = ("name", "user", "status", "created_at", "completed_at")
+    list_filter = ("user",)
+    search_fields = ("user",)
     readonly_fields = ("created_at",)
+
+    @admin.action(description="Перевести в Завершено")
+    def change_status(self, request, queryset):
+        change_status_tasck = queryset.update(status="Завершена")
+        for matrix in queryset:
+            matrix.save()
+        self.message_user(
+            request,
+            ngettext(
+                ("%d Успешно изменен"),
+                ("%d Успешно изменены"),
+                change_status_tasck
+            )
+            % change_status_tasck,
+            messages.SUCCESS
+        )
+
 
 
 @admin.register(GradeSkill)

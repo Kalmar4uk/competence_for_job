@@ -1,7 +1,8 @@
 import os
+from pathlib import Path
+
 import sentry_sdk
 from dotenv import load_dotenv
-from pathlib import Path
 from sentry_sdk.integrations.django import DjangoIntegration
 
 load_dotenv()
@@ -25,12 +26,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_celery_results',
     "rangefilter",
-    'users.apps.UsersConfig',
-    'matrix.apps.MatrixConfig',
     'core.apps.CoreConfig',
+    'users.apps.UsersConfig',
+    'companies.apps.CompaniesConfig',
+    'matrix.apps.MatrixConfig',
+    'tokens.apps.TokensConfig',
+    'api.apps.ApiConfig',
     'djangoql',
     'debug_toolbar',
-    'drf_yasg'
 ]
 
 MIDDLEWARE = [
@@ -101,6 +104,8 @@ STATICFILES_DIRS = [
    os.path.join(BASE_DIR, "static"),
 ]
 
+STATIC_ROOT = BASE_DIR / 'collected_static'
+
 LANGUAGE_CODE = 'ru-RU'
 
 TIME_ZONE = 'UTC'
@@ -113,12 +118,6 @@ AUTH_USER_MODEL = 'users.User'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_REDIRECT_URL = 'matrix:main'
-
-LOGOUT_REDIRECT_URL = '/auth/login/'
-
-LOGIN_URL = '/auth/login/'
-
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
 CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND')
 
@@ -126,6 +125,13 @@ BROKER_HOST = os.getenv('BROKER_HOST')
 BROKER_BACKEND = os.getenv('BROKER_BACKEND')
 REDIS_PORT = os.getenv('REDIS_PORT')
 REDIS_HOST = os.getenv('REDIS_HOST')
+
+
+SECRET_KEY_JWT = os.getenv("SECRET_KEY_JWT")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 1500
+REFRESH_TOKEN_EXPIRE_DAYS = 7
+
 
 sentry_sdk.init(
     dsn=os.getenv('DSN'),
