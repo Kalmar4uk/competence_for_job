@@ -22,7 +22,7 @@ django-filter==23.1
 django_debug_toolbar==3.8.1
 djangoql==0.18.1
 et_xmlfile==2.0.0
-fastapi==0.115.8
+fastapi==0.115.12
 flower==2.0.1
 h11==0.14.0
 humanize==4.11.0
@@ -41,8 +41,8 @@ prompt_toolkit==3.0.48
 psycopg2-binary==2.9.9
 py==1.11.0
 pycparser==2.22
-pydantic==2.10.6
-pydantic_core==2.27.2
+pydantic==2.11.2
+pydantic_core==2.33.1
 PyJWT==2.9.0
 pytest==7.1.2
 pytest-django==4.5.2
@@ -60,6 +60,7 @@ sqlparse==0.5.1
 starlette==0.45.3
 tomli==2.2.1
 tornado==6.4.2
+typing-inspection==0.4.0
 typing_extensions==4.12.2
 tzdata==2024.2
 uritemplate==4.1.1
