@@ -1,4 +1,3 @@
-from companies.models import Company
 from core.models import GeneralHierarchy
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -23,19 +22,6 @@ class User(AbstractUser):
         validators=[validation_min_length_personnal_number]
     )
     job_title = models.CharField("Должность", max_length=50, null=True)
-    is_director = models.BooleanField(
-        "Статус директора",
-        default=False,
-        help_text="Проставить если сотрудник является директором компании"
-    )
-    company = models.ForeignKey(
-        Company,
-        on_delete=models.SET_NULL,
-        verbose_name="Компания",
-        related_name="users",
-        null=True,
-        blank=True
-    )
     group = models.ForeignKey(
         "JobGroup",
         verbose_name="Группа",

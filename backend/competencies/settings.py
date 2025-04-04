@@ -28,10 +28,7 @@ INSTALLED_APPS = [
     "rangefilter",
     'core.apps.CoreConfig',
     'users.apps.UsersConfig',
-    'companies.apps.CompaniesConfig',
     'matrix.apps.MatrixConfig',
-    'tokens.apps.TokensConfig',
-    'api.apps.ApiConfig',
     'djangoql',
     'debug_toolbar',
 ]
@@ -131,12 +128,6 @@ BROKER_HOST = os.getenv('BROKER_HOST')
 BROKER_BACKEND = os.getenv('BROKER_BACKEND')
 REDIS_PORT = os.getenv('REDIS_PORT')
 REDIS_HOST = os.getenv('REDIS_HOST')
-
-
-SECRET_KEY_JWT = os.getenv("SECRET_KEY_JWT")
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 1500
-REFRESH_TOKEN_EXPIRE_DAYS = 7
 
 
 sentry_sdk.init(
