@@ -24,6 +24,32 @@ from tokens.models import (BlackListAccessToken, BlackListRefreshToken,
 User = get_user_model()
 
 
+@router_users.get("/me", response_model=ApiUserResponse)
+def read_users_me(current_user: ApiUserResponse = Depends(get_current_user)):
+    """Выводит текущего пользователя из токена"""
+    return current_user
+
+
+@router_users.get("/{user_id}", response_model=ApiUserResponse)
+def get_user(
+    user_id: int,
+    current_user: ApiUserResponse = Depends(get_current_user)
+):
+    """Выводит пользователя по id"""
+    try:
+        user = get_object_or_404(User, id=user_id)
+    except Http404:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Сотрудника с id {user_id} нет в базе"
+        )
+    return ApiUserResponse.from_django_model(
+        user, ApiCompanyForUserList(
+            id=user.company.id, name=user.company.name
+        ) if user.company else None
+    )
+
+
 @router_users.get("/", response_model=ApiUserPagination)
 def get_users_list(
     page: int = Query(
@@ -34,9 +60,13 @@ def get_users_list(
         10,
         le=50,
         description="Указать кол-во сотрудников если требуется"
-    )
+    ),
+    current_user: ApiUser = Depends(get_current_user)
 ):
-    """По умолчанию выдает 10 сотрудников"""
+    """
+    Выводит список всех активных пользователей.
+    По умолчанию выдает 10 сотрудников
+    """
     offset = (page - 1) * limit
     users_data = User.objects.filter(is_active=True).order_by("-id")
     count = users_data.count()
@@ -58,13 +88,9 @@ def get_users_list(
     )
 
 
-@router_users.get("/me", response_model=ApiUser)
-def read_users_me(current_user: ApiUser = Depends(get_current_user)):
-    return current_user
-
-
 @router_users.post("/registration", response_model=ApiUser)
 def registration_user(from_data: UserRegistration):
+    """Регистрация пользователя"""
     try:
         validate_password(from_data.password)
     except ValidationError as error:
@@ -87,6 +113,7 @@ def registration_user(from_data: UserRegistration):
 
 @router_token.post("/login", response_model=Token)
 def login_for_access_token(form_data: UserLogin):
+    """Авторизация пользователя/получение токенов"""
     user = authenticate(email=form_data.email, password=form_data.password)
     if not user:
         raise HTTPException(
@@ -118,6 +145,7 @@ def logout_user(
     current_user: ApiUser = Depends(get_current_user),
     token: str = Depends(oauth2_scheme)
 ):
+    """Выход пользователя из авторизации"""
     user = User.objects.get(email=current_user.email)
     refresh_tokens = RefreshToken.objects.filter(user=user)
     for refresh in refresh_tokens:

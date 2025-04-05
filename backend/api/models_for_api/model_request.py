@@ -25,5 +25,6 @@ class ApiCompanyUpdate(BaseModel):
     is_active: bool
 
 
-class ApiCompanyUpdateEmployees(BaseModel):
-    pass
+class ApiCompanyUpdateDirector(BaseModel):
+    """Модель обновления директора компании"""
+    new_director: int
