@@ -5,7 +5,6 @@ from api.models_for_api.model_request import (ApiCompanyUpdate,
 from api.models_for_api.models_response import ApiCompanyBaseGet
 from api.routers.routers import router_companies
 from companies.models import Company
-from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
 from django.http.response import Http404
@@ -18,17 +17,19 @@ from users.models import User
 def get_list_companies(current_user: User = Depends(get_current_user)):
     companies = Company.objects.filter(
         is_active=True
-    ).prefetch_related("users")
+    ).prefetch_related(
+        "users"
+    ).order_by(
+        "-created_at"
+    )
 
     api_company_list = []
     api_users_list = []
 
     for company in companies:
+        director = ApiUser.from_django_model(company.director)
         for user in company.users.all():
-            if user.is_director:
-                director = ApiUser.from_django_model(user)
-            else:
-                api_users_list.append(ApiUser.from_django_model(user))
+            api_users_list.append(ApiUser.from_django_model(user))
         api_company_list.append(
             ApiCompanyBaseGet.from_django_model(
                 company, director, api_users_list
@@ -55,7 +56,10 @@ def registration_company(
                 detail="Сотруднику необходимо сначала выйти из компании"
             )
     try:
-        company = Company.objects.create(name=from_data.name)
+        company = Company.objects.create(
+            name=from_data.name,
+            director=current_user
+        )
     except IntegrityError:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -96,7 +100,7 @@ def update_company(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Недостаточно прав"
         )
-    current_company: Company = Company.objects.get(id=company_id)
+    current_company = Company.objects.get(id=company_id)
 
     if from_data.is_active:
         if from_data.employees:

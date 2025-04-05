@@ -6,7 +6,8 @@ from api.models_for_api.auth_models import Token, UserLogin
 from api.models_for_api.base_model import ApiUser
 from api.models_for_api.model_request import UserRegistration
 from api.models_for_api.models_response import (ApiCompanyForUserList,
-                                                ApiUserResponse)
+                                                ApiUserResponse,
+                                                ApiUserPagination)
 from api.routers.routers import router_token, router_users
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
@@ -23,41 +24,38 @@ from tokens.models import (BlackListAccessToken, BlackListRefreshToken,
 User = get_user_model()
 
 
-@router_users.get("/", response_model=list[ApiUserResponse])
+@router_users.get("/", response_model=ApiUserPagination)
 def get_users_list(
-    is_director: bool | None = Query(
-        None,
-        description="True Если нужны только директора"
+    page: int = Query(
+        1,
+        description="Номер страницы"
     ),
-    is_company: bool | None = Query(
-        None,
-        description="True Если нужны сотрудники которые привязаны к компаниям"
+    limit: int = Query(
+        10,
+        le=50,
+        description="Указать кол-во сотрудников если требуется"
     )
 ):
-    """По умолчанию выдает сотрудников которые не связаны с компанией"""
-    if is_director and is_company:
-        users = User.objects.filter(is_active=True, company__isnull=False)
-    elif is_director:
-        users = User.objects.filter(is_active=True, is_director=True)
-    elif is_company:
-        users = User.objects.filter(
-            is_active=True,
-            is_director=False,
-            company__isnull=False
-        )
-    else:
-        users = User.objects.filter(
-            is_active=True,
-            is_director=False,
-            company__isnull=True
-        )
-    return [
+    """По умолчанию выдает 10 сотрудников"""
+    offset = (page - 1) * limit
+    users_data = User.objects.filter(is_active=True).order_by("-id")
+    count = users_data.count()
+    users = users_data[offset:offset+limit]
+    users_api = [
         ApiUserResponse.from_django_model(
             user, ApiCompanyForUserList(
                 id=user.company.id, name=user.company.name
             ) if user.company else None
         ) for user in users
     ]
+    next = page + 1 if offset + limit < count else None
+    previous = page - 1 if page > 1 else None
+    return ApiUserPagination(
+        count=count,
+        next=next,
+        previous=previous,
+        result=users_api
+    )
 
 
 @router_users.get("/me", response_model=ApiUser)
