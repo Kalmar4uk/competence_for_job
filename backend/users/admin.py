@@ -39,6 +39,8 @@ class MyUserAdmin(MyDjangoQLSearchMixin, UserAdmin):
                     "personnel_number",
                     "job_title",
                     "company",
+                    'date_of_employment',
+                    'date_of_dismissal',
                     "group"
                 )
             }

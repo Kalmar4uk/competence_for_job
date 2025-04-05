@@ -42,6 +42,16 @@ class User(AbstractUser):
         on_delete=models.CASCADE,
         null=True, blank=True
     )
+    date_of_employment = models.DateField(
+        "Дата трудоустройства",
+        null=True,
+        blank=True
+    )
+    date_of_dismissal = models.DateField(
+        "Дата увольнения",
+        null=True,
+        blank=True
+    )
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []

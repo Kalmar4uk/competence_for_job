@@ -1,9 +1,8 @@
 from django.contrib.auth import get_user_model
+from django.conf import settings
 from django.db import models
 from matrix.constants import CHOICES, NAME_FOR_TASK_MATRIX
 from matrix.validators import validation_check_status
-
-User = get_user_model()
 
 
 class Skill(models.Model):
@@ -78,11 +77,29 @@ class GradeSkill(models.Model):
 
 
 class Matrix(models.Model):
-    name = models.CharField("Наименование", max_length=20, default=NAME_FOR_TASK_MATRIX)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Сотрудник")
-    status = models.CharField("Статус", max_length=10, default="Новая", choices=CHOICES, validators=[validation_check_status])
+    name = models.CharField(
+        "Наименование",
+        max_length=20,
+        default=NAME_FOR_TASK_MATRIX
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        verbose_name="Сотрудник"
+    )
+    status = models.CharField(
+        "Статус",
+        max_length=10,
+        default="Новая",
+        choices=CHOICES,
+        validators=[validation_check_status]
+    )
     created_at = models.DateTimeField("Дата создания", auto_now_add=True)
-    completed_at = models.DateTimeField("Дата завершения", null=True, blank=True)
+    completed_at = models.DateTimeField(
+        "Дата завершения",
+        null=True,
+        blank=True
+    )
 
     class Meta:
         verbose_name = "Матрица"

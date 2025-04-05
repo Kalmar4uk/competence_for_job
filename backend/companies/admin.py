@@ -9,6 +9,11 @@ class UserInlines(admin.TabularInline):
     fields = ("email", "job_title", "is_director")
     extra = 0
 
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        queryset = queryset.exclude(is_director=True)
+        return queryset
+
 
 @admin.register(Company)
 class CompanyAdmin(admin.ModelAdmin):

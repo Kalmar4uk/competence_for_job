@@ -1,4 +1,5 @@
 from dateutil.relativedelta import relativedelta
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q, Sum
 from django.http import HttpResponse, JsonResponse
@@ -6,9 +7,10 @@ from django.shortcuts import get_object_or_404, render
 from matrix.constants import CURRENT_DATE, CURRENT_MONTH
 from matrix.functions import check_connect_redis
 from matrix.models import (Competence, GradeCompetenceJobTitle, GradeSkill,
-                           Matrix, User)
+                           Matrix)
 from matrix.tasks import download_file, save_to_db
 
+User = get_user_model()
 
 @login_required
 def for_main_page(request):

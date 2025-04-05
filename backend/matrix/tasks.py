@@ -3,11 +3,15 @@ from tempfile import NamedTemporaryFile
 
 from celery import shared_task
 from dateutil.relativedelta import relativedelta
+from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from matrix.constants import CURRENT_DATE, CURRENT_DATETIME, CURRENT_MONTH
 from matrix.exceptions import NotNull
-from matrix.models import Competence, GradeSkill, Matrix, Skill, User
+from matrix.models import Competence, GradeSkill, Matrix, Skill
 from openpyxl import Workbook
+
+
+User = get_user_model()
 
 
 @shared_task

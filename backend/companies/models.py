@@ -1,4 +1,4 @@
-from django.contrib.auth import get_user_model
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
@@ -6,6 +6,12 @@ from django.utils import timezone
 
 class Company(models.Model):
     name = models.CharField("Название", max_length=250, unique=True)
+    director = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="director_company",
+        verbose_name="Директор"
+    )
     created_at = models.DateTimeField("Создана от", auto_now_add=True)
     closed_at = models.DateTimeField("Закрыта от", null=True, blank=True)
     is_active = models.BooleanField("Статус", default=True)
