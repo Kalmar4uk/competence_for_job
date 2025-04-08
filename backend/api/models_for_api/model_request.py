@@ -28,3 +28,8 @@ class ApiCompanyUpdate(BaseModel):
 class ApiCompanyUpdateDirector(BaseModel):
     """Модель обновления директора компании"""
     new_director: int
+
+
+class ApiCompanyDeleteEmployees(BaseModel):
+    """Модель удаления сотрудников из компании"""
+    employees: list[int]

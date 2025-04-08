@@ -2,7 +2,8 @@ from api.auth import get_current_user, get_current_user_is_director_or_admin
 from api.models_for_api.base_model import ApiCompany, ApiUser
 from api.models_for_api.model_request import (ApiCompanyUpdate,
                                               ApiCompanyUpdateDirector,
-                                              CompanyRegistration)
+                                              CompanyRegistration,
+                                              ApiCompanyDeleteEmployees)
 from api.models_for_api.models_response import ApiCompanyBaseGet
 from api.routers.routers import router_companies
 from companies.models import Company
@@ -10,6 +11,7 @@ from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from fastapi import Depends, HTTPException, status
 from users.models import User
 
@@ -151,7 +153,9 @@ def update_company(
                 id__in=from_data.employees,
                 company__isnull=True
             ).update(
-                company=current_company
+                company=current_company,
+                date_of_employment=timezone.now().date(),
+                date_of_dismissal=None
             )
         employees_data = current_company.users.exclude(is_director=True)
         employees_company = [
@@ -248,5 +252,42 @@ def update_dir_company(
     return ApiCompanyBaseGet.from_django_model(
         current_company,
         new_dir_api,
+        employees_company
+    )
+
+
+@router_companies.delete(
+        "/{company_id}/delete_employees",
+        response_model=ApiCompanyBaseGet
+)
+def delete_employees_company(
+    company_id: int,
+    from_data: ApiCompanyDeleteEmployees,
+    current_user: User = Depends(get_current_user_is_director_or_admin)
+):
+    """Удаление сотрудника из компании по его id"""
+    try:
+        current_company = get_object_or_404(Company, id=company_id)
+    except Http404:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Комапнии с id {company_id} в базе нет"
+        )
+    for employee in current_company.users.all():
+        if employee.id in from_data.employees:
+            employee.company = None
+            employee.date_of_dismissal = timezone.now().date()
+            employee.save()
+    dir_company = ApiUser.from_django_model(current_user)
+    employees_company = [
+        ApiUser.from_django_model(
+            employee
+        ) for employee in current_company.users.exclude(
+            is_director=True
+        )
+    ]
+    return ApiCompanyBaseGet.from_django_model(
+        current_company,
+        dir_company,
         employees_company
     )

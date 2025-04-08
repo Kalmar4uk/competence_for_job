@@ -60,7 +60,7 @@ class User(AbstractUser):
 
     def save(self, *args, **kwargs):
         if self.is_active is False and not self.email.startswith("Этот"):
-            self.email = f"Этот пидор больше не работает - {self.email}"
+            self.email = f"Сотрудник больше не работает - {self.email}"
         super().save(*args, **kwargs)
 
     def __str__(self):

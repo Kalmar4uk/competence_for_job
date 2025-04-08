@@ -3,6 +3,7 @@ from django.conf import settings
 from django.db import models
 from matrix.constants import CHOICES, NAME_FOR_TASK_MATRIX
 from matrix.validators import validation_check_status
+from companies.models import Company
 
 
 class Skill(models.Model):
@@ -107,3 +108,9 @@ class Matrix(models.Model):
 
     def __str__(self):
         return self.name
+
+
+# class TemplateMatrix(models.Model):
+#     name = models.CharField("Название", max_length=100)
+#     company = models.ManyToManyField()
+#     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, verbose_name="Автор шаблона", )
