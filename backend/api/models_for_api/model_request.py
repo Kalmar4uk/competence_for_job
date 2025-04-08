@@ -33,3 +33,8 @@ class ApiCompanyUpdateDirector(BaseModel):
 class ApiCompanyDeleteEmployees(BaseModel):
     """Модель удаления сотрудников из компании"""
     employees: list[int]
+
+
+class ApiRefreshToken(BaseModel):
+    """Модель для получения рефреш токена"""
+    refresh_token: str

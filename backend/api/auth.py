@@ -11,6 +11,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 from tokens.models import BlackListAccessToken
 from users.models import User
+from api.models_for_api.model_request import ApiRefreshToken
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -92,7 +93,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
 
 
 def get_current_user_is_director_or_admin(
-        current_user: User = Depends(get_current_user),
+        current_user: User = Depends(get_current_user)
 ):
     if current_user.is_director or current_user.is_staff:
         return current_user
