@@ -6,6 +6,7 @@ from api.models_for_api.model_request import (ApiCompanyDeleteEmployees,
                                               ApiCompanyUpdate,
                                               ApiCompanyUpdateDirector,
                                               CompanyRegistration)
+from api.exceptions import CompanyNotFound, UserNotFound, NotRights, EmployeeDir, EmployeeInCompany, UniqueNameCompany
 from api.models_for_api.models_response import ApiCompanyBaseGet
 from api.routers.routers import router_companies
 from companies.models import Company
@@ -13,7 +14,7 @@ from django.db.utils import IntegrityError
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
 from users.models import User
 
 
@@ -55,10 +56,7 @@ def get_company(
     try:
         current_company = get_object_or_404(Company, id=company_id)
     except Http404:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Комапнии с id {company_id} в базе нет"
-        )
+        raise CompanyNotFound()
 
     director = ApiUser.from_django_model(current_company.director)
     users = [
@@ -83,25 +81,17 @@ def registration_company(
     """
     if current_user.company:
         if current_user.is_director:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail="Сотрудник уже является директором компании"
-            )
+            raise EmployeeDir()
         else:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail="Сотруднику необходимо сначала выйти из компании"
-            )
+            raise EmployeeInCompany()
     try:
         company = Company.objects.create(
             name=from_data.name,
             director=current_user
         )
     except IntegrityError:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Такое название компании уже используется"
-        )
+        raise UniqueNameCompany()
+
     current_user.company = company
     current_user.is_director = True
     current_user.save()
@@ -135,18 +125,12 @@ def update_company(
 ):
     """Обновление компании по id"""
     if current_user.company.id != company_id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Недостаточно прав"
-        )
+        raise NotRights()
 
     try:
         current_company = get_object_or_404(Company, id=company_id)
     except Http404:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Комапнии с id {company_id} в базе нет"
-        )
+        raise CompanyNotFound()
 
     if from_data.is_active:
         if from_data.employees:
@@ -208,29 +192,18 @@ def update_dir_company(
     в компании, но теряет все привелегии директора
     """
     if current_user.id == from_data.new_director:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Сотрудник уже является директором этой компании"
-        )
+        raise EmployeeDir()
     try:
         current_company = get_object_or_404(Company, id=company_id)
     except Http404:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Комапнии с id {company_id} в базе нет"
-        )
+        raise CompanyNotFound()
     try:
         new_dir = get_object_or_404(User, id=from_data.new_director)
     except Http404:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Сотрудника с id {from_data.new_director} в базе нет"
-        )
+        raise UserNotFound()
+
     if new_dir.is_director:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Сотрудник уже является директором другой компании"
-        )
+        raise EmployeeDir()
 
     current_user.is_director = False
     current_user.save()
@@ -270,10 +243,8 @@ def delete_employees_company(
     try:
         current_company = get_object_or_404(Company, id=company_id)
     except Http404:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Комапнии с id {company_id} в базе нет"
-        )
+        raise CompanyNotFound()
+
     for employee in current_company.users.all():
         if employee.id in from_data.employees:
             employee.company = None

@@ -1,4 +1,7 @@
+import re
+
 from api.permissions import get_current_user
+from api.exceptions import CompanyNotFound, UserNotFound, UniqueEmailEmployee, NotValidEmail
 from api.models_for_api.base_model import ApiUser
 from api.models_for_api.model_request import UserRegistration
 from api.models_for_api.models_response import (ApiCompanyForUserList,
@@ -28,10 +31,7 @@ def get_user(
     try:
         user = get_object_or_404(User, id=user_id)
     except Http404:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Сотрудника с id {user_id} нет в базе"
-        )
+        raise UserNotFound()
     return ApiUserResponse.from_django_model(
         user, ApiCompanyForUserList(
             id=user.company.id, name=user.company.name
@@ -88,10 +88,11 @@ def registration_user(from_data: UserRegistration):
             detail=str(error)
         )
     if User.objects.filter(email=from_data.email).exists():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Пользователь с таким email уже зарегестрирован."
-        )
+        raise UniqueEmailEmployee()
+
+    if not re.search(r"^[\w.]+@[\w]+\.+(ru|com)$", from_data.email):
+        raise NotValidEmail()
+
     user_data = from_data.model_dump()
     password = user_data.pop("password")
     new_user = User.objects.create(**user_data)

@@ -3,10 +3,11 @@ from datetime import timedelta
 import jwt
 from api.auth import get_access_and_refresh_tekens, oauth2_scheme
 from api.permissions import get_current_user
+from api.exceptions import NotValidToken
+from api.routers.routers import router_token
 from api.models_for_api.auth_models import Token, UserLogin
 from api.models_for_api.base_model import ApiUser
 from api.models_for_api.model_request import ApiRefreshToken
-from api.routers.routers import router_token
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.utils import timezone
@@ -82,20 +83,13 @@ def update_tokens_through_refresh(
         email: str = payload.get("sub")
         token_type: str = payload.get("token_type")
     except InvalidTokenError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Некорректный токен"
-        )
+        raise NotValidToken()
+
     if current_user.email != email:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Токен не принадлежит сотруднику"
-        )
+        raise NotValidToken()
+
     if token_type != "refresh_token":
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Тип токена не соответствует"
-        )
+        raise NotValidToken()
 
     refresh_token_in_db = RefreshToken.objects.get(
         refresh_token=refresh_token_request.refresh_token,
@@ -107,10 +101,7 @@ def update_tokens_through_refresh(
             token=refresh_token_in_db
         ).exists()
     ):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Некорректный токен"
-        )
+        raise NotValidToken()
 
     BlackListRefreshToken.objects.create(
         user=current_user,

@@ -8,7 +8,7 @@ from matrix.constants import CURRENT_DATE, CURRENT_MONTH
 from matrix.functions import check_connect_redis
 from matrix.models import (Competence, GradeCompetenceJobTitle, GradeSkill,
                            Matrix)
-from matrix.tasks import download_file, save_to_db
+from matrix.tasks import save_to_db
 
 User = get_user_model()
 
@@ -155,19 +155,3 @@ def new_profile(request, personnel_number):
     }
 
     return render(request, "matrix/new_profile.html", context)
-
-
-@login_required
-def competence_file(request, personnel_number, period):
-    if check_connect_redis():
-        stream = download_file.delay(personnel_number, period).get()
-    else:
-        stream = download_file(personnel_number, period)
-    response = HttpResponse(
-        content=stream,
-        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers={
-            "Content-Disposition": 'attachment; filename="competence.xlsx"'
-        },
-    )
-    return response

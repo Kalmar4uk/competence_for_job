@@ -2,14 +2,8 @@ from datetime import timedelta
 
 import jwt
 from django.conf import settings
-from django.http.response import Http404
-from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jwt.exceptions import InvalidTokenError
-from tokens.models import BlackListAccessToken
-from users.models import User
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
