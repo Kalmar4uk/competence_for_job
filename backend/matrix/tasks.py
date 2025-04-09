@@ -10,7 +10,6 @@ from matrix.exceptions import NotNull
 from matrix.models import Competence, GradeSkill, Matrix, Skill
 from openpyxl import Workbook
 
-
 User = get_user_model()
 
 

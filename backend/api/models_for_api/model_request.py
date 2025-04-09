@@ -1,7 +1,5 @@
 from pydantic import BaseModel
 
-from .base_model import ApiCompany, ApiUser
-
 
 class UserRegistration(BaseModel):
     """Модель для регистрации юзера"""

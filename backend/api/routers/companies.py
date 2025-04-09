@@ -1,13 +1,14 @@
-from api.auth import get_current_user, get_current_user_is_director_or_admin
-from api.models_for_api.base_model import ApiCompany, ApiUser
-from api.models_for_api.model_request import (ApiCompanyUpdate,
+from api.permissions import (
+    get_current_user,
+    get_current_user_is_director_or_admin)
+from api.models_for_api.base_model import ApiUser
+from api.models_for_api.model_request import (ApiCompanyDeleteEmployees,
+                                              ApiCompanyUpdate,
                                               ApiCompanyUpdateDirector,
-                                              CompanyRegistration,
-                                              ApiCompanyDeleteEmployees)
+                                              CompanyRegistration)
 from api.models_for_api.models_response import ApiCompanyBaseGet
 from api.routers.routers import router_companies
 from companies.models import Company
-from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
@@ -227,7 +228,7 @@ def update_dir_company(
         )
     if new_dir.is_director:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail="Сотрудник уже является директором другой компании"
         )
 

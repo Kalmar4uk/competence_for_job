@@ -1,9 +1,9 @@
-from django.contrib.auth import get_user_model
+from companies.models import Company
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db import models
 from matrix.constants import CHOICES, NAME_FOR_TASK_MATRIX
 from matrix.validators import validation_check_status
-from companies.models import Company
 
 
 class Skill(models.Model):
