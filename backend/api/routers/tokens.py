@@ -3,31 +3,26 @@ from datetime import timedelta
 import jwt
 from api.auth import get_access_and_refresh_tekens, oauth2_scheme
 from api.permissions import get_current_user
-from api.exceptions import NotValidToken
+from api.exceptions.error_401 import NotValidToken, NotValidEmailOrPassword
 from api.routers.routers import router_token
 from api.models_for_api.auth_models import Token, UserLogin
-from api.models_for_api.base_model import ApiUser
 from api.models_for_api.model_request import ApiRefreshToken
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.utils import timezone
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
 from jwt.exceptions import InvalidTokenError
 from tokens.models import (BlackListAccessToken, BlackListRefreshToken,
                            RefreshToken)
 from users.models import User
 
 
-@router_token.post("/login", response_model=Token)
+@router_token.post("/login", response_model=Token, responses={401: {}})
 def login_for_access_token(form_data: UserLogin):
     """Авторизация пользователя/получение токенов"""
     user = authenticate(email=form_data.email, password=form_data.password)
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Некорректный логин или пароль",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        raise NotValidEmailOrPassword()
     access_token, refresh_token = get_access_and_refresh_tekens(
         data={"sub": user.email}
     )
@@ -47,29 +42,28 @@ def login_for_access_token(form_data: UserLogin):
     )
 
 
-@router_token.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
+@router_token.post("/logout", status_code=204, responses={401: {}})
 def logout_user(
-    current_user: ApiUser = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     token: str = Depends(oauth2_scheme)
 ):
     """Выход пользователя из авторизации"""
-    user = User.objects.get(email=current_user.email)
-    refresh_tokens = RefreshToken.objects.filter(user=user)
+    refresh_tokens = RefreshToken.objects.filter(user=current_user)
     for refresh in refresh_tokens:
         BlackListRefreshToken.objects.create(
-            user=user,
+            user=current_user,
             token=refresh.refresh_token,
             expires_at=refresh.expires_at
         )
         refresh.delete()
 
     BlackListAccessToken.objects.create(
-        user=user,
+        user=current_user,
         token=token
     )
 
 
-@router_token.post("/refresh_token", response_model=Token)
+@router_token.post("/refresh_token", response_model=Token, responses={401: {}})
 def update_tokens_through_refresh(
     refresh_token_request: ApiRefreshToken,
     current_user: User = Depends(get_current_user)

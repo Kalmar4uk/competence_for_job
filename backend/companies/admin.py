@@ -1,7 +1,7 @@
 from django.contrib import admin
 from users.models import User
 
-from .models import Company, LegalDetailsCompany
+from .models import Company, LegalDetailsCompany, OldCompanyEmployee
 
 
 class UserInlines(admin.TabularInline):
@@ -24,4 +24,9 @@ class CompanyAdmin(admin.ModelAdmin):
 
 @admin.register(LegalDetailsCompany)
 class LegalDetailsCompanyAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(OldCompanyEmployee)
+class OldCompanyEmployeeAdmin(admin.ModelAdmin):
     pass

@@ -1,12 +1,15 @@
-from api.permissions import (
-    get_current_user,
-    get_current_user_is_director_or_admin)
+from api.permissions import (get_current_user,
+                             get_current_user_is_director_or_admin)
 from api.models_for_api.base_model import ApiUser
 from api.models_for_api.model_request import (ApiCompanyDeleteEmployees,
                                               ApiCompanyUpdate,
                                               ApiCompanyUpdateDirector,
                                               CompanyRegistration)
-from api.exceptions import CompanyNotFound, UserNotFound, NotRights, EmployeeDir, EmployeeInCompany, UniqueNameCompany
+from api.exceptions.error_404 import CompanyNotFound, UserNotFound
+from api.exceptions.error_422 import (EmployeeDir,
+                                      EmployeeInCompany,
+                                      UniqueNameCompany)
+from api.exceptions.error_403 import NotRights
 from api.models_for_api.models_response import ApiCompanyBaseGet
 from api.routers.routers import router_companies
 from companies.models import Company
@@ -14,11 +17,12 @@ from django.db.utils import IntegrityError
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from fastapi import Depends
+from fastapi import Depends, status
 from users.models import User
+from fastapi.exception_handlers import http_exception_handler
 
 
-@router_companies.get("/", response_model=list[ApiCompanyBaseGet])
+@router_companies.get("/", response_model=list[ApiCompanyBaseGet], responses={401: {}})
 def get_list_companies(current_user: User = Depends(get_current_user)):
     """Выводит список всех активных компаний"""
     companies = Company.objects.filter(
@@ -33,8 +37,11 @@ def get_list_companies(current_user: User = Depends(get_current_user)):
     api_users_list = []
 
     for company in companies:
-        director = ApiUser.from_django_model(company.director)
+        director_data = company.director
+        director = ApiUser.from_django_model(director_data)
         for user in company.users.all():
+            if user == director_data:
+                continue
             api_users_list.append(ApiUser.from_django_model(user))
         api_company_list.append(
             ApiCompanyBaseGet.from_django_model(
@@ -46,7 +53,11 @@ def get_list_companies(current_user: User = Depends(get_current_user)):
     return api_company_list
 
 
-@router_companies.get("/{company_id}", response_model=ApiCompanyBaseGet)
+@router_companies.get(
+        "/{company_id}",
+        response_model=ApiCompanyBaseGet,
+        responses={404: {}, 401: {}}
+    )
 def get_company(
     company_id: int,
     current_user: ApiUser = Depends(get_current_user)
@@ -63,6 +74,7 @@ def get_company(
         ApiUser.from_django_model(
             user
         ) for user in current_company.users.all()
+        if not user.groups.filter(id=1).exists()
     ]
 
     return ApiCompanyBaseGet.from_django_model(
@@ -70,7 +82,12 @@ def get_company(
     )
 
 
-@router_companies.post("/", response_model=ApiCompanyBaseGet)
+@router_companies.post(
+        "/",
+        response_model=ApiCompanyBaseGet,
+        status_code=201,
+        responses={422: {}, 401: {}}
+    )
 def registration_company(
     from_data: CompanyRegistration,
     current_user: User = Depends(get_current_user)
@@ -117,7 +134,11 @@ def registration_company(
     )
 
 
-@router_companies.patch("/{company_id}", response_model=ApiCompanyBaseGet)
+@router_companies.patch(
+        "/{company_id}",
+        response_model=ApiCompanyBaseGet,
+        responses={403: {}, 404: {}, 401: {}}
+    )
 def update_company(
     company_id: int,
     from_data: ApiCompanyUpdate,
@@ -142,7 +163,7 @@ def update_company(
                 date_of_employment=timezone.now().date(),
                 date_of_dismissal=None
             )
-        employees_data = current_company.users.exclude(is_director=True)
+        employees_data = current_company.users.exclude(groups__id=1)
         employees_company = [
             ApiUser.from_django_model(
                 employee
@@ -179,7 +200,8 @@ def update_company(
 
 @router_companies.patch(
         "/{company_id}/update_director",
-        response_model=ApiCompanyBaseGet
+        response_model=ApiCompanyBaseGet,
+        responses={404: {}, 422: {}, 401: {}}
     )
 def update_dir_company(
     company_id: int,
@@ -232,8 +254,9 @@ def update_dir_company(
 
 @router_companies.delete(
         "/{company_id}/delete_employees",
-        response_model=ApiCompanyBaseGet
-)
+        response_model=ApiCompanyBaseGet,
+        responses={404: {}, 401: {}}
+    )
 def delete_employees_company(
     company_id: int,
     from_data: ApiCompanyDeleteEmployees,

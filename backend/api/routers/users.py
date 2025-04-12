@@ -1,7 +1,8 @@
 import re
 
 from api.permissions import get_current_user
-from api.exceptions import CompanyNotFound, UserNotFound, UniqueEmailEmployee, NotValidEmail
+from api.exceptions.error_404 import UserNotFound
+from api.exceptions.error_422 import UniqueEmailEmployee, NotValidEmail
 from api.models_for_api.base_model import ApiUser
 from api.models_for_api.model_request import UserRegistration
 from api.models_for_api.models_response import (ApiCompanyForUserList,
@@ -16,13 +17,17 @@ from fastapi import Depends, HTTPException, Query, status
 from users.models import User
 
 
-@router_users.get("/me", response_model=ApiUserResponse)
+@router_users.get("/me", response_model=ApiUserResponse, responses={401: {}})
 def read_users_me(current_user: ApiUserResponse = Depends(get_current_user)):
     """Выводит текущего пользователя из токена"""
     return current_user
 
 
-@router_users.get("/{user_id}", response_model=ApiUserResponse)
+@router_users.get(
+        "/{user_id}",
+        response_model=ApiUserResponse,
+        responses={404: {}, 401: {}}
+    )
 def get_user(
     user_id: int,
     current_user: ApiUserResponse = Depends(get_current_user)
@@ -39,7 +44,7 @@ def get_user(
     )
 
 
-@router_users.get("/", response_model=ApiUserPagination)
+@router_users.get("/", response_model=ApiUserPagination, responses={401: {}})
 def get_users_list(
     page: int = Query(
         1,
@@ -77,7 +82,12 @@ def get_users_list(
     )
 
 
-@router_users.post("/registration", response_model=ApiUser)
+@router_users.post(
+        "/registration",
+        response_model=ApiUser,
+        status_code=201,
+        responses={422: {}, 401: {}}
+    )
 def registration_user(from_data: UserRegistration):
     """Регистрация пользователя"""
     try:

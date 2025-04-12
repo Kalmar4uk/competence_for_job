@@ -5,7 +5,7 @@ from django.conf import settings
 from django.utils import timezone
 from fastapi.security import OAuth2PasswordBearer
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token", auto_error=False)
 
 
 def create_token(data: dict, expires_delta: timedelta | None = None):

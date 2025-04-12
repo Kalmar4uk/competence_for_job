@@ -1,8 +1,11 @@
 import jwt
+from api.exceptions.error_401 import NotValidToken, NotAuth
+from api.exceptions.error_403 import NotRights
+from api.exceptions.error_404 import UserNotFound
 from django.conf import settings
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
 from jwt.exceptions import InvalidTokenError
 from tokens.models import BlackListAccessToken
 from users.models import User
@@ -10,11 +13,8 @@ from api.auth import oauth2_scheme
 
 
 def get_current_user(token: str = Depends(oauth2_scheme)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Необходимо авторизоваться",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    if not token:
+        raise NotAuth()
     try:
         payload = jwt.decode(
             token,
@@ -23,22 +23,16 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
         )
         email: str = payload.get("sub")
         if email is None:
-            raise credentials_exception
+            raise NotValidToken()
     except InvalidTokenError:
-        raise credentials_exception
+        raise NotValidToken()
     if BlackListAccessToken.objects.filter(token=token).exists():
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Токен недействителен",
-        )
+        raise NotValidToken()
 
     try:
         user = get_object_or_404(User, email=email)
     except Http404:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Сотрудник не найден"
-        )
+        raise UserNotFound()
 
     return user
 
@@ -48,7 +42,4 @@ def get_current_user_is_director_or_admin(
 ):
     if current_user.is_director or current_user.is_staff:
         return current_user
-    raise HTTPException(
-        status_code=status.HTTP_403_FORBIDDEN,
-        detail="Недостаточно прав",
-    )
+    raise NotRights()
