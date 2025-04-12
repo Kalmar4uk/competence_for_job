@@ -17,12 +17,15 @@ from django.db.utils import IntegrityError
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from fastapi import Depends, status
+from fastapi import Depends
 from users.models import User
-from fastapi.exception_handlers import http_exception_handler
 
 
-@router_companies.get("/", response_model=list[ApiCompanyBaseGet], responses={401: {}})
+@router_companies.get(
+        "/",
+        response_model=list[ApiCompanyBaseGet],
+        responses={401: {}}
+    )
 def get_list_companies(current_user: User = Depends(get_current_user)):
     """Выводит список всех активных компаний"""
     companies = Company.objects.filter(
