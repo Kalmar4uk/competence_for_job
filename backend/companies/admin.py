@@ -1,13 +1,18 @@
 from django.contrib import admin
 from users.models import User
 
-from .models import Company, LegalDetailsCompany
+from .models import Company, LegalDetailsCompany, OldCompanyEmployee
 
 
 class UserInlines(admin.TabularInline):
     model = User
     fields = ("email", "job_title", "is_director")
     extra = 0
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        queryset = queryset.exclude(is_director=True)
+        return queryset
 
 
 @admin.register(Company)
@@ -19,4 +24,9 @@ class CompanyAdmin(admin.ModelAdmin):
 
 @admin.register(LegalDetailsCompany)
 class LegalDetailsCompanyAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(OldCompanyEmployee)
+class OldCompanyEmployeeAdmin(admin.ModelAdmin):
     pass

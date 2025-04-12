@@ -20,4 +20,12 @@ class ApiCompanyForUserList(BaseModel):
 
 class ApiUserResponse(ApiUser):
     """Модель юзера с компанией для ответа"""
+    is_director: bool
     company: ApiCompanyForUserList | None = None
+
+
+class ApiUserPagination(BaseModel):
+    count: int
+    next: int | None = None
+    previous: int | None = None
+    result: list[ApiUserResponse]
