@@ -42,6 +42,16 @@ class User(AbstractUser):
         on_delete=models.CASCADE,
         null=True, blank=True
     )
+    date_of_employment = models.DateField(
+        "Дата трудоустройства",
+        null=True,
+        blank=True
+    )
+    date_of_dismissal = models.DateField(
+        "Дата увольнения",
+        null=True,
+        blank=True
+    )
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
@@ -50,7 +60,7 @@ class User(AbstractUser):
 
     def save(self, *args, **kwargs):
         if self.is_active is False and not self.email.startswith("Этот"):
-            self.email = f"Этот пидор больше не работает - {self.email}"
+            self.email = f"Сотрудник больше не работает - {self.email}"
         super().save(*args, **kwargs)
 
     def __str__(self):

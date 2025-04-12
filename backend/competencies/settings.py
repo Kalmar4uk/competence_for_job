@@ -26,12 +26,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_celery_results',
     "rangefilter",
-    'core.apps.CoreConfig',
-    'users.apps.UsersConfig',
-    'companies.apps.CompaniesConfig',
-    'matrix.apps.MatrixConfig',
-    'tokens.apps.TokensConfig',
-    'api.apps.ApiConfig',
+    'core',
+    'users',
+    'companies',
+    'matrix',
+    'tokens',
+    'api',
     'djangoql',
     'debug_toolbar',
 ]
@@ -99,10 +99,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 STATIC_URL = '/static/'
-
-STATICFILES_DIRS = [
-   os.path.join(BASE_DIR, "static"),
-]
 
 STATIC_ROOT = BASE_DIR / 'collected_static'
 

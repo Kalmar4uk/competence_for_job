@@ -11,7 +11,6 @@ class ApiUser(ApiUserFromDjangoModel):
     first_name: str
     last_name: str
     job_title: str
-    is_director: bool
 
 
 class ApiCompany(BaseModel):
