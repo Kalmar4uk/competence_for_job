@@ -11,3 +11,4 @@ env.bak/
 venv.bak/
 backend/collected_static/
 db.sqlite3
+celerybeat-schedule.*
