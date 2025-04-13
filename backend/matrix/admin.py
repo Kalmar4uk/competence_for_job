@@ -1,13 +1,14 @@
 from core.models import MyDjangoQLSearchMixin
 from django.contrib import admin, messages
 from django.utils.translation import ngettext
-from matrix.models import (Competence, GradeCompetenceJobTitle, GradeSkill,
-                           Matrix, Skill)
+from matrix.models import (GradeSkill,
+                           Matrix, Skill, TemplateMatrix, GradeSkillMatrix)
 from rangefilter.filters import DateRangeFilterBuilder
 
 
-class CompetenceInline(admin.TabularInline):
-    model = Competence
+class MatrixSkillGradeWithTemplate(admin.TabularInline):
+    model = GradeSkillMatrix
+    readonly_fields = ("skills", "grades")
     extra = 0
 
 
@@ -19,18 +20,10 @@ class SkillAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
     readonly_fields = ("area_of_application",)
 
 
-@admin.register(GradeCompetenceJobTitle)
-class GradeCompetenceJobTitleAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
-    list_display = ("id", "job_title", "skill", "min_grade")
-    list_filter = ("job_title", "min_grade", "skill")
-    search_fields = ("skill", "job_title")
-    readonly_fields = ("job_title", "skill", "min_grade")
-
-
 @admin.register(Matrix)
 class MatrixAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
+    inlines = [MatrixSkillGradeWithTemplate]
     actions = ("change_status",)
-    inlines = (CompetenceInline,)
     list_display = ("name", "user", "status", "created_at", "completed_at")
     list_filter = ("user",)
     search_fields = ("user",)
@@ -53,7 +46,6 @@ class MatrixAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
         )
 
 
-
 @admin.register(GradeSkill)
 class GardeSkillAdmin(admin.ModelAdmin):
     actions = None
@@ -62,3 +54,8 @@ class GardeSkillAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+
+@admin.register(TemplateMatrix)
+class TemplateMatrixAdmin(admin.ModelAdmin):
+    filter_horizontal = ("skills",)

@@ -21,50 +21,6 @@ class Skill(models.Model):
         return self.skill
 
 
-class GradeCompetenceJobTitle(models.Model):
-    job_title = models.CharField("Должность сотрудника", max_length=50)
-    min_grade = models.ForeignKey(
-        "GradeSkill",
-        on_delete=models.CASCADE,
-        verbose_name="Минимальная оценка"
-    )
-    skill = models.ForeignKey(
-        Skill,
-        on_delete=models.CASCADE,
-        related_name="grade_competence",
-        verbose_name="Навык"
-    )
-
-    class Meta:
-        ordering = ["id"]
-        verbose_name = "Уровень навыков по должности"
-        verbose_name_plural = "Уровень навыков по должностям"
-
-    def __str__(self):
-        return f"Минимальная оценка ({self.id})"
-
-
-class Competence(models.Model):
-    skill = models.ForeignKey(
-        Skill,
-        related_name="skill_competence",
-        verbose_name="Навык",
-        on_delete=models.CASCADE
-    )
-    grade_skill = models.ForeignKey(
-        "GradeSkill",
-        verbose_name="Оценка",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True
-    )
-    matrix = models.ForeignKey("Matrix", on_delete=models.CASCADE, related_name="competencies")
-
-    class Meta:
-        verbose_name = "Компетенция"
-        verbose_name_plural = "Компетенции"
-
-
 class GradeSkill(models.Model):
     grade = models.CharField("Оценка", max_length=10)
     evaluation_number = models.PositiveSmallIntegerField("Числовая оценка")
@@ -83,6 +39,12 @@ class Matrix(models.Model):
         max_length=20,
         default=NAME_FOR_TASK_MATRIX
     )
+    template_matrix = models.ForeignKey(
+        "TemplateMatrix",
+        on_delete=models.CASCADE,
+        verbose_name="Шаблон на основании которого создана матрица",
+        related_name="matrix"
+    )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -95,7 +57,20 @@ class Matrix(models.Model):
         choices=CHOICES,
         validators=[validation_check_status]
     )
-    created_at = models.DateTimeField("Дата создания", auto_now_add=True)
+    skills = models.ManyToManyField(
+        Skill,
+        through="GradeSkillMatrix",
+        related_name="matrix"
+    )
+    created_at = models.DateTimeField(
+        "Дата создания",
+        auto_now_add=True
+    )
+    last_update_status = models.DateTimeField(
+        "Последнее изменение статуса",
+        null=True,
+        blank=True
+    )
     completed_at = models.DateTimeField(
         "Дата завершения",
         null=True,
@@ -110,7 +85,55 @@ class Matrix(models.Model):
         return self.name
 
 
-# class TemplateMatrix(models.Model):
-#     name = models.CharField("Название", max_length=100)
-#     company = models.ManyToManyField()
-#     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, verbose_name="Автор шаблона", )
+class TemplateMatrix(models.Model):
+    name = models.CharField("Название", max_length=100)
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.SET_NULL,
+        verbose_name="Компания",
+        related_name="temmplate_matrix",
+        null=True,
+        blank=True)
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        verbose_name="Автор шаблона",
+        related_name="temmplate_matrix",
+        null=True,
+        blank=True
+    )
+    skills = models.ManyToManyField(
+        Skill,
+        verbose_name="Навыки",
+        related_name="template_matrix"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Шаблон матрицы"
+        verbose_name_plural = "Шаблоны матриц"
+
+    def __str__(self):
+        return self.name
+
+
+class GradeSkillMatrix(models.Model):
+    matrix = models.ForeignKey(
+        Matrix,
+        on_delete=models.CASCADE,
+        verbose_name="Матрица",
+        related_name="gradeskillmatrix"
+    )
+    skills = models.ForeignKey(
+        Skill,
+        on_delete=models.CASCADE,
+        verbose_name="Навык",
+        related_name="gradeskillmatrix"
+    )
+    grades = models.ForeignKey(
+        GradeSkill,
+        on_delete=models.CASCADE,
+        verbose_name="Оценка",
+        related_name="gradeskillmatrix",
+        default=1
+    )
