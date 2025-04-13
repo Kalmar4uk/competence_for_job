@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'tokens',
     'api',
     'djangoql',
+    'admin_auto_filters',
     'debug_toolbar',
 ]
 

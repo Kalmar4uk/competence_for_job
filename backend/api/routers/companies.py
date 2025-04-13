@@ -1,4 +1,5 @@
-from api.permissions import (get_current_user,
+from api.permissions import (dir_group,
+                             get_current_user,
                              get_current_user_is_director_or_admin)
 from api.models_for_api.base_model import ApiUser
 from api.models_for_api.model_request import (ApiCompanyDeleteEmployees,
@@ -12,8 +13,9 @@ from api.exceptions.error_422 import (EmployeeDir,
 from api.exceptions.error_403 import NotRights
 from api.models_for_api.models_response import ApiCompanyBaseGet
 from api.routers.routers import router_companies
-from companies.models import Company
+from companies.models import Company, OldCompanyEmployee
 from django.db.utils import IntegrityError
+from django.db.models import Q
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -100,7 +102,7 @@ def registration_company(
     Список сотрудников не обязателен, может быть не передан вовсе
     """
     if current_user.company:
-        if current_user.is_director:
+        if current_user.groups.filter(id=1):
             raise EmployeeDir()
         else:
             raise EmployeeInCompany()
@@ -113,8 +115,9 @@ def registration_company(
         raise UniqueNameCompany()
 
     current_user.company = company
-    current_user.is_director = True
     current_user.save()
+    dir_group(current_user)
+
     user_api = ApiUser.from_django_model(current_user)
     if from_data.employees:
         api_user_list = []
@@ -125,6 +128,9 @@ def registration_company(
                 print(f"Сотрудника с id {employee} в базе нет")  # Вывести в логи при добавлении логов, а принт убрать
             else:
                 user_data.company = company
+                user_data.date_of_employment = timezone.now().date
+                user_data.date_of_dismissal = None
+                user_data.save()
                 api_user_list.append(ApiUser.from_django_model(user_data))
         return ApiCompanyBaseGet.from_django_model(
             company,
@@ -148,6 +154,7 @@ def update_company(
     current_user: User = Depends(get_current_user_is_director_or_admin)
 ):
     """Обновление компании по id"""
+    print(current_user)
     if current_user.company.id != company_id:
         raise NotRights()
 
@@ -166,16 +173,15 @@ def update_company(
                 date_of_employment=timezone.now().date(),
                 date_of_dismissal=None
             )
-        employees_data = current_company.users.exclude(groups__id=1)
         employees_company = [
             ApiUser.from_django_model(
                 employee
-            ) for employee in employees_data
+            ) for employee in current_company.users.exclude(groups__id=1)
         ]
         current_company.name = from_data.name
         current_company.save()
 
-        user_api = ApiUser.from_django_model(current_user)
+        user_api = ApiUser.from_django_model(current_company.director)
 
         return ApiCompanyBaseGet.from_django_model(
             current_company,
@@ -184,11 +190,11 @@ def update_company(
         )
 
     if not from_data.is_active:
-        User.objects.filter(
-            company=current_company,
-            is_director=False
+        current_company.users.exclude(
+            groups__id=1
         ).update(
-            company=None
+            company=None,
+            date_of_dismissal=timezone.now().date()
         )
         current_company.is_active = from_data.is_active
         current_company.save()
@@ -227,14 +233,16 @@ def update_dir_company(
     except Http404:
         raise UserNotFound()
 
-    if new_dir.is_director:
+    if new_dir.groups.filter(id=1):
         raise EmployeeDir()
 
-    current_user.is_director = False
-    current_user.save()
+    dir_group(current_user, True)
 
-    new_dir.is_director, new_dir.company = True, current_company
-    new_dir.save()
+    if new_dir.company != current_company:
+        new_dir.company = current_company
+        new_dir.save()
+
+    dir_group(new_dir)
 
     current_company.director = new_dir
     current_company.save()
@@ -243,9 +251,7 @@ def update_dir_company(
     employees_company = [
         ApiUser.from_django_model(
             employee
-        ) for employee in current_company.users.exclude(
-            is_director=True
-        )
+        ) for employee in current_company.users.exclude(groups__id=1)
     ]
 
     return ApiCompanyBaseGet.from_django_model(
@@ -271,17 +277,32 @@ def delete_employees_company(
     except Http404:
         raise CompanyNotFound()
 
-    for employee in current_company.users.all():
-        if employee.id in from_data.employees:
+    employees_data = current_company.users.filter(
+        Q(id__in=from_data.employees) &
+        ~Q(groups__id=1)
+    )
+
+    if employees_data:
+        for employee in employees_data:
             employee.company = None
             employee.date_of_dismissal = timezone.now().date()
             employee.save()
-    dir_company = ApiUser.from_django_model(current_user)
+            OldCompanyEmployee.objects.create(
+                company=current_company,
+                user=employee,
+                job_title=employee.job_title,
+                date_of_employment=employee.date_of_employment,
+                date_of_dismissal=employee.date_of_dismissal,
+            )
+    else:
+        raise UserNotFound()
+
+    dir_company = ApiUser.from_django_model(current_company.director)
     employees_company = [
         ApiUser.from_django_model(
             employee
         ) for employee in current_company.users.exclude(
-            is_director=True
+            groups__id=1
         )
     ]
     return ApiCompanyBaseGet.from_django_model(

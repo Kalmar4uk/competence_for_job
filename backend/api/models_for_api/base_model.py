@@ -11,6 +11,7 @@ class ApiUser(ApiUserFromDjangoModel):
     first_name: str
     last_name: str
     job_title: str
+    role: str | None = None
 
 
 class ApiCompany(BaseModel):

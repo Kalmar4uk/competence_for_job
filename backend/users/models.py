@@ -3,7 +3,6 @@ from core.models import GeneralHierarchy
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from users.manager import CustomUserManager
-from users.validators import validation_min_length_personnal_number
 
 
 class User(AbstractUser):
@@ -15,19 +14,7 @@ class User(AbstractUser):
         blank=True,
         null=True
     )
-    personnel_number = models.CharField(
-        "Табельный номер",
-        max_length=8,
-        unique=True,
-        null=True,
-        validators=[validation_min_length_personnal_number]
-    )
     job_title = models.CharField("Должность", max_length=50, null=True)
-    is_director = models.BooleanField(
-        "Статус директора",
-        default=False,
-        help_text="Проставить если сотрудник является директором компании"
-    )
     company = models.ForeignKey(
         Company,
         on_delete=models.SET_NULL,

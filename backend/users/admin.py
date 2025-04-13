@@ -1,4 +1,5 @@
 from core.models import MyDjangoQLSearchMixin
+from companies.models import Company
 from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Permission
@@ -7,6 +8,12 @@ from django.contrib.sessions.models import Session
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ngettext
 from users.models import JobDepartment, JobGroup, JobManagement, User
+from admin_auto_filters.filters import AutocompleteFilter
+
+
+class CompanyFilter(AutocompleteFilter):
+    title = "Компания"
+    field_name = "company"
 
 
 @admin.register(User)
@@ -19,24 +26,22 @@ class MyUserAdmin(MyDjangoQLSearchMixin, UserAdmin):
         "job_title",
         "group",
         "company",
-        "is_director",
         "date_joined"
     )
-    raw_id_fields = ("company",)
+    list_filter = ("is_active", CompanyFilter)
     ordering = ("-date_joined",)
     fieldsets = (
-        (None, {"fields": ("email", "password")}),
-        (_("Personal info"), {
-            "fields": (
-                "first_name", "last_name", "middle_name"
-            )
-        }
-        ),
+        (None, {"fields": (
+            "email",
+            "password",
+            "first_name",
+            "last_name",
+            "middle_name"
+        )}),
         (
             _("Сотрудник"),
             {
                 "fields": (
-                    "personnel_number",
                     "job_title",
                     "company",
                     'date_of_employment',
@@ -51,7 +56,6 @@ class MyUserAdmin(MyDjangoQLSearchMixin, UserAdmin):
                 "fields": (
                     "is_active",
                     "is_staff",
-                    "is_director",
                     "is_superuser",
                     "groups"
                 ),
@@ -71,7 +75,6 @@ class MyUserAdmin(MyDjangoQLSearchMixin, UserAdmin):
             _("Сотрудник"),
             {
                 "fields": (
-                    "personnel_number",
                     "job_title",
                     "group"
                 )
@@ -83,7 +86,8 @@ class MyUserAdmin(MyDjangoQLSearchMixin, UserAdmin):
                 "fields": (
                     "is_active",
                     "is_staff",
-                    "is_superuser"
+                    "is_superuser",
+                    "groups"
                 ),
             },
         ),
@@ -93,7 +97,7 @@ class MyUserAdmin(MyDjangoQLSearchMixin, UserAdmin):
         return obj.__str__()
 
     def get_queryset(self, request):
-        user = super(MyUserAdmin, self).get_queryset(request)
+        user = super().get_queryset(request)
         if request.user.is_superuser:
             return user
         return user.filter(id=request.user.id)

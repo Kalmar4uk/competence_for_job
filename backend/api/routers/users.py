@@ -86,7 +86,7 @@ def get_users_list(
         "/registration",
         response_model=ApiUser,
         status_code=201,
-        responses={422: {}, 401: {}}
+        responses={422: {}, 401: {}, 400: {}}
     )
 def registration_user(from_data: UserRegistration):
     """Регистрация пользователя"""

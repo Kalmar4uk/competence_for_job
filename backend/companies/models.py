@@ -13,7 +13,7 @@ class Company(models.Model):
     )
     created_at = models.DateTimeField("Создана от", auto_now_add=True)
     closed_at = models.DateTimeField("Закрыта от", null=True, blank=True)
-    is_active = models.BooleanField("Статус", default=True)
+    is_active = models.BooleanField("Активна?", default=True)
 
     class Meta:
         verbose_name = "Компания"
@@ -66,7 +66,6 @@ class OldCompanyEmployee(models.Model):
     date_of_employment = models.DateField(
         "Дата трудоустройства",
         null=True,
-        blank=True
     )
     date_of_dismissal = models.DateField(
         "Дата увольнения",
@@ -79,4 +78,7 @@ class OldCompanyEmployee(models.Model):
         verbose_name_plural = "Старые компании сотрудников"
 
     def __str__(self):
-        return f"Старая компания {self.user.first_name} {self.user.last_name}"
+        return (
+            f"Старая компания сотрудника "
+            f"{self.user.first_name} {self.user.last_name}"
+        )

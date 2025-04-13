@@ -20,7 +20,6 @@ class ApiCompanyForUserList(BaseModel):
 
 class ApiUserResponse(ApiUser):
     """Модель юзера с компанией для ответа"""
-    is_director: bool
     company: ApiCompanyForUserList | None = None
 
 
