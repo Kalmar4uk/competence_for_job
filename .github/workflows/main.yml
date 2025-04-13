@@ -3,7 +3,7 @@ name: Main Competence workflow
 on:
   push:
     branches:
-      - new_api
+      - main
 
 jobs:
   build_and_push_to_docker_hub:
