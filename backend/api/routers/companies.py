@@ -39,21 +39,20 @@ def get_list_companies(current_user: User = Depends(get_current_user)):
     )
 
     api_company_list = []
-    api_users_list = []
 
     for company in companies:
         director_data = company.director
-        director = ApiUser.from_django_model(director_data)
-        for user in company.users.all():
-            if user == director_data:
-                continue
-            api_users_list.append(ApiUser.from_django_model(user))
+        director = ApiUser.from_django_model(company.director)
+        api_users_list = [
+            ApiUser.from_django_model(user)
+            for user in company.users.all()
+            if user != director_data
+        ]
         api_company_list.append(
             ApiCompanyBaseGet.from_django_model(
                 company, director, api_users_list
             )
         )
-        api_users_list.clear()
 
     return api_company_list
 

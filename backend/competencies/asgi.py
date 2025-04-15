@@ -2,7 +2,7 @@
 import os
 
 import django
-from django.core.wsgi import get_wsgi_application
+from django.core.asgi import get_asgi_application
 from fastapi import FastAPI
 from fastapi.middleware.wsgi import WSGIMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -12,7 +12,7 @@ django.setup()
 
 from .fastapi_competencies import fastapi_competencies
 
-django_application = get_wsgi_application()
+django_application = get_asgi_application()
 
 application = FastAPI()
 
@@ -23,4 +23,4 @@ application.mount(
 )
 
 application.mount("/api", fastapi_competencies)
-application.mount("/", WSGIMiddleware(django_application))
+application.mount("/", django_application)
