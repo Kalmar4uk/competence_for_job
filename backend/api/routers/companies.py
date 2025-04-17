@@ -11,7 +11,7 @@ from api.exceptions.error_422 import (EmployeeDir,
                                       EmployeeInCompany,
                                       UniqueNameCompany)
 from api.exceptions.error_403 import NotRights
-from api.models_for_api.models_response import ApiCompanyBaseGet
+from api.models_for_api.models_response import ApiCompanyBaseGet, ApiCompanyPagination
 from api.routers.routers import router_companies
 from companies.models import Company, OldCompanyEmployee
 from django.db.utils import IntegrityError
@@ -19,24 +19,37 @@ from django.db.models import Q
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from fastapi import Depends
+from fastapi import Depends, Query
 from users.models import User
 
 
 @router_companies.get(
         "/",
-        response_model=list[ApiCompanyBaseGet],
+        response_model=ApiCompanyPagination,
         responses={401: {}}
     )
-def get_list_companies(current_user: User = Depends(get_current_user)):
+def get_list_companies(
+    page: int = Query(
+        1,
+        description="Номер страницы"
+    ),
+    limit: int = Query(
+        10,
+        le=50,
+        description="Указать кол-во компаний если требуется"
+    ),
+    current_user: User = Depends(get_current_user)):
     """Выводит список всех активных компаний"""
-    companies = Company.objects.filter(
+    companies_data = Company.objects.filter(
         is_active=True
     ).prefetch_related(
         "users"
     ).order_by(
         "-created_at"
     )
+    offset = (page - 1) * limit
+    count = companies_data.count()
+    companies = companies_data[offset:offset+limit]
 
     api_company_list = []
 
@@ -54,7 +67,15 @@ def get_list_companies(current_user: User = Depends(get_current_user)):
             )
         )
 
-    return api_company_list
+    next = page + 1 if offset + limit < count else None
+    previous = page - 1 if page > 1 else None
+
+    return ApiCompanyPagination(
+        count=count,
+        next=next,
+        previous=previous,
+        result=api_company_list
+    )
 
 
 @router_companies.get(
