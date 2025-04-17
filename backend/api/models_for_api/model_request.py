@@ -36,3 +36,9 @@ class ApiCompanyDeleteEmployees(BaseModel):
 class ApiRefreshToken(BaseModel):
     """Модель для получения рефреш токена"""
     refresh_token: str
+
+
+class ApiTemplateMatrixCreate(BaseModel):
+    name: str
+    author: int
+    skills: list[int]

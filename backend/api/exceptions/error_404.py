@@ -15,3 +15,11 @@ class UserNotFound(HTTPException):
             status_code=404,
             detail="Сотрудник(-и) не найден(-ы)"
         )
+
+
+class TemplateMatrixNotFound(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=404,
+            detail="Шаблон матрицы не найден"
+        )
