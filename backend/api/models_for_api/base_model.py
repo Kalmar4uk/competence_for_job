@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from api.core.base_from_django_model import ApiUserFromDjangoModel
+from api.core.base_from_django_model import ApiUserFromDjangoModel, ApiBaseModelIfFieldsMatch
 from pydantic import BaseModel
 
 
@@ -27,7 +27,7 @@ class ApiTemplateMatrix(BaseModel):
     created_at: datetime
 
 
-class ApiSkills(BaseModel):
+class ApiSkills(ApiBaseModelIfFieldsMatch):
     id: int
     area_of_application: str
     skill: str

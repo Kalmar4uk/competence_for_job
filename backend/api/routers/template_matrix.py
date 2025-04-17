@@ -1,7 +1,9 @@
-from api.exceptions.error_404 import CompanyNotFound, UserNotFound
+from api.exceptions.error_404 import (CompanyNotFound,
+                                      UserNotFound,
+                                      TemplateMatrixNotFound)
 from api.exceptions.error_422 import NotValidEmail, UniqueEmailEmployee
 from api.models_for_api.base_model import ApiCompany, ApiSkills, ApiUser
-from api.models_for_api.model_request import UserRegistration
+from api.models_for_api.model_request import ApiTemplateMatrixCreate
 from api.models_for_api.models_response import (ApiCompanyForUserList,
                                                 ApiTemplateMatrixBaseGet,
                                                 ApiTemplateMatrixPaginator,
@@ -14,7 +16,7 @@ from django.core.exceptions import ValidationError
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
 from fastapi import Depends, HTTPException, Query, status
-from matrix.models import TemplateMatrix
+from matrix.models import TemplateMatrix, Skill
 from users.models import User
 
 
@@ -80,10 +82,8 @@ def get_template_matrix_list(
 
     for template in template_matrix_limit:
         skills = [
-            ApiSkills(
-                id=skill.id,
-                area_of_application=skill.area_of_application,
-                skill=skill.skill
+            ApiSkills.from_django_model(
+                skill
             ) for skill in template.skills.all()
         ]
 
@@ -103,20 +103,18 @@ def get_template_matrix_list(
         except UnboundLocalError:
             company_data = template.company
 
-        company = ApiCompany(
+        company_api = ApiCompany(
             id=company_data.id,
             name=company_data.name,
             is_active=company_data.is_active
         ) if company_data else None
 
         template_matrix.append(
-            ApiTemplateMatrixBaseGet(
-                id=template.id,
-                name=template.name,
-                created_at=template.created_at,
-                author=author_api,
-                company=company,
-                skills=skills
+            ApiTemplateMatrixBaseGet.from_django_model(
+                template,
+                author_api,
+                company_api,
+                skills
             )
         )
     next = page + 1 if offset + limit < count else None
@@ -127,4 +125,70 @@ def get_template_matrix_list(
         next=next,
         previous=previous,
         result=template_matrix
+    )
+
+
+@router_template_matrix.get("/{template_matrix_id}", response_model=ApiTemplateMatrixBaseGet)
+def get_template_matrix(template_matrix_id: int):
+    """Выводит шаблон матрицы по id"""
+    try:
+        template_matrix_data = get_object_or_404(TemplateMatrix, id=template_matrix_id)
+    except Http404:
+        raise TemplateMatrixNotFound
+
+    author_data = template_matrix_data.author
+    author_api = ApiUser.from_django_model(author_data) if author_data else None
+
+    company_data = template_matrix_data.company
+    company_api = ApiCompany(
+        id=company_data.id,
+        name=company_data.name,
+        is_active=company_data.is_active
+    ) if company_data else None
+
+    skills_api = [
+        ApiSkills.from_django_model(
+            skill
+        ) for skill in template_matrix_data.skills.all()
+    ]
+
+    return ApiTemplateMatrixBaseGet.from_django_model(
+        template_matrix_data,
+        author_api,
+        company_api,
+        skills_api
+    )
+
+
+@router_template_matrix.post("/", response_model=ApiTemplateMatrixBaseGet)
+def matrix_template(from_data: ApiTemplateMatrixCreate):
+    name = from_data.name
+    try:
+        author_data = get_object_or_404(User, id=from_data.author)
+    except Http404:
+        raise UserNotFound
+    company_data = author_data.company
+    skills = Skill.objects.filter(id__in=from_data.skills)
+    template_matrix = TemplateMatrix.objects.create(
+        name=name,
+        author=author_data,
+        company=company_data
+    )
+    template_matrix.skills.set(skills)
+
+    author_api = ApiUser.from_django_model(author_data)
+    company_api = ApiCompany(
+        id=company_data.id,
+        name=company_data.name,
+        is_active=company_data.is_active
+    )
+    skills_api = [
+        ApiSkills.from_django_model(skill) for skill in skills
+    ]
+
+    return ApiTemplateMatrixBaseGet.from_django_model(
+        template_matrix,
+        author_api,
+        company_api,
+        skills_api
     )

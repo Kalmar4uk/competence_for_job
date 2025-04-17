@@ -21,7 +21,7 @@ class ApiUserFromDjangoModel(BaseModel):
                 first_name=model.first_name,
                 last_name=model.last_name,
                 job_title=model.job_title,
-                role=model.groups.all()[0].name if model.groups.all() else None,
+                role=model.groups.first.name if model.groups.all() else None,
                 company=company
             )
         return cls(
@@ -33,7 +33,7 @@ class ApiUserFromDjangoModel(BaseModel):
         )
 
 
-class ApiCompanyUpdateFromDkangoModel(BaseModel):
+class ApiCompanyUpdateFromDjangoModel(BaseModel):
 
     @classmethod
     def from_django_model(cls, model, director, employees=None):
@@ -45,4 +45,18 @@ class ApiCompanyUpdateFromDkangoModel(BaseModel):
             employees=employees,
             created_at=model.created_at,
             closed_at=model.closed_at
+        )
+
+
+class ApiTemplateMatrixFromDjangoModel(BaseModel):
+
+    @classmethod
+    def from_django_model(cls, model, author=None, company=None, skills=None):
+        return cls(
+            id=model.id,
+            name=model.name,
+            created_at=model.created_at,
+            author=author,
+            company=company,
+            skills=skills
         )
