@@ -90,14 +90,14 @@ class TemplateMatrix(models.Model):
         Company,
         on_delete=models.SET_NULL,
         verbose_name="Компания",
-        related_name="temmplate_matrix",
+        related_name="template_matrix",
         null=True,
         blank=True)
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         verbose_name="Автор шаблона",
-        related_name="temmplate_matrix",
+        related_name="template_matrix",
         null=True,
         blank=True
     )

@@ -1,7 +1,9 @@
 from datetime import datetime
 
 from api.core.base_from_django_model import ApiCompanyUpdateFromDkangoModel
-from api.models_for_api.base_model import ApiCompany, ApiUser, ApiTemplateMatrix, ApiSkills, ApiBasePagination
+from api.models_for_api.base_model import (ApiBasePagination, ApiCompany,
+                                           ApiSkills, ApiTemplateMatrix,
+                                           ApiUser)
 from pydantic import BaseModel
 
 
@@ -19,6 +21,7 @@ class ApiCompanyForUserList(BaseModel):
 
 
 class ApiTemplateMatrixBaseGet(ApiTemplateMatrix):
+    """Модель шаблона матрицы для ответа"""
     author: ApiUser | None = None
     company: ApiCompany | None = None
     skills: list[ApiSkills]

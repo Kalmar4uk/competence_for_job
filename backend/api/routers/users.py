@@ -1,13 +1,13 @@
 import re
 
-from api.permissions import get_current_user
 from api.exceptions.error_404 import UserNotFound
-from api.exceptions.error_422 import UniqueEmailEmployee, NotValidEmail
+from api.exceptions.error_422 import NotValidEmail, UniqueEmailEmployee
 from api.models_for_api.base_model import ApiUser
 from api.models_for_api.model_request import UserRegistration
 from api.models_for_api.models_response import (ApiCompanyForUserList,
-                                                ApiUserResponse,
-                                                ApiUserPagination)
+                                                ApiUserPagination,
+                                                ApiUserResponse)
+from api.permissions import get_current_user
 from api.routers.routers import router_users
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError

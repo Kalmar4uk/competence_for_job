@@ -8,3 +8,27 @@ router_template_matrix = APIRouter(
     tags=["Шаблон матрицы"]
 )
 router_matrix = APIRouter(prefix="/matrix", tags=["Матрица"])
+
+
+tags_metadata = [
+    {
+        "name": "Пользователь",
+        "description": "Эндпоинты для работы с пользователями",
+    },
+    {
+        "name": "Токены",
+        "description": "Эндпоинты для работы с токенами"
+    },
+    {
+        "name": "Компания",
+        "description": "Эндпоинты для работы с компаниями"
+    },
+    {
+        "name": "Шаблон матрицы",
+        "description": "Эндпоинты для работы с шаблонами матриц"
+    },
+    {
+        "name": "Матрица",
+        "description": "Эндпоинты для работы с матрицами"
+    }
+]

@@ -1,7 +1,7 @@
-from django.contrib import admin
 from core.models import MyDjangoQLSearchMixin
-from users.models import User
+from django.contrib import admin
 from rangefilter.filters import DateRangeFilterBuilder
+from users.models import User
 
 from .models import Company, LegalDetailsCompany, OldCompanyEmployee
 

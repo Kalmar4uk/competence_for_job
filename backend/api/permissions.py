@@ -1,5 +1,6 @@
 import jwt
-from api.exceptions.error_401 import NotValidToken, NotAuth
+from api.auth import oauth2_scheme
+from api.exceptions.error_401 import NotAuth, NotValidToken
 from api.exceptions.error_403 import NotRights
 from api.exceptions.error_404 import UserNotFound
 from django.conf import settings
@@ -10,7 +11,6 @@ from fastapi import Depends
 from jwt.exceptions import InvalidTokenError
 from tokens.models import BlackListAccessToken
 from users.models import User
-from api.auth import oauth2_scheme
 
 
 def dir_group(user, remove=None):

@@ -1,8 +1,8 @@
 from core.models import MyDjangoQLSearchMixin
 from django.contrib import admin, messages
 from django.utils.translation import ngettext
-from matrix.models import (GradeSkill,
-                           Matrix, Skill, TemplateMatrix, GradeSkillMatrix)
+from matrix.models import (GradeSkill, GradeSkillMatrix, Matrix, Skill,
+                           TemplateMatrix)
 from rangefilter.filters import DateRangeFilterBuilder
 
 
