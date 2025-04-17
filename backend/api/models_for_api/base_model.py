@@ -19,3 +19,21 @@ class ApiCompany(BaseModel):
     id: int
     name: str
     is_active: bool = True
+
+
+class ApiTemplateMatrix(BaseModel):
+    id: int
+    name: str
+    created_at: datetime
+
+
+class ApiSkills(BaseModel):
+    id: int
+    area_of_application: str
+    skill: str
+
+
+class ApiBasePagination(BaseModel):
+    count: int
+    next: int | None = None
+    previous: int | None = None
