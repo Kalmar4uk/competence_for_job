@@ -2,11 +2,11 @@ from datetime import timedelta
 
 import jwt
 from api.auth import get_access_and_refresh_tekens, oauth2_scheme
-from api.permissions import get_current_user
-from api.exceptions.error_401 import NotValidToken, NotValidEmailOrPassword
-from api.routers.routers import router_token
+from api.exceptions.error_401 import NotValidEmailOrPassword, NotValidToken
 from api.models_for_api.auth_models import Token, UserLogin
 from api.models_for_api.model_request import ApiRefreshToken
+from api.permissions import get_current_user
+from api.routers.routers import router_token
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.utils import timezone

@@ -1,21 +1,20 @@
-from api.permissions import (dir_group,
-                             get_current_user,
-                             get_current_user_is_director_or_admin)
+from api.exceptions.error_403 import NotRights
+from api.exceptions.error_404 import CompanyNotFound, UserNotFound
+from api.exceptions.error_422 import (EmployeeDir, EmployeeInCompany,
+                                      UniqueNameCompany)
 from api.models_for_api.base_model import ApiUser
 from api.models_for_api.model_request import (ApiCompanyDeleteEmployees,
                                               ApiCompanyUpdate,
                                               ApiCompanyUpdateDirector,
                                               CompanyRegistration)
-from api.exceptions.error_404 import CompanyNotFound, UserNotFound
-from api.exceptions.error_422 import (EmployeeDir,
-                                      EmployeeInCompany,
-                                      UniqueNameCompany)
-from api.exceptions.error_403 import NotRights
-from api.models_for_api.models_response import ApiCompanyBaseGet, ApiCompanyPagination
+from api.models_for_api.models_response import (ApiCompanyBaseGet,
+                                                ApiCompanyPagination)
+from api.permissions import (dir_group, get_current_user,
+                             get_current_user_is_director_or_admin)
 from api.routers.routers import router_companies
 from companies.models import Company, OldCompanyEmployee
-from django.db.utils import IntegrityError
 from django.db.models import Q
+from django.db.utils import IntegrityError
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
 from django.utils import timezone

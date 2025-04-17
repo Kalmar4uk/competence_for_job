@@ -1,5 +1,6 @@
-from core.models import MyDjangoQLSearchMixin
+from admin_auto_filters.filters import AutocompleteFilter
 from companies.models import Company
+from core.models import MyDjangoQLSearchMixin
 from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Permission
@@ -8,7 +9,6 @@ from django.contrib.sessions.models import Session
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ngettext
 from users.models import JobDepartment, JobGroup, JobManagement, User
-from admin_auto_filters.filters import AutocompleteFilter
 
 
 class CompanyFilter(AutocompleteFilter):

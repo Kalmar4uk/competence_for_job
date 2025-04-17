@@ -11,7 +11,6 @@ django.setup()
 
 from .fastapi_competencies import fastapi_competencies
 
-
 origins = [
     "http://localhost",
     "http://localhost:8000",
