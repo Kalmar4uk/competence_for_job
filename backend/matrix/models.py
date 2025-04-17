@@ -42,7 +42,9 @@ class Matrix(models.Model):
         "TemplateMatrix",
         on_delete=models.CASCADE,
         verbose_name="Шаблон на основании которого создана матрица",
-        related_name="matrix"
+        related_name="matrix",
+        null=True,
+        blank=True
     )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,

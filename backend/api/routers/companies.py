@@ -21,6 +21,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from fastapi import Depends
 from users.models import User
+from asgiref.sync import sync_to_async
 
 
 @router_companies.get(
@@ -28,7 +29,7 @@ from users.models import User
         response_model=list[ApiCompanyBaseGet],
         responses={401: {}}
     )
-def get_list_companies(current_user: User = Depends(get_current_user)):
+async def get_list_companies(current_user: User = Depends(get_current_user)):
     """Выводит список всех активных компаний"""
     companies = Company.objects.filter(
         is_active=True
@@ -40,12 +41,12 @@ def get_list_companies(current_user: User = Depends(get_current_user)):
 
     api_company_list = []
 
-    for company in companies:
-        director_data = company.director
-        director = ApiUser.from_django_model(company.director)
+    async for company in companies:
+        director_data = await sync_to_async(lambda: company.director)()
+        director = ApiUser.from_django_model(director_data)
         api_users_list = [
             ApiUser.from_django_model(user)
-            for user in company.users.all()
+            async for user in company.users.all()
             if user != director_data
         ]
         api_company_list.append(

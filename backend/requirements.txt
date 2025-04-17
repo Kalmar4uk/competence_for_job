@@ -24,6 +24,7 @@ isort==5.13.2
 kombu==5.5.2
 ply==3.11
 prompt_toolkit==3.0.50
+psycopg2==2.9.10
 pydantic==2.11.3
 pydantic_core==2.33.1
 PyJWT==2.10.1

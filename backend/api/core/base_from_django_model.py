@@ -21,7 +21,7 @@ class ApiUserFromDjangoModel(BaseModel):
                 first_name=model.first_name,
                 last_name=model.last_name,
                 job_title=model.job_title,
-                role=model.groups.all()[0].name if model.groups.all() else None,
+                role=model.groups.first().name if model.groups.all() else None,
                 company=company
             )
         return cls(
