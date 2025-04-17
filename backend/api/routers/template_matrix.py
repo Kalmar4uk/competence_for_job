@@ -9,7 +9,7 @@ from api.models_for_api.models_response import (ApiCompanyForUserList,
                                                 ApiTemplateMatrixPaginator,
                                                 ApiUserPagination,
                                                 ApiUserResponse)
-from api.permissions import get_current_user
+from api.permissions import get_current_user, get_current_user_is_director_or_admin
 from api.routers.routers import router_template_matrix
 from companies.models import Company
 from django.core.exceptions import ValidationError
@@ -129,7 +129,7 @@ def get_template_matrix_list(
 
 
 @router_template_matrix.get("/{template_matrix_id}", response_model=ApiTemplateMatrixBaseGet)
-def get_template_matrix(template_matrix_id: int):
+def get_template_matrix(template_matrix_id: int, current_user: User = Depends(get_current_user_is_director_or_admin)):
     """Выводит шаблон матрицы по id"""
     try:
         template_matrix_data = get_object_or_404(TemplateMatrix, id=template_matrix_id)
@@ -161,7 +161,7 @@ def get_template_matrix(template_matrix_id: int):
 
 
 @router_template_matrix.post("/", response_model=ApiTemplateMatrixBaseGet)
-def matrix_template(from_data: ApiTemplateMatrixCreate):
+def matrix_template(from_data: ApiTemplateMatrixCreate, current_user: User = Depends(get_current_user)):
     name = from_data.name
     try:
         author_data = get_object_or_404(User, id=from_data.author)
