@@ -61,9 +61,9 @@ def get_users_list(
     Выводит список всех активных пользователей.
     По умолчанию выдает 10 сотрудников
     """
-    offset = (page - 1) * limit
+    offset: int = (page - 1) * limit
     users_data = User.objects.filter(is_active=True).order_by("-id")
-    count = users_data.count()
+    count: int = users_data.count()
     users = users_data[offset:offset+limit]
     users_api = [
         ApiUserResponse.from_django_model(
@@ -72,8 +72,8 @@ def get_users_list(
             ) if user.company else None
         ) for user in users
     ]
-    next = page + 1 if offset + limit < count else None
-    previous = page - 1 if page > 1 else None
+    next: int = page + 1 if offset + limit < count else None
+    previous: int = page - 1 if page > 1 else None
     return ApiUserPagination(
         count=count,
         next=next,
@@ -103,8 +103,8 @@ def registration_user(from_data: UserRegistration):
     if not re.search(r"^[\w.]+@[\w]+\.+(ru|com)$", from_data.email):
         raise NotValidEmail()
 
-    user_data = from_data.model_dump()
-    password = user_data.pop("password")
+    user_data: dict[str, str] = from_data.model_dump()
+    password: str = user_data.pop("password")
     new_user = User.objects.create(**user_data)
     new_user.set_password(password)
     new_user.save()

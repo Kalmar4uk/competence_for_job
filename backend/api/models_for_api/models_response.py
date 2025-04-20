@@ -1,13 +1,13 @@
 from datetime import datetime
 
-from api.core.base_from_django_model import ApiCompanyUpdateFromDjangoModel, ApiTemplateMatrixFromDjangoModel
+from api.core.base_from_django_model import ApiTemplateMatrixFromDjangoModel
 from api.models_for_api.base_model import (ApiBasePagination, ApiCompany,
                                            ApiSkills, ApiTemplateMatrix,
                                            ApiUser)
 from pydantic import BaseModel
 
 
-class ApiCompanyBaseGet(ApiCompany, ApiCompanyUpdateFromDjangoModel):
+class ApiCompanyBaseGet(ApiCompany):
     """Модель компании для ответа"""
     director: ApiUser
     employees: list[ApiUser] | None = None

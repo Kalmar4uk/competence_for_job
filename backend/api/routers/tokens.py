@@ -20,7 +20,9 @@ from users.models import User
 @router_token.post("/login", response_model=Token, responses={401: {}})
 def login_for_access_token(form_data: UserLogin):
     """Авторизация пользователя/получение токенов"""
-    user = authenticate(email=form_data.email, password=form_data.password)
+    user = authenticate(
+        email=form_data.email, password=form_data.password
+    )
     if not user:
         raise NotValidEmailOrPassword()
     access_token, refresh_token = get_access_and_refresh_tekens(

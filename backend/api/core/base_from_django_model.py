@@ -33,10 +33,16 @@ class ApiUserFromDjangoModel(BaseModel):
         )
 
 
-class ApiCompanyUpdateFromDjangoModel(BaseModel):
+class ApiCompanyFromDjangoModel(BaseModel):
 
     @classmethod
-    def from_django_model(cls, model, director, employees=None):
+    def from_django_model(cls, model, director=None, employees=None):
+        if not director:
+            return cls(
+                id=model.id,
+                name=model.name,
+                is_active=model.is_active
+            )
         return cls(
             id=model.id,
             name=model.name,

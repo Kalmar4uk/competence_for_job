@@ -19,7 +19,6 @@ class CompanyRegistration(BaseModel):
 class ApiCompanyUpdate(BaseModel):
     """Модель запроса обновления компании"""
     name: str
-    employees: list[int] | None = None
     is_active: bool
 
 
@@ -28,7 +27,7 @@ class ApiCompanyUpdateDirector(BaseModel):
     new_director: int
 
 
-class ApiCompanyDeleteEmployees(BaseModel):
+class ApiCompanyUpdateEmployees(BaseModel):
     """Модель удаления сотрудников из компании"""
     employees: list[int]
 
@@ -38,7 +37,6 @@ class ApiRefreshToken(BaseModel):
     refresh_token: str
 
 
-class ApiTemplateMatrixCreate(BaseModel):
+class ApiTemplateMatrixUpdateOrCreate(BaseModel):
     name: str
-    author: int
     skills: list[int]

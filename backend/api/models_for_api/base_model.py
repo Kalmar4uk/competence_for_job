@@ -1,6 +1,8 @@
 from datetime import datetime
 
-from api.core.base_from_django_model import ApiUserFromDjangoModel, ApiBaseModelIfFieldsMatch
+from api.core.base_from_django_model import (ApiUserFromDjangoModel,
+                                             ApiCompanyFromDjangoModel,
+                                             ApiBaseModelIfFieldsMatch)
 from pydantic import BaseModel
 
 
@@ -14,7 +16,7 @@ class ApiUser(ApiUserFromDjangoModel):
     role: str | None = None
 
 
-class ApiCompany(BaseModel):
+class ApiCompany(ApiCompanyFromDjangoModel):
     """Базовая модель компании"""
     id: int
     name: str
