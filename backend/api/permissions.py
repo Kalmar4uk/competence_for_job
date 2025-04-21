@@ -41,7 +41,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
     try:
         user = get_object_or_404(User, email=email)
     except Http404:
-        raise UserNotFound()
+        raise UserNotFound(email=email)
 
     return user
 

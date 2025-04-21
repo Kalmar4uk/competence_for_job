@@ -10,10 +10,10 @@ class EmployeeDir(HTTPException):
 
 
 class EmployeeInCompany(HTTPException):
-    def __init__(self):
+    def __init__(self, user_id):
         super().__init__(
             status_code=422,
-            detail="Сотрудник уже находится в компании"
+            detail=f"Сотрудник с id {user_id} уже находится в компании"
         )
 
 

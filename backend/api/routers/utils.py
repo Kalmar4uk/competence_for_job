@@ -1,4 +1,5 @@
 from api.models_for_api.base_model import ApiUser
+from api.exceptions.error_404 import UserNotFound
 from api.exceptions.error_422 import EmployeeInCompany
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -33,14 +34,13 @@ def added_employees_in_company(
             employee_data = get_object_or_404(User, id=employee)
         except Http404:
             pass
-
-        if employee_data.company:
-            raise EmployeeInCompany()
-
-        employee_data.company = company
-        employee_data.date_of_employment = timezone.now().date()
-        employee_data.date_of_dismissal = None
-        employee_data.save()
-        result.append(ApiUser.from_django_model(employee_data))
-
+        else:
+            if employee_data.company:
+                pass
+            else:
+                employee_data.company = company
+                employee_data.date_of_employment = timezone.now().date()
+                employee_data.date_of_dismissal = None
+                employee_data.save()
+                result.append(ApiUser.from_django_model(employee_data))
     return result

@@ -14,7 +14,7 @@ class User(AbstractUser):
         blank=True,
         null=True
     )
-    job_title = models.CharField("Должность", max_length=50, null=True)
+    job_title = models.CharField("Должность", max_length=50, null=True, blank=True)
     company = models.ForeignKey(
         Company,
         on_delete=models.SET_NULL,

@@ -11,7 +11,8 @@ from api.models_for_api.models_response import (ApiCompanyBaseGet,
                                                 ApiCompanyPagination)
 from api.permissions import (dir_group, get_current_user,
                              get_current_user_is_director_or_admin)
-from api.routers.utils import added_employees_in_company, delete_employees_with_company
+from api.routers.utils import (added_employees_in_company,
+                               delete_employees_with_company)
 from api.routers.routers import router_companies
 from companies.models import Company, OldCompanyEmployee
 from django.db.models import Q, QuerySet
@@ -57,15 +58,15 @@ def get_list_companies(
 
     for company in companies:
         director_data: User = company.director
-        director = ApiUser.from_django_model(company.director)
+        director = ApiUser.from_django_model(model=company.director)
         api_users_list = [
-            ApiUser.from_django_model(user)
+            ApiUser.from_django_model(model=user)
             for user in company.users.all()
             if user != director_data
         ]
         api_company_list.append(
             ApiCompanyBaseGet.from_django_model(
-                company, director, api_users_list
+                model=company, director=director, employees=api_users_list
             )
         )
 
@@ -94,18 +95,17 @@ def get_company(
     try:
         current_company = get_object_or_404(Company, id=company_id)
     except Http404:
-        raise CompanyNotFound()
+        raise CompanyNotFound(company_id=company_id)
 
-    director = ApiUser.from_django_model(current_company.director)
+    director = ApiUser.from_django_model(model=current_company.director)
     users = [
         ApiUser.from_django_model(
-            user
-        ) for user in current_company.users.all()
-        if not user.groups.filter(id=1).exists()
+            model=user
+        ) for user in current_company.users.exclude(groups__id=1)
     ]
 
     return ApiCompanyBaseGet.from_django_model(
-        current_company, director, users
+        model=current_company, director=director, employees=users
     )
 
 
@@ -140,7 +140,7 @@ def registration_company(
     current_user.save()
     dir_group(current_user)
 
-    user_api = ApiUser.from_django_model(current_user)
+    user_api = ApiUser.from_django_model(model=current_user)
 
     if from_data.employees:
         api_user_list = added_employees_in_company(
@@ -148,13 +148,13 @@ def registration_company(
             employees=from_data.employees
         )
         return ApiCompanyBaseGet.from_django_model(
-            company,
-            user_api,
-            api_user_list
+            model=company,
+            director=user_api,
+            employees=api_user_list
         )
     return ApiCompanyBaseGet.from_django_model(
-        company,
-        user_api
+        model=company,
+        director=user_api
     )
 
 
@@ -175,7 +175,7 @@ def update_name_and_status_company(
     try:
         current_company = get_object_or_404(Company, id=company_id)
     except Http404:
-        raise CompanyNotFound()
+        raise CompanyNotFound(company_id=company_id)
 
     employees_data: QuerySet[User] = (
         current_company.users.exclude(groups__id=1)
@@ -197,27 +197,27 @@ def update_name_and_status_company(
                 date_of_dismissal=employee.date_of_dismissal,
             )
 
-        user_api = ApiUser.from_django_model(current_user)
+        user_api = ApiUser.from_django_model(model=current_user)
 
         return ApiCompanyBaseGet.from_django_model(
-            current_company,
-            user_api
+            model=current_company,
+            director=user_api
         )
 
     employees_company = [
         ApiUser.from_django_model(
-            employee
+            model=employee
         ) for employee in employees_data
     ]
     current_company.name = from_data.name
     current_company.save()
 
-    user_api = ApiUser.from_django_model(current_company.director)
+    user_api = ApiUser.from_django_model(model=current_company.director)
 
     return ApiCompanyBaseGet.from_django_model(
-        current_company,
-        user_api,
-        employees_company
+        model=current_company,
+        director=user_api,
+        employees=employees_company
     )
 
 
@@ -241,37 +241,37 @@ def update_dir_company(
     try:
         current_company = get_object_or_404(Company, id=company_id)
     except Http404:
-        raise CompanyNotFound()
+        raise CompanyNotFound(company_id=company_id)
     try:
         new_dir = get_object_or_404(User, id=from_data.new_director)
     except Http404:
-        raise UserNotFound()
+        raise UserNotFound(user_id=from_data.new_director)
 
     if new_dir.groups.filter(id=1):
         raise EmployeeDir()
 
-    dir_group(current_user, True)
+    dir_group(user=current_user, remove=True)
 
     if new_dir.company != current_company:
         new_dir.company = current_company
         new_dir.save()
 
-    dir_group(new_dir)
+    dir_group(user=new_dir)
 
     current_company.director = new_dir
     current_company.save()
 
-    new_dir_api = ApiUser.from_django_model(new_dir)
+    new_dir_api = ApiUser.from_django_model(model=new_dir)
     employees_company = [
         ApiUser.from_django_model(
-            employee
+            model=employee
         ) for employee in current_company.users.exclude(groups__id=1)
     ]
 
     return ApiCompanyBaseGet.from_django_model(
-        current_company,
-        new_dir_api,
-        employees_company
+        model=current_company,
+        director=new_dir_api,
+        employees=employees_company
     )
 
 
@@ -290,7 +290,7 @@ def update_employees_company(
     try:
         current_company = get_object_or_404(Company, id=company_id)
     except Http404:
-        raise CompanyNotFound()
+        raise CompanyNotFound(company_id=company_id)
 
     employees_company_data: QuerySet[int] = (
         current_company.users.exclude(
@@ -320,16 +320,16 @@ def update_employees_company(
             company=current_company
         )
 
-    dir_company = ApiUser.from_django_model(current_company.director)
+    dir_company = ApiUser.from_django_model(model=current_company.director)
     employees_company = [
         ApiUser.from_django_model(
-            employee
+            model=employee
         ) for employee in current_company.users.exclude(
             groups__id=1
         )
     ]
     return ApiCompanyBaseGet.from_django_model(
-        current_company,
-        dir_company,
-        employees_company
+        model=current_company,
+        director=dir_company,
+        employees=employees_company
     )

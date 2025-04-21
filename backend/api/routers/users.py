@@ -1,10 +1,14 @@
 import re
 
+from api.exceptions.error_400 import NotValidNewPassword
+from api.exceptions.error_401 import NotValidPassowod
 from api.exceptions.error_404 import UserNotFound
 from api.exceptions.error_422 import NotValidEmail, UniqueEmailEmployee
 from api.models_for_api.base_model import ApiUser
-from api.models_for_api.model_request import UserRegistration
-from api.models_for_api.models_response import (ApiCompanyForUserList,
+from api.models_for_api.model_request import (UserRegistration,
+                                              UserUpdate,
+                                              UserSetPassword)
+from api.models_for_api.models_response import (ApiCompanyForUser,
                                                 ApiUserPagination,
                                                 ApiUserResponse)
 from api.permissions import get_current_user
@@ -18,9 +22,13 @@ from users.models import User
 
 
 @router_users.get("/me", response_model=ApiUserResponse, responses={401: {}})
-def read_users_me(current_user: ApiUserResponse = Depends(get_current_user)):
+def read_users_me(current_user: User = Depends(get_current_user)):
     """Выводит текущего пользователя из токена"""
-    return current_user
+    return ApiUserResponse.from_django_model(
+        model=current_user, company=ApiCompanyForUser.from_django_model(
+            model=current_user.company
+        ) if current_user.company else None
+    )
 
 
 @router_users.get(
@@ -36,10 +44,10 @@ def get_user(
     try:
         user = get_object_or_404(User, id=user_id)
     except Http404:
-        raise UserNotFound()
+        raise UserNotFound(user_id=user_id)
     return ApiUserResponse.from_django_model(
-        user, ApiCompanyForUserList(
-            id=user.company.id, name=user.company.name
+        model=user, company=ApiCompanyForUser.from_django_model(
+            model=current_user.company
         ) if user.company else None
     )
 
@@ -67,8 +75,8 @@ def get_users_list(
     users = users_data[offset:offset+limit]
     users_api = [
         ApiUserResponse.from_django_model(
-            user, ApiCompanyForUserList(
-                id=user.company.id, name=user.company.name
+            model=user, company=ApiCompanyForUser.from_django_model(
+                model=current_user.company
             ) if user.company else None
         ) for user in users
     ]
@@ -108,4 +116,36 @@ def registration_user(from_data: UserRegistration):
     new_user = User.objects.create(**user_data)
     new_user.set_password(password)
     new_user.save()
-    return ApiUser.from_django_model(new_user)
+    return ApiUser.from_django_model(model=new_user)
+
+
+@router_users.patch("/edit", response_model=ApiUserResponse)
+def update_user(
+    from_data: UserUpdate,
+    current_user: User = Depends(get_current_user)
+):
+    """Обновление персональных данных пользователя"""
+    current_user.email = from_data.email
+    current_user.first_name = from_data.first_name
+    current_user.last_name = from_data.last_name
+    current_user.middle_name = from_data.middle_name
+    current_user.save()
+    return ApiUserResponse.from_django_model(
+        model=current_user, company=ApiCompanyForUser.from_django_model(
+            model=current_user.company
+        ) if current_user.company else None
+    )
+
+
+@router_users.post("/set_password", status_code=204, responses={400: {}, 401: {}})
+def set_password(from_data: UserSetPassword, current_user: User = Depends(get_current_user)):
+    if not current_user.check_password(from_data.current_password):
+        raise NotValidPassowod()
+    if from_data.current_password == from_data.new_password:
+        raise NotValidNewPassword()
+    try:
+        validate_password(from_data.new_password)
+    except ValidationError as error:
+        raise NotValidNewPassword(error=error)
+    current_user.set_password(from_data.new_password)
+    current_user.save()

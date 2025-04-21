@@ -1,10 +1,11 @@
 from datetime import datetime
 
-from api.core.base_from_django_model import ApiTemplateMatrixFromDjangoModel
+from api.core.base_from_django_model import (ApiTemplateMatrixFromDjangoModel,
+                                             ApiCompanyFromDjangoModel)
 from api.models_for_api.base_model import (ApiBasePagination, ApiCompany,
                                            ApiSkills, ApiTemplateMatrix,
                                            ApiUser)
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class ApiCompanyBaseGet(ApiCompany):
@@ -15,9 +16,9 @@ class ApiCompanyBaseGet(ApiCompany):
     closed_at: datetime | None = None
 
 
-class ApiCompanyForUserList(BaseModel):
-    id: int
-    name: str
+class ApiCompanyForUser(ApiCompanyFromDjangoModel):
+    id: int = Field(examples=[1])
+    name: str = Field(examples=["Абракадабра"])
 
 
 class ApiTemplateMatrixBaseGet(
@@ -31,7 +32,7 @@ class ApiTemplateMatrixBaseGet(
 
 class ApiUserResponse(ApiUser):
     """Модель юзера с компанией для ответа"""
-    company: ApiCompanyForUserList | None = None
+    company: ApiCompanyForUser | None = None
 
 
 class ApiUserPagination(ApiBasePagination):
