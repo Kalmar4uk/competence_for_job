@@ -1,10 +1,12 @@
-from api.models_for_api.base_model import ApiUser
+from api.models_for_api.base_model import ApiUser, ApiGrades, ApiTemplateMatrix
+from api.models_for_api.models_response import ApiMatrixForResponse, ApiSkillsAndGradesForMatrix
 from api.exceptions.error_404 import UserNotFound
 from api.exceptions.error_422 import EmployeeInCompany
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from users.models import User
 from companies.models import Company, OldCompanyEmployee
+from matrix.models import Matrix, GradeSkillMatrix
 from django.http.response import Http404
 
 
@@ -44,3 +46,31 @@ def added_employees_in_company(
                 employee_data.save()
                 result.append(ApiUser.from_django_model(employee_data))
     return result
+
+
+def result_matrix(matrices: Matrix):
+    matrix_result: list[ApiMatrixForResponse] = []
+    for matrix in matrices:
+        grades_skills_matrix = GradeSkillMatrix.objects.filter(matrix=matrix)
+        skills = [
+            ApiSkillsAndGradesForMatrix.from_django_model(
+                model=grade_skill.skills,
+                grade=ApiGrades.from_django_model(
+                    model=grade_skill.grades
+                )
+            )
+            for grade_skill in grades_skills_matrix
+        ]
+        employee = ApiUser.from_django_model(matrix.user)
+        template_matrix = ApiTemplateMatrix.from_django_model(
+            matrix.template_matrix
+        )
+        matrix_result.append(
+            ApiMatrixForResponse.from_django_model(
+                model=matrix,
+                user=employee,
+                template_matrix=template_matrix,
+                skills=skills
+            )
+        )
+    return matrix_result

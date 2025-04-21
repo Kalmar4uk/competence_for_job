@@ -4,7 +4,7 @@ from api.core.base_from_django_model import (ApiTemplateMatrixFromDjangoModel,
                                              ApiCompanyFromDjangoModel)
 from api.models_for_api.base_model import (ApiBasePagination, ApiCompany,
                                            ApiSkills, ApiTemplateMatrix,
-                                           ApiUser)
+                                           ApiUser, ApiMatrix, ApiGrades)
 from pydantic import BaseModel, Field
 
 
@@ -21,9 +21,7 @@ class ApiCompanyForUser(ApiCompanyFromDjangoModel):
     name: str = Field(examples=["Абракадабра"])
 
 
-class ApiTemplateMatrixBaseGet(
-    ApiTemplateMatrix, ApiTemplateMatrixFromDjangoModel
-):
+class ApiTemplateMatrixBaseGet(ApiTemplateMatrix):
     """Модель шаблона матрицы для ответа"""
     author: ApiUser | None = None
     company: ApiCompany | None = None
@@ -45,3 +43,11 @@ class ApiCompanyPagination(ApiBasePagination):
 
 class ApiTemplateMatrixPaginator(ApiBasePagination):
     result: list[ApiTemplateMatrixBaseGet]
+
+
+class ApiSkillsAndGradesForMatrix(ApiSkills):
+    grade: ApiGrades
+
+
+class ApiMatrixForResponse(ApiMatrix):
+    skills: list[ApiSkillsAndGradesForMatrix]

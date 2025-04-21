@@ -2,7 +2,9 @@ from datetime import datetime
 
 from api.core.base_from_django_model import (ApiUserFromDjangoModel,
                                              ApiCompanyFromDjangoModel,
-                                             ApiBaseModelIfFieldsMatch)
+                                             ApiTemplateMatrixFromDjangoModel,
+                                             ApiBaseModelIfFieldsMatch,
+                                             ApiMatrixFromDjangoModel)
 from pydantic import BaseModel, Field
 
 
@@ -24,7 +26,7 @@ class ApiCompany(ApiCompanyFromDjangoModel):
     is_active: bool = True
 
 
-class ApiTemplateMatrix(BaseModel):
+class ApiTemplateMatrix(ApiTemplateMatrixFromDjangoModel):
     id: int = Field(examples=[1])
     name: str = Field(examples=["Шаблон матрицы"])
     created_at: datetime
@@ -36,7 +38,24 @@ class ApiSkills(ApiBaseModelIfFieldsMatch):
     skill: str = Field(examples=["Включать компьютер"])
 
 
+class ApiGrades(ApiBaseModelIfFieldsMatch):
+    id: int = Field(examples=[1])
+    grade: str = Field(examples=["Basic"])
+    evaluation_number: int = Field(examples=[1])
+
+
 class ApiBasePagination(BaseModel):
     count: int = Field(examples=[4])
     next: int | None = Field(examples=[2])
     previous: int | None = Field(examples=[1])
+
+
+class ApiMatrix(ApiMatrixFromDjangoModel):
+    id: int = Field(examples=[1])
+    name: str = Field(examples=["Назначенная матрица"])
+    user: ApiUser
+    template_matrix: ApiTemplateMatrix
+    status: str = Field(examples=["Новая"])
+    created_at: datetime
+    last_update_status: datetime | None = None
+    completed_at: datetime | None = None

@@ -49,3 +49,9 @@ class ApiRefreshToken(BaseModel):
 class ApiTemplateMatrixUpdateOrCreate(BaseModel):
     name: str = Field(examples=["Template matrix"])
     skills: list[int] = Field(examples=[[1, 2, 3]])
+
+
+class ApiMatrixCreate(BaseModel):
+    name: str | None = Field(default=None, examples=["Назначенная матрица"])
+    employee: list[int] = Field(examples=[[1, 2, 3]])
+    template_matrix: int = Field(examples=[1])

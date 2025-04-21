@@ -2,24 +2,19 @@ from api.exceptions.error_403 import NotRights
 from api.exceptions.error_404 import (CompanyNotFound,
                                       UserNotFound,
                                       TemplateMatrixNotFound)
-from api.exceptions.error_422 import NotValidEmail, UniqueEmailEmployee
 from api.models_for_api.base_model import ApiCompany, ApiSkills, ApiUser
 from api.models_for_api.model_request import ApiTemplateMatrixUpdateOrCreate
-from api.models_for_api.models_response import (ApiCompanyForUser,
-                                                ApiTemplateMatrixBaseGet,
-                                                ApiTemplateMatrixPaginator,
-                                                ApiUserPagination,
-                                                ApiUserResponse)
+from api.models_for_api.models_response import (ApiTemplateMatrixBaseGet,
+                                                ApiTemplateMatrixPaginator)
 from api.permissions import (get_current_user,
                              get_current_user_is_director_or_admin)
 from api.routers.routers import router_template_matrix
 from companies.models import Company
 from django.db.models import QuerySet
-from django.core.exceptions import ValidationError
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
-from fastapi import Depends, HTTPException, Query, status
-from matrix.models import TemplateMatrix, Skill
+from fastapi import Depends, Query
+from matrix.models import TemplateMatrix
 from users.models import User
 
 
