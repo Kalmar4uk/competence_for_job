@@ -4,13 +4,13 @@ router_token = APIRouter(prefix="/token", tags=["Токены"])
 router_users = APIRouter(prefix="/users", tags=["Пользователь"])
 router_companies = APIRouter(prefix="/companies", tags=["Компания"])
 router_template_matrix = APIRouter(
-    prefix="/matrix_template",
+    prefix="/template_matrix",
     tags=["Шаблон матрицы"]
 )
 router_matrix = APIRouter(prefix="/matrix", tags=["Матрица"])
 
 
-tags_metadata = [
+tags_metadata: list[dict[str, str]] = [
     {
         "name": "Пользователь",
         "description": "Эндпоинты для работы с пользователями",

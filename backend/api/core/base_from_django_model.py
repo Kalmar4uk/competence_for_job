@@ -20,8 +20,9 @@ class ApiUserFromDjangoModel(BaseModel):
                 email=model.email,
                 first_name=model.first_name,
                 last_name=model.last_name,
+                middle_name=model.middle_name,
                 job_title=model.job_title,
-                role=model.groups.first.name if model.groups.all() else None,
+                role=model.groups.first().name if model.groups.all() else None,
                 company=company
             )
         return cls(
@@ -29,14 +30,21 @@ class ApiUserFromDjangoModel(BaseModel):
             email=model.email,
             first_name=model.first_name,
             last_name=model.last_name,
+            middle_name=model.middle_name,
             job_title=model.job_title
         )
 
 
-class ApiCompanyUpdateFromDjangoModel(BaseModel):
+class ApiCompanyFromDjangoModel(BaseModel):
 
     @classmethod
-    def from_django_model(cls, model, director, employees=None):
+    def from_django_model(cls, model, director=None, employees=None):
+        if not director:
+            return cls(
+                id=model.id,
+                name=model.name,
+                is_active=model.is_active
+            )
         return cls(
             id=model.id,
             name=model.name,

@@ -8,7 +8,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sessions.models import Session
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ngettext
-from users.models import JobDepartment, JobGroup, JobManagement, User
+from users.models import User
 
 
 class CompanyFilter(AutocompleteFilter):
@@ -24,12 +24,12 @@ class MyUserAdmin(MyDjangoQLSearchMixin, UserAdmin):
         "email",
         "full_name",
         "job_title",
-        "group",
         "company",
         "date_joined"
     )
     list_filter = ("is_active", CompanyFilter)
     ordering = ("-date_joined",)
+    raw_id_fields = ("company",)
     fieldsets = (
         (None, {"fields": (
             "email",
@@ -46,7 +46,6 @@ class MyUserAdmin(MyDjangoQLSearchMixin, UserAdmin):
                     "company",
                     'date_of_employment',
                     'date_of_dismissal',
-                    "group"
                 )
             }
         ),
@@ -76,7 +75,6 @@ class MyUserAdmin(MyDjangoQLSearchMixin, UserAdmin):
             {
                 "fields": (
                     "job_title",
-                    "group"
                 )
             }
         ),
@@ -117,30 +115,6 @@ class MyUserAdmin(MyDjangoQLSearchMixin, UserAdmin):
             % deactivate_user,
             messages.SUCCESS
         )
-
-
-@admin.register(JobDepartment)
-class JobDepartmentAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
-    fieldsets = (
-        (None, {"fields": ("title", "parent", "children", "is_deleted")}),
-    )
-    list_display = ("title", "parent", "children", "is_deleted")
-
-
-@admin.register(JobGroup)
-class JobGroup(MyDjangoQLSearchMixin, admin.ModelAdmin):
-    fieldsets = (
-        (None, {"fields": ("title", "parent", "is_deleted")}),
-    )
-    list_display = ("title", "parent", "is_deleted")
-
-
-@admin.register(JobManagement)
-class JobManagementAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
-    fieldsets = (
-        (None, {"fields": ("title", "children", "is_deleted")}),
-    )
-    list_display = ("title", "children", "is_deleted")
 
 
 @admin.register(ContentType)

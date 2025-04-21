@@ -13,7 +13,7 @@ from tokens.models import BlackListAccessToken
 from users.models import User
 
 
-def dir_group(user, remove=None):
+def dir_group(user, remove=None) -> None:
     group = Group.objects.get(id=1)
     if remove:
         user.groups.remove(group)
@@ -21,7 +21,7 @@ def dir_group(user, remove=None):
         user.groups.add(group)
 
 
-def get_current_user(token: str = Depends(oauth2_scheme)):
+def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
     if not token:
         raise NotAuth()
     try:
@@ -41,14 +41,14 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
     try:
         user = get_object_or_404(User, email=email)
     except Http404:
-        raise UserNotFound()
+        raise UserNotFound(email=email)
 
     return user
 
 
 def get_current_user_is_director_or_admin(
         current_user: User = Depends(get_current_user)
-):
+) -> User:
     """Проверка прав директора у сотрудника"""
     if (
         current_user.groups.filter(name="Директор") or
