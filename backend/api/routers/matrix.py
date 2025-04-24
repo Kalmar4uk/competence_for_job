@@ -5,12 +5,14 @@ from users.models import User
 from fastapi import Depends, Query
 from api.permissions import (get_current_user,
                              get_current_user_is_director_or_admin)
+from api.exceptions.error_400 import NotValidStatusMatrix
 from api.exceptions.error_403 import NotRights
 from api.exceptions.error_404 import (CompanyNotFound,
                                       UserNotFound,
-                                      TemplateMatrixNotFound)
+                                      TemplateMatrixNotFound,
+                                      MatrixNotFound)
 from api.models_for_api.base_model import ApiCompany, ApiSkills, ApiUser, ApiGrades, ApiTemplateMatrix
-from api.models_for_api.model_request import ApiTemplateMatrixUpdateOrCreate, ApiMatrixCreate
+from api.models_for_api.model_request import ApiTemplateMatrixUpdateOrCreate, ApiMatrixCreate, ApiMatrixInWorkStatus
 from api.models_for_api.models_response import (ApiTemplateMatrixBaseGet,
                                                 ApiTemplateMatrixPaginator)
 from api.permissions import (get_current_user,
@@ -21,6 +23,7 @@ from django.db.models import QuerySet
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
 from fastapi import Depends, Query
+from matrix.constants import STATUSES_MATRIX
 from matrix.models import TemplateMatrix, GradeSkillMatrix
 from users.models import User
 
@@ -81,3 +84,29 @@ def create_matrix(
         matrices.append(matrix)
 
     return result_matrix(matrices=matrices)
+
+
+@router_matrix.put("/{matrix_id}/new_status", status_code=204)
+def in_work_status_matrix(
+    matrix_id: int,
+    from_data: ApiMatrixInWorkStatus,
+    current_user: User = Depends(get_current_user)
+):
+    """Перевод матрицы в статус В процессе"""
+    try:
+        matrix = get_object_or_404(Matrix, id=matrix_id)
+    except Http404:
+        raise MatrixNotFound(matrix_id=matrix_id)
+    if matrix.user != current_user:
+        raise NotRights()
+
+    status = from_data.status.capitalize()
+
+    if status == matrix.status:
+        raise NotValidStatusMatrix()
+    if status not in STATUSES_MATRIX:
+        raise NotValidStatusMatrix(status=status)
+
+    matrix.update(status=from_data.status)
+
+    return "Ok"

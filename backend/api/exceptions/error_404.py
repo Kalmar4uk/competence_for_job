@@ -29,3 +29,11 @@ class TemplateMatrixNotFound(HTTPException):
             status_code=404,
             detail=f"Шаблон матрицы с id {template_id} не найден"
         )
+
+
+class MatrixNotFound(HTTPException):
+    def __init__(self, matrix_id):
+        super().__init__(
+            status_code=404,
+            detail=f"Матрица с id {matrix_id} не найден"
+        )

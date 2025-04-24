@@ -55,3 +55,7 @@ class ApiMatrixCreate(BaseModel):
     name: str | None = Field(default=None, examples=["Назначенная матрица"])
     employee: list[int] = Field(examples=[[1, 2, 3]])
     template_matrix: int = Field(examples=[1])
+
+
+class ApiMatrixInWorkStatus(BaseModel):
+    status: str = Field(examples=["В процессе"])
