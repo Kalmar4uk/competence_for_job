@@ -137,8 +137,16 @@ def update_user(
     )
 
 
-@router_users.post("/set_password", status_code=204, responses={400: {}, 401: {}})
-def set_password(from_data: UserSetPassword, current_user: User = Depends(get_current_user)):
+@router_users.post(
+        "/set_password",
+        status_code=204,
+        responses={400: {}, 401: {}}
+    )
+def set_password(
+    from_data: UserSetPassword,
+    current_user: User = Depends(get_current_user)
+):
+    """Обновление пароля пользователя"""
     if not current_user.check_password(from_data.current_password):
         raise NotValidPassowod()
     if from_data.current_password == from_data.new_password:

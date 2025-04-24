@@ -21,7 +21,7 @@ from django.db.models import QuerySet
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
 from fastapi import Depends, Query
-from matrix.models import TemplateMatrix
+from matrix.models import TemplateMatrix, GradeSkillMatrix
 from users.models import User
 
 
@@ -29,6 +29,10 @@ from users.models import User
 def get_matrix_list_by_company(
     current_user: User = Depends(get_current_user_is_director_or_admin)
 ):
+    """
+    Выводит все матрицы сотрудников по компании директора
+    который отправляет запрос
+    """
     matrices = Matrix.objects.filter(user__company=current_user.company)
     return result_matrix(matrices=matrices)
 
@@ -37,6 +41,9 @@ def get_matrix_list_by_company(
 def get_matrix_list_by_employee(
     current_user: User = Depends(get_current_user)
 ):
+    """
+    Выводит все матрицы сотрудника который отправляет запрос
+    """
     matrices = Matrix.objects.filter(user=current_user)
     return result_matrix(matrices=matrices)
 
@@ -46,6 +53,7 @@ def create_matrix(
     from_data: ApiMatrixCreate,
     current_user: User = Depends(get_current_user_is_director_or_admin)
 ):
+    """Создание матриц(-ы)"""
     try:
         template_matrix = get_object_or_404(
             TemplateMatrix,
@@ -55,4 +63,21 @@ def create_matrix(
         raise TemplateMatrixNotFound(
             template_id=from_data.template_matrix
         )
-# дописать эндпоинт
+
+    employees = User.objects.filter(id__in=from_data.employee)
+    if not employees:
+        raise UserNotFound(user_id=from_data.employee)
+
+    skills = template_matrix.skills.all()
+    matrices: list[Matrix] = []
+
+    for employee in employees:
+        matrix = Matrix.objects.create(
+            name=from_data.name,
+            template_matrix=template_matrix,
+            user=employee
+        )
+        matrix.skills.set(skills)
+        matrices.append(matrix)
+
+    return result_matrix(matrices=matrices)

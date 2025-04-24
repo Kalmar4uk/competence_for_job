@@ -58,7 +58,7 @@ def get_list_companies(
 
     for company in companies:
         director_data: User = company.director
-        director = ApiUser.from_django_model(model=company.director)
+        director = ApiUser.from_django_model(model=director_data)
         api_users_list = [
             ApiUser.from_django_model(model=user)
             for user in company.users.all()
