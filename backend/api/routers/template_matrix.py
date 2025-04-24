@@ -140,15 +140,14 @@ def get_template_matrix(
     except Http404:
         raise TemplateMatrixNotFound(template_id=template_matrix_id)
 
-    author_data: User = template_matrix_data.author
     author_api = (
-        ApiUser.from_django_model(author_data) if author_data else None
+        ApiUser.from_django_model(author_data)
+        if (author_data := template_matrix_data.author) else None
     )
 
-    company_data: Company = template_matrix_data.company
     company_api = (
-        ApiCompany.from_django_model(model=company_data)
-        if company_data else None
+        ApiCompany.from_django_model(model=company)
+        if (company := template_matrix_data.company) else None
     )
 
     skills_api = [
@@ -222,8 +221,8 @@ def update_template_matrix(
     template_matrix_data.save()
     author_api = ApiUser.from_django_model(model=template_matrix_data.author)
     company_api = (
-        ApiCompany.from_django_model(model=template_matrix_data.company)
-        if template_matrix_data.company else None
+        ApiCompany.from_django_model(model=company)
+        if (company := template_matrix_data.company) else None
     )
     skills_api = [
         ApiSkills.from_django_model(

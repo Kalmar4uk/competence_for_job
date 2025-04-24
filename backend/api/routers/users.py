@@ -26,8 +26,8 @@ def read_users_me(current_user: User = Depends(get_current_user)):
     """Выводит текущего пользователя из токена"""
     return ApiUserResponse.from_django_model(
         model=current_user, company=ApiCompanyForUser.from_django_model(
-            model=current_user.company
-        ) if current_user.company else None
+            model=company
+        ) if (company := current_user.company) else None
     )
 
 
@@ -38,17 +38,18 @@ def read_users_me(current_user: User = Depends(get_current_user)):
     )
 def get_user(
     user_id: int,
-    current_user: ApiUserResponse = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """Выводит пользователя по id"""
     try:
         user = get_object_or_404(User, id=user_id)
     except Http404:
         raise UserNotFound(user_id=user_id)
+
     return ApiUserResponse.from_django_model(
         model=user, company=ApiCompanyForUser.from_django_model(
-            model=current_user.company
-        ) if user.company else None
+            model=company
+        ) if (company := user.company) else None
     )
 
 
@@ -63,7 +64,7 @@ def get_users_list(
         le=50,
         description="Указать кол-во сотрудников если требуется"
     ),
-    current_user: ApiUser = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """
     Выводит список всех активных пользователей.
@@ -76,8 +77,8 @@ def get_users_list(
     users_api = [
         ApiUserResponse.from_django_model(
             model=user, company=ApiCompanyForUser.from_django_model(
-                model=current_user.company
-            ) if user.company else None
+                model=company
+            ) if (company := user.company) else None
         ) for user in users
     ]
     next: int = page + 1 if offset + limit < count else None
@@ -132,8 +133,8 @@ def update_user(
     current_user.save()
     return ApiUserResponse.from_django_model(
         model=current_user, company=ApiCompanyForUser.from_django_model(
-            model=current_user.company
-        ) if current_user.company else None
+            model=company
+        ) if (company := current_user.company) else None
     )
 
 
