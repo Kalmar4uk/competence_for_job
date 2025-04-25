@@ -15,9 +15,10 @@ from api.models_for_api.base_model import ApiCompany, ApiSkills, ApiUser, ApiGra
 from api.models_for_api.model_request import ApiTemplateMatrixUpdateOrCreate, ApiMatrixCreate, ApiMatrixInWorkStatus
 from api.models_for_api.models_response import (ApiTemplateMatrixBaseGet,
                                                 ApiTemplateMatrixPaginator)
-from api.permissions import (get_current_user,
+from api.permissions import (check_matrix_user_or_not,
+                             get_current_user,
                              get_current_user_is_director_or_admin)
-from api.routers.utils import result_matrix
+from api.routers.utils import result_matrix, check_matrix_and_user
 from companies.models import Company
 from django.db.models import QuerySet
 from django.http.response import Http404
@@ -90,15 +91,10 @@ def create_matrix(
 def in_work_status_matrix(
     matrix_id: int,
     from_data: ApiMatrixInWorkStatus,
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(check_matrix_user_or_not)
 ):
     """Перевод матрицы в статус В процессе"""
-    try:
-        matrix = get_object_or_404(Matrix, id=matrix_id)
-    except Http404:
-        raise MatrixNotFound(matrix_id=matrix_id)
-    if matrix.user != current_user:
-        raise NotRights()
+    matrix = current_user.matrix.get(id=matrix_id)
 
     status = from_data.status.capitalize()
 
@@ -107,6 +103,15 @@ def in_work_status_matrix(
     if status not in STATUSES_MATRIX:
         raise NotValidStatusMatrix(status=status)
 
-    matrix.update(status=from_data.status)
+    matrix.status = from_data.status
+    matrix.save()
 
-    return "Ok"
+    return {}
+
+
+@router_matrix.patch("/{matrix_id}/completed/")
+def completed_matrix(
+    matrix_id: int,
+    current_user: User = Depends(check_matrix_user_or_not)
+):
+    pass

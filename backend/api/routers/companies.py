@@ -169,9 +169,6 @@ def update_name_and_status_company(
     current_user: User = Depends(get_current_user_is_director_or_admin)
 ):
     """Обновление названия и статуса компании по id"""
-    if current_user.company.id != company_id:
-        raise NotRights()
-
     try:
         current_company = get_object_or_404(Company, id=company_id)
     except Http404:
@@ -285,7 +282,7 @@ def update_employees_company(
     from_data: ApiCompanyUpdateEmployees,
     current_user: User = Depends(get_current_user_is_director_or_admin)
 ):
-    """Обновление сотрудников в компании по его id"""
+    """Обновление сотрудников в компании"""
 
     try:
         current_company = get_object_or_404(Company, id=company_id)

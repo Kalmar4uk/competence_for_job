@@ -47,6 +47,7 @@ class Matrix(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
+        related_name="matrix",
         verbose_name="Сотрудник"
     )
     status = models.CharField(

@@ -1,6 +1,7 @@
 from api.models_for_api.base_model import ApiUser, ApiGrades, ApiTemplateMatrix
 from api.models_for_api.models_response import ApiMatrixForResponse, ApiSkillsAndGradesForMatrix
-from api.exceptions.error_404 import UserNotFound
+from api.exceptions.error_403 import NotRights
+from api.exceptions.error_404 import UserNotFound, MatrixNotFound
 from api.exceptions.error_422 import EmployeeInCompany
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -74,3 +75,13 @@ def result_matrix(matrices: Matrix):
             )
         )
     return matrix_result
+
+
+def check_matrix_and_user(matrix_id: int, current_user: User):
+    try:
+        matrix = get_object_or_404(Matrix, id=matrix_id)
+    except Http404:
+        raise MatrixNotFound(matrix_id=matrix_id)
+    if matrix.user != current_user:
+        raise NotRights()
+    return matrix
