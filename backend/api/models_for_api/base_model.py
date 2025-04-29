@@ -59,3 +59,4 @@ class ApiMatrix(ApiMatrixFromDjangoModel):
     created_at: datetime
     last_update_status: datetime | None = None
     completed_at: datetime | None = None
+    deadline: datetime | None = None

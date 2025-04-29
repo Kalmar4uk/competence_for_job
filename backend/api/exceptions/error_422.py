@@ -66,3 +66,14 @@ class SkillAlreadyExists(HTTPException):
             status_code=422,
             detail=f"Навык '{name}' уже есть"
         )
+
+
+class SmallDeadline(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=422,
+            detail=(
+                "Дата дедлайна меньше или равна текущей дате, "
+                "необходимо выставить минимум t+1"
+            )
+        )

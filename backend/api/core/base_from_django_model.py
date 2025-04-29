@@ -88,5 +88,6 @@ class ApiMatrixFromDjangoModel(BaseModel):
             created_at=model.created_at,
             last_update_status=model.last_update_status,
             completed_at=model.completed_at,
+            deadline=model.deadline,
             skills=skills
         )

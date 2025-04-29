@@ -1,7 +1,7 @@
 from api.exceptions.error_400 import NotValidStatusMatrix
 from api.exceptions.error_404 import (MatrixNotFound, TemplateMatrixNotFound,
                                       UserNotFound)
-from api.exceptions.error_422 import BadSkillInRequest, DoesNotMatchCountSkill
+from api.exceptions.error_422 import BadSkillInRequest, DoesNotMatchCountSkill, SmallDeadline
 from api.models_for_api.model_request import (ApiMatrixCompeted,
                                               ApiMatrixCreate,
                                               ApiMatrixInWorkStatus)
@@ -93,6 +93,11 @@ def create_matrix(
             template_matrix=template_matrix,
             user=employee
         )
+        if deadline := from_data.deadline:
+            if deadline <= timezone.now():
+                raise SmallDeadline()
+            else:
+                matrix.deadline = deadline
         matrix.skills.set(skills)
         matrices.append(matrix)
 
@@ -138,7 +143,7 @@ def completed_matrix(
     from_data: ApiMatrixCompeted,
     current_user: User = Depends(check_matrix_user)
 ):
-    """перевод матрицы в завершенную"""
+    """Перевод матрицы в завершенную"""
     try:
         matrix = get_object_or_404(Matrix, id=matrix_id)
     except Http404:
