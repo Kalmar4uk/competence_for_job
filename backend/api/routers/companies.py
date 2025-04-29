@@ -1,4 +1,3 @@
-from api.exceptions.error_403 import NotRights
 from api.exceptions.error_404 import CompanyNotFound, UserNotFound
 from api.exceptions.error_422 import (EmployeeDir, EmployeeInCompany,
                                       UniqueNameCompany)
@@ -15,7 +14,7 @@ from api.routers.routers import router_companies
 from api.routers.utils import (added_employees_in_company,
                                delete_employees_with_company)
 from companies.models import Company, OldCompanyEmployee
-from django.db.models import Q, QuerySet
+from django.db.models import QuerySet
 from django.db.utils import IntegrityError
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404

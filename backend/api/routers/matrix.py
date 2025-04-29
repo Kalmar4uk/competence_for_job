@@ -50,6 +50,17 @@ def get_matrix_list_by_employee(
     return result_matrix_list(matrices=matrices)
 
 
+@router_matrix.get("/{matrix_id}", response_model=ApiMatrixForResponse)
+def get_matrix(matrix_id: int, current_user: User = Depends(get_current_user)):
+    """Выводит матрицу по id"""
+    try:
+        matrix = get_object_or_404(Matrix, id=matrix_id)
+    except Http404:
+        raise MatrixNotFound(matrix_id=matrix_id)
+
+    return result_matrix(matrix=matrix)
+
+
 @router_matrix.post(
         "/",
         response_model=list[ApiMatrixForResponse],

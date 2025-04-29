@@ -23,7 +23,14 @@ class SkillAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
 class MatrixAdmin(MyDjangoQLSearchMixin, admin.ModelAdmin):
     inlines = [MatrixSkillGradeWithTemplate]
     actions = ("change_status",)
-    list_display = ("name", "user", "status", "created_at", "completed_at")
+    list_display = (
+        "name",
+        "user",
+        "status",
+        "created_at",
+        "completed_at",
+        "deadline"
+    )
     list_filter = ("user",)
     search_fields = ("user",)
     readonly_fields = ("created_at",)

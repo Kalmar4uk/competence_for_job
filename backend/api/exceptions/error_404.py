@@ -35,5 +35,13 @@ class MatrixNotFound(HTTPException):
     def __init__(self, matrix_id: int):
         super().__init__(
             status_code=404,
-            detail=f"Матрица с id {matrix_id} не найден"
+            detail=f"Матрица с id {matrix_id} не найдена"
+        )
+
+
+class SkillNotFound(HTTPException):
+    def __init__(self, skill_id: int):
+        super().__init__(
+            status_code=404,
+            detail=f"Навыка с id {skill_id} не найдено"
         )
