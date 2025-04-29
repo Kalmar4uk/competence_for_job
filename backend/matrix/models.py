@@ -2,7 +2,8 @@ from companies.models import Company
 from django.conf import settings
 from django.db import models
 from matrix.constants import CHOICES, NAME_FOR_TASK_MATRIX
-from matrix.validators import validation_check_status
+from matrix.validators import (validation_check_status, validation_max_number,
+                               validation_template_grade)
 
 
 class Skill(models.Model):
@@ -21,8 +22,15 @@ class Skill(models.Model):
 
 
 class GradeSkill(models.Model):
-    grade = models.CharField("Оценка", max_length=10)
-    evaluation_number = models.PositiveSmallIntegerField("Числовая оценка")
+    grade = models.CharField(
+        "Оценка",
+        max_length=10,
+        validators=[validation_template_grade]
+    )
+    evaluation_number = models.PositiveSmallIntegerField(
+        "Числовая оценка",
+        validators=[validation_max_number]
+    )
 
     class Meta:
         verbose_name = "Шаблон оценки навыка"
@@ -47,6 +55,7 @@ class Matrix(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
+        related_name="matrix",
         verbose_name="Сотрудник"
     )
     status = models.CharField(

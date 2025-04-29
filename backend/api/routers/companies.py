@@ -3,17 +3,17 @@ from api.exceptions.error_404 import CompanyNotFound, UserNotFound
 from api.exceptions.error_422 import (EmployeeDir, EmployeeInCompany,
                                       UniqueNameCompany)
 from api.models_for_api.base_model import ApiUser
-from api.models_for_api.model_request import (ApiCompanyUpdateEmployees,
-                                              ApiCompanyUpdate,
+from api.models_for_api.model_request import (ApiCompanyUpdate,
                                               ApiCompanyUpdateDirector,
+                                              ApiCompanyUpdateEmployees,
                                               CompanyRegistration)
 from api.models_for_api.models_response import (ApiCompanyBaseGet,
                                                 ApiCompanyPagination)
 from api.permissions import (dir_group, get_current_user,
                              get_current_user_is_director_or_admin)
+from api.routers.routers import router_companies
 from api.routers.utils import (added_employees_in_company,
                                delete_employees_with_company)
-from api.routers.routers import router_companies
 from companies.models import Company, OldCompanyEmployee
 from django.db.models import Q, QuerySet
 from django.db.utils import IntegrityError
@@ -58,7 +58,7 @@ def get_list_companies(
 
     for company in companies:
         director_data: User = company.director
-        director = ApiUser.from_django_model(model=company.director)
+        director = ApiUser.from_django_model(model=director_data)
         api_users_list = [
             ApiUser.from_django_model(model=user)
             for user in company.users.all()
@@ -169,9 +169,6 @@ def update_name_and_status_company(
     current_user: User = Depends(get_current_user_is_director_or_admin)
 ):
     """Обновление названия и статуса компании по id"""
-    if current_user.company.id != company_id:
-        raise NotRights()
-
     try:
         current_company = get_object_or_404(Company, id=company_id)
     except Http404:
@@ -285,7 +282,7 @@ def update_employees_company(
     from_data: ApiCompanyUpdateEmployees,
     current_user: User = Depends(get_current_user_is_director_or_admin)
 ):
-    """Обновление сотрудников в компании по его id"""
+    """Обновление сотрудников в компании"""
 
     try:
         current_company = get_object_or_404(Company, id=company_id)

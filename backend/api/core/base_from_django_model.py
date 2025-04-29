@@ -5,8 +5,13 @@ from pydantic import BaseModel
 class ApiBaseModelIfFieldsMatch(BaseModel):
 
     @classmethod
-    def from_django_model(cls, model):
+    def from_django_model(cls, model, grade=None):
         data = model_to_dict(model)
+        if grade:
+            return cls(
+                **data,
+                grade=grade
+            )
         return cls(**data)
 
 
@@ -66,5 +71,22 @@ class ApiTemplateMatrixFromDjangoModel(BaseModel):
             created_at=model.created_at,
             author=author,
             company=company,
+            skills=skills
+        )
+
+
+class ApiMatrixFromDjangoModel(BaseModel):
+
+    @classmethod
+    def from_django_model(cls, model, user, template_matrix, skills=None):
+        return cls(
+            id=model.id,
+            name=model.name,
+            user=user,
+            template_matrix=template_matrix,
+            status=model.status,
+            created_at=model.created_at,
+            last_update_status=model.last_update_status,
+            completed_at=model.completed_at,
             skills=skills
         )

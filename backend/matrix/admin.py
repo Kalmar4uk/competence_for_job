@@ -8,7 +8,6 @@ from rangefilter.filters import DateRangeFilterBuilder
 
 class MatrixSkillGradeWithTemplate(admin.TabularInline):
     model = GradeSkillMatrix
-    readonly_fields = ("skills", "grades")
     extra = 0
 
 

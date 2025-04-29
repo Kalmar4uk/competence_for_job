@@ -5,6 +5,7 @@ from api.exceptions.error_403 import NotRights
 from api.exceptions.error_404 import UserNotFound
 from django.conf import settings
 from django.contrib.auth.models import Group
+from django.core.exceptions import ObjectDoesNotExist
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
 from fastapi import Depends
@@ -22,6 +23,7 @@ def dir_group(user, remove=None) -> None:
 
 
 def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
+    """Проверка токена пользователя"""
     if not token:
         raise NotAuth()
     try:
@@ -47,12 +49,25 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
 
 
 def get_current_user_is_director_or_admin(
+        company_id: int,
         current_user: User = Depends(get_current_user)
 ) -> User:
     """Проверка прав директора у сотрудника"""
     if (
-        current_user.groups.filter(name="Директор") or
-        (current_user.is_staff or current_user.is_superuser)
+        current_user.groups.filter(name="Директор")
+        or (current_user.is_staff or current_user.is_superuser)
     ):
         return current_user
     raise NotRights()
+
+
+def check_matrix_user(
+        matrix_id: int,
+        current_user: User = Depends(get_current_user)
+):
+    try:
+        current_user.matrix.get(id=matrix_id)
+    except ObjectDoesNotExist:
+        raise NotRights()
+
+    return current_user

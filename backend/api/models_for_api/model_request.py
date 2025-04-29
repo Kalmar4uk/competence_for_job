@@ -1,7 +1,8 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class UserUpdate(BaseModel):
+    """Модель обновления юзера"""
     email: str = Field(examples=["olezha.korotky@mail.ru"])
     first_name: str = Field(examples=["Олежа"])
     last_name: str = Field(examples=["Короткий"])
@@ -47,5 +48,63 @@ class ApiRefreshToken(BaseModel):
 
 
 class ApiTemplateMatrixUpdateOrCreate(BaseModel):
+    """Модель создания или обновления шаблона матрицы"""
     name: str = Field(examples=["Template matrix"])
     skills: list[int] = Field(examples=[[1, 2, 3]])
+
+
+class ApiMatrixCreate(BaseModel):
+    """Модель создания матрицы"""
+    name: str | None = Field(default=None, examples=["Назначенная матрица"])
+    employee: list[int] = Field(examples=[[1, 2, 3]])
+    template_matrix: int = Field(examples=[1])
+
+
+class ApiMatrixInWorkStatus(BaseModel):
+    """Модель обновления статуса"""
+    status: str = Field(examples=["В процессе"])
+
+    @field_validator("status")
+    @classmethod
+    def check_status(cls, value: str) -> str:
+        if value != "В процессе":
+            raise ValueError(
+                f"Некорректный статус для матрицы - {value}"
+            )
+        return value
+
+
+class ApiGradeForMatrixCompeted(BaseModel):
+    """Модель оценки для завершения матрицы"""
+    evaluation_number: int = Field(examples=[1])
+
+    @field_validator("evaluation_number")
+    @classmethod
+    def check_min_max_number(cls, value: int) -> int:
+        if value < 0 or value > 5:
+            raise ValueError(
+                "Значение оценки меньше 0 или больше 5"
+            )
+        return value
+
+
+class ApiSkillForMatrixCompleted(BaseModel):
+    """Модель навыка для завершения матрицы"""
+    skill: str = Field(examples=["Включать компьютер"])
+    grade: ApiGradeForMatrixCompeted
+
+
+class ApiMatrixCompeted(BaseModel):
+    """Модель завершения матрицы"""
+    name: str = Field(examples=["Назначенная матрица"])
+    status: str = Field(examples=["Завершена"])
+    skills: list[ApiSkillForMatrixCompleted]
+
+    @field_validator("status")
+    @classmethod
+    def check_status(cls, value: str) -> str:
+        if value != "Завершена":
+            raise ValueError(
+                f"Некорректный статус для матрицы - {value}"
+            )
+        return value

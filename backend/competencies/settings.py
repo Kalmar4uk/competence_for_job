@@ -120,8 +120,29 @@ CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND')
 
 BROKER_HOST = os.getenv('BROKER_HOST')
 BROKER_BACKEND = os.getenv('BROKER_BACKEND')
+
 REDIS_PORT = os.getenv('REDIS_PORT')
 REDIS_HOST = os.getenv('REDIS_HOST')
+REDIS_DB_CACHE = os.getenv('REDIS_DB_CACHE')
+REDIS_PASSWORD = os.getenv('REDIS_PASSWORD')
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB_CACHE}",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "PASSWORD": REDIS_PASSWORD,
+            "SOCKET_CONNECT_TIMEOUT": 5,
+            "SOCKET_TIMEOUT": 5,
+            "IGNORE_EXCEPTIONS": True,
+            "CONNECTION_POOL_KWARGS": {
+                "max_connections": 100,
+            }
+        },
+        "KEY_PREFIX": "competence_cache",
+    }
+}
 
 
 SECRET_KEY_JWT = os.getenv("SECRET_KEY_JWT")

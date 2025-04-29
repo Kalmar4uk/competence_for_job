@@ -39,3 +39,22 @@ class NotValidEmail(HTTPException):
             status_code=422,
             detail="Некорректный Email"
         )
+
+
+class DoesNotMatchCountSkill(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=422,
+            detail="Кол-во навыков не совпадает с исходным кол-вом"
+        )
+
+
+class BadSkillInRequest(HTTPException):
+    def __init__(self, skills: list[str]):
+        super().__init__(
+            status_code=422,
+            detail=(
+                f"Были обнаружены навыки которые "
+                f"отсутствовали в исходной матрице {skills}"
+            )
+        )

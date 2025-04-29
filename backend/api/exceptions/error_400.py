@@ -13,3 +13,11 @@ class NotValidNewPassword(HTTPException):
                 status_code=400,
                 detail=str(error)
             )
+
+
+class NotValidStatusMatrix(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=400,
+            detail="Текущий статус совпадает с новым"
+        )

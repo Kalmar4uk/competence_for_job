@@ -17,3 +17,17 @@ CHOICES = (
     ("Завершена", "Завершена"),
     ("Просрочена", "Просрочена")
 )
+STATUSES_MATRIX = [
+    "Новая",
+    "В процессе",
+    "Просрочена",
+    "Завершена"
+]
+TEMPLATE_GRADE = [
+    "Expert",
+    "Strong"
+    "Good+",
+    "Good",
+    "Basic",
+    "No skills"
+]
