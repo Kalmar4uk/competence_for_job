@@ -3,9 +3,9 @@ from api.auth import oauth2_scheme
 from api.exceptions.error_401 import NotAuth, NotValidToken
 from api.exceptions.error_403 import NotRights
 from api.exceptions.error_404 import UserNotFound
-from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.contrib.auth.models import Group
+from django.core.exceptions import ObjectDoesNotExist
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
 from fastapi import Depends
@@ -61,7 +61,7 @@ def get_current_user_is_director_or_admin(
     raise NotRights()
 
 
-def check_matrix_user_or_not(
+def check_matrix_user(
         matrix_id: int,
         current_user: User = Depends(get_current_user)
 ):

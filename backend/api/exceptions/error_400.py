@@ -16,14 +16,8 @@ class NotValidNewPassword(HTTPException):
 
 
 class NotValidStatusMatrix(HTTPException):
-    def __init__(self, status=None):
-        if status:
-            super().__init__(
-                status_code=400,
-                detail=f"Неизвестный статус матрицы - {status}"
-            )
-        else:
-            super().__init__(
-                status_code=400,
-                detail=f"Текущий статус совпадает с новым"
-            )
+    def __init__(self):
+        super().__init__(
+            status_code=400,
+            detail="Текущий статус совпадает с новым"
+        )

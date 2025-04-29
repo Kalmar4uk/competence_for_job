@@ -1,10 +1,10 @@
 from datetime import datetime
 
-from api.core.base_from_django_model import (ApiUserFromDjangoModel,
+from api.core.base_from_django_model import (ApiBaseModelIfFieldsMatch,
                                              ApiCompanyFromDjangoModel,
+                                             ApiMatrixFromDjangoModel,
                                              ApiTemplateMatrixFromDjangoModel,
-                                             ApiBaseModelIfFieldsMatch,
-                                             ApiMatrixFromDjangoModel)
+                                             ApiUserFromDjangoModel)
 from pydantic import BaseModel, Field
 
 

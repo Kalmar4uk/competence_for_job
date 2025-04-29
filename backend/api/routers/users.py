@@ -6,8 +6,7 @@ from api.exceptions.error_404 import UserNotFound
 from api.exceptions.error_422 import NotValidEmail, UniqueEmailEmployee
 from api.models_for_api.base_model import ApiUser
 from api.models_for_api.model_request import (UserRegistration,
-                                              UserUpdate,
-                                              UserSetPassword)
+                                              UserSetPassword, UserUpdate)
 from api.models_for_api.models_response import (ApiCompanyForUser,
                                                 ApiUserPagination,
                                                 ApiUserResponse)
@@ -17,40 +16,8 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
-from fastapi import Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from users.models import User
-
-
-@router_users.get("/me", response_model=ApiUserResponse, responses={401: {}})
-def read_users_me(current_user: User = Depends(get_current_user)):
-    """Выводит текущего пользователя из токена"""
-    return ApiUserResponse.from_django_model(
-        model=current_user, company=ApiCompanyForUser.from_django_model(
-            model=company
-        ) if (company := current_user.company) else None
-    )
-
-
-@router_users.get(
-        "/{user_id}",
-        response_model=ApiUserResponse,
-        responses={404: {}, 401: {}}
-    )
-def get_user(
-    user_id: int,
-    current_user: User = Depends(get_current_user)
-):
-    """Выводит пользователя по id"""
-    try:
-        user = get_object_or_404(User, id=user_id)
-    except Http404:
-        raise UserNotFound(user_id=user_id)
-
-    return ApiUserResponse.from_django_model(
-        model=user, company=ApiCompanyForUser.from_django_model(
-            model=company
-        ) if (company := user.company) else None
-    )
 
 
 @router_users.get("/", response_model=ApiUserPagination, responses={401: {}})
@@ -88,6 +55,38 @@ def get_users_list(
         next=next,
         previous=previous,
         result=users_api
+    )
+
+
+@router_users.get("/me", response_model=ApiUserResponse)
+def read_users_me(current_user: User = Depends(get_current_user)):
+    """Выводит текущего пользователя из токена"""
+    return ApiUserResponse.from_django_model(
+        model=current_user, company=ApiCompanyForUser.from_django_model(
+            model=company
+        ) if (company := current_user.company) else None
+    )
+
+
+@router_users.get(
+        "/{user_id}",
+        response_model=ApiUserResponse,
+        responses={404: {}, 401: {}}
+    )
+def get_user(
+    user_id: int,
+    current_user: User = Depends(get_current_user)
+):
+    """Выводит пользователя по id"""
+    try:
+        user = get_object_or_404(User, id=user_id)
+    except Http404:
+        raise UserNotFound(user_id=user_id)
+
+    return ApiUserResponse.from_django_model(
+        model=user, company=ApiCompanyForUser.from_django_model(
+            model=company
+        ) if (company := user.company) else None
     )
 
 

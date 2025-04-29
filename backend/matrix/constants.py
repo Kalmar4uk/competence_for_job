@@ -23,3 +23,11 @@ STATUSES_MATRIX = [
     "Просрочена",
     "Завершена"
 ]
+TEMPLATE_GRADE = [
+    "Expert",
+    "Strong"
+    "Good+",
+    "Good",
+    "Basic",
+    "No skills"
+]

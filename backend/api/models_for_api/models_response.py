@@ -1,10 +1,10 @@
 from datetime import datetime
 
-from api.core.base_from_django_model import (ApiTemplateMatrixFromDjangoModel,
-                                             ApiCompanyFromDjangoModel)
+from api.core.base_from_django_model import (ApiCompanyFromDjangoModel,
+                                             ApiTemplateMatrixFromDjangoModel)
 from api.models_for_api.base_model import (ApiBasePagination, ApiCompany,
-                                           ApiSkills, ApiTemplateMatrix,
-                                           ApiUser, ApiMatrix, ApiGrades)
+                                           ApiGrades, ApiMatrix, ApiSkills,
+                                           ApiTemplateMatrix, ApiUser)
 from pydantic import BaseModel, Field
 
 
@@ -34,20 +34,31 @@ class ApiUserResponse(ApiUser):
 
 
 class ApiUserPagination(ApiBasePagination):
+    """Модель пагинации юзера"""
     result: list[ApiUserResponse]
 
 
 class ApiCompanyPagination(ApiBasePagination):
+    """Модель пагинации компании"""
     result: list[ApiCompanyBaseGet]
 
 
 class ApiTemplateMatrixPaginator(ApiBasePagination):
+    """Модель пагинации шаблонов матрицы"""
     result: list[ApiTemplateMatrixBaseGet]
 
 
 class ApiSkillsAndGradesForMatrix(ApiSkills):
+    """Модель навыка с добавленной оценкой"""
     grade: ApiGrades
 
 
 class ApiMatrixForResponse(ApiMatrix):
+    """Модель матрицы с навыками и оценками навыков"""
     skills: list[ApiSkillsAndGradesForMatrix]
+
+
+class ApiMatrixForResponseWithStatusAndLastUpdateFields(BaseModel):
+    """Модель матрицы с новым статусои и датой изменения (только эти поля)"""
+    status: str = Field(examples=["В процессе"])
+    last_update_status: datetime

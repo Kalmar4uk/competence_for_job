@@ -1,35 +1,35 @@
-from api.routers.routers import router_matrix
-from api.models_for_api.models_response import ApiMatrixForResponse, ApiSkillsAndGradesForMatrix
-from matrix.models import Matrix, GradeSkillMatrix, Skill
-from users.models import User
-from fastapi import Depends, Query
-from api.permissions import (get_current_user,
-                             get_current_user_is_director_or_admin)
 from api.exceptions.error_400 import NotValidStatusMatrix
-from api.exceptions.error_403 import NotRights
-from api.exceptions.error_404 import (CompanyNotFound,
-                                      UserNotFound,
+from api.exceptions.error_404 import (MatrixNotFound,
                                       TemplateMatrixNotFound,
-                                      MatrixNotFound)
-from api.models_for_api.base_model import ApiCompany, ApiSkills, ApiUser, ApiGrades, ApiTemplateMatrix
-from api.models_for_api.model_request import ApiTemplateMatrixUpdateOrCreate, ApiMatrixCreate, ApiMatrixInWorkStatus
-from api.models_for_api.models_response import (ApiTemplateMatrixBaseGet,
-                                                ApiTemplateMatrixPaginator)
-from api.permissions import (check_matrix_user_or_not,
-                             get_current_user,
+                                      UserNotFound)
+from api.exceptions.error_422 import BadSkillInRequest, DoesNotMatchCountSkill
+from api.models_for_api.model_request import (ApiMatrixCompeted,
+                                              ApiMatrixCreate,
+                                              ApiMatrixInWorkStatus
+                                              )
+from api.models_for_api.models_response import (
+    ApiMatrixForResponse, ApiMatrixForResponseWithStatusAndLastUpdateFields,
+)
+from api.permissions import (check_matrix_user, get_current_user,
                              get_current_user_is_director_or_admin)
-from api.routers.utils import result_matrix, check_matrix_and_user
-from companies.models import Company
-from django.db.models import QuerySet
+from api.routers.routers import router_matrix
+from api.routers.utils import result_matrix_list, result_matrix
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
-from fastapi import Depends, Query
-from matrix.constants import STATUSES_MATRIX
-from matrix.models import TemplateMatrix, GradeSkillMatrix
+from django.utils import timezone
+from fastapi import Depends
+from matrix.models import (GradeSkillMatrix,
+                           Matrix,
+                           Skill,
+                           TemplateMatrix,
+                           GradeSkill)
 from users.models import User
 
 
-@router_matrix.get("/by_company", response_model=list[ApiMatrixForResponse])
+@router_matrix.get(
+        "/by_company",
+        response_model=list[ApiMatrixForResponse],
+        responses={401: {}, 403: {}})
 def get_matrix_list_by_company(
     current_user: User = Depends(get_current_user_is_director_or_admin)
 ):
@@ -38,10 +38,14 @@ def get_matrix_list_by_company(
     который отправляет запрос
     """
     matrices = Matrix.objects.filter(user__company=current_user.company)
-    return result_matrix(matrices=matrices)
+    return result_matrix_list(matrices=matrices)
 
 
-@router_matrix.get("/by_employee", response_model=list[ApiMatrixForResponse])
+@router_matrix.get(
+        "/by_employee",
+        response_model=list[ApiMatrixForResponse],
+        responses={401: {}}
+    )
 def get_matrix_list_by_employee(
     current_user: User = Depends(get_current_user)
 ):
@@ -49,10 +53,13 @@ def get_matrix_list_by_employee(
     Выводит все матрицы сотрудника который отправляет запрос
     """
     matrices = Matrix.objects.filter(user=current_user)
-    return result_matrix(matrices=matrices)
+    return result_matrix_list(matrices=matrices)
 
 
-@router_matrix.post("/", response_model=list[ApiMatrixForResponse])
+@router_matrix.post(
+        "/",
+        response_model=list[ApiMatrixForResponse],
+        responses={401: {}, 403: {}, 404: {}})
 def create_matrix(
     from_data: ApiMatrixCreate,
     current_user: User = Depends(get_current_user_is_director_or_admin)
@@ -84,34 +91,94 @@ def create_matrix(
         matrix.skills.set(skills)
         matrices.append(matrix)
 
-    return result_matrix(matrices=matrices)
+    return result_matrix_list(matrices=matrices)
 
 
-@router_matrix.put("/{matrix_id}/new_status", status_code=204)
+@router_matrix.put(
+        "/{matrix_id}/new_status",
+        response_model=ApiMatrixForResponseWithStatusAndLastUpdateFields,
+        responses={401: {}, 403: {}, 404: {}, 422: {}}
+    )
 def in_work_status_matrix(
     matrix_id: int,
     from_data: ApiMatrixInWorkStatus,
-    current_user: User = Depends(check_matrix_user_or_not)
+    current_user: User = Depends(check_matrix_user)
 ):
     """Перевод матрицы в статус В процессе"""
-    matrix = current_user.matrix.get(id=matrix_id)
+    try:
+        matrix = get_object_or_404(Matrix, id=matrix_id)
+    except Http404:
+        raise MatrixNotFound(matrix_id=matrix_id)
 
-    status = from_data.status.capitalize()
-
-    if status == matrix.status:
+    if from_data.status == matrix.status:
         raise NotValidStatusMatrix()
-    if status not in STATUSES_MATRIX:
-        raise NotValidStatusMatrix(status=status)
 
     matrix.status = from_data.status
+    matrix.last_update_status = timezone.now()
     matrix.save()
 
-    return {}
+    return ApiMatrixForResponseWithStatusAndLastUpdateFields(
+        status=matrix.status,
+        last_update_status=matrix.last_update_status
+    )
 
 
-@router_matrix.patch("/{matrix_id}/completed/")
+@router_matrix.patch(
+        "/{matrix_id}/completed/",
+        response_model=ApiMatrixForResponse,
+        responses={401: {}, 403: {}, 404: {}, 422: {}}
+    )
 def completed_matrix(
     matrix_id: int,
-    current_user: User = Depends(check_matrix_user_or_not)
+    from_data: ApiMatrixCompeted,
+    current_user: User = Depends(check_matrix_user)
 ):
-    pass
+    """перевод матрицы в завершенную"""
+    try:
+        matrix = get_object_or_404(Matrix, id=matrix_id)
+    except Http404:
+        raise MatrixNotFound(matrix_id=matrix_id)
+
+    if from_data.status == matrix.status:
+        raise NotValidStatusMatrix()
+
+    skills_matrix = matrix.skills.values_list("skill", flat=True)
+
+    original_count_skills: int = skills_matrix.count()
+
+    if (
+        original_count_skills > len(from_data.skills)
+        or original_count_skills < len(from_data.skills)
+    ):
+        raise DoesNotMatchCountSkill()
+
+    matrix_skills_grade: list = []
+
+    for skill in from_data.skills:
+        bad_skill: list = []
+        if skill.skill not in skills_matrix:
+            bad_skill.append(skill.skill)
+        else:
+            skills = Skill.objects.get(skill=skill.skill)
+            grades = GradeSkill.objects.get(
+                evaluation_number=skill.grade.evaluation_number
+            )
+            matrix_skills_grade.append(
+                GradeSkillMatrix(
+                    matrix=matrix,
+                    skills=skills,
+                    grades=grades
+                )
+            )
+    if bad_skill:
+        raise BadSkillInRequest(skills=bad_skill)
+
+    GradeSkillMatrix.objects.filter(matrix=matrix).delete()
+    GradeSkillMatrix.objects.bulk_create(matrix_skills_grade)
+
+    matrix.name = from_data.name
+    matrix.status = from_data.status
+    matrix.completed_at = timezone.now()
+    matrix.save()
+
+    return result_matrix(matrix=matrix)

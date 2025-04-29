@@ -2,7 +2,7 @@ from fastapi import HTTPException
 
 
 class CompanyNotFound(HTTPException):
-    def __init__(self, company_id):
+    def __init__(self, company_id: int):
         super().__init__(
             status_code=404,
             detail=f"Компания с id {company_id} не найдена"
@@ -10,7 +10,7 @@ class CompanyNotFound(HTTPException):
 
 
 class UserNotFound(HTTPException):
-    def __init__(self, user_id=None, email=None):
+    def __init__(self, user_id: int | None = None, email: str | None = None):
         if email:
             super().__init__(
                 status_code=404,
@@ -24,7 +24,7 @@ class UserNotFound(HTTPException):
 
 
 class TemplateMatrixNotFound(HTTPException):
-    def __init__(self, template_id):
+    def __init__(self, template_id: int):
         super().__init__(
             status_code=404,
             detail=f"Шаблон матрицы с id {template_id} не найден"
@@ -32,7 +32,7 @@ class TemplateMatrixNotFound(HTTPException):
 
 
 class MatrixNotFound(HTTPException):
-    def __init__(self, matrix_id):
+    def __init__(self, matrix_id: int):
         super().__init__(
             status_code=404,
             detail=f"Матрица с id {matrix_id} не найден"

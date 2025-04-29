@@ -1,7 +1,7 @@
-from api.routers import companies, template_matrix, tokens, users, matrix
-from api.routers.routers import (router_companies, router_template_matrix,
-                                 router_token, router_users, tags_metadata,
-                                 router_matrix)
+from api.routers import companies, matrix, template_matrix, tokens, users
+from api.routers.routers import (router_companies, router_matrix,
+                                 router_template_matrix, router_token,
+                                 router_users, tags_metadata)
 from dotenv import load_dotenv
 from fastapi import FastAPI
 

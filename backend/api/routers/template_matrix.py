@@ -1,7 +1,6 @@
 from api.exceptions.error_403 import NotRights
-from api.exceptions.error_404 import (CompanyNotFound,
-                                      UserNotFound,
-                                      TemplateMatrixNotFound)
+from api.exceptions.error_404 import (CompanyNotFound, TemplateMatrixNotFound,
+                                      UserNotFound)
 from api.models_for_api.base_model import ApiCompany, ApiSkills, ApiUser
 from api.models_for_api.model_request import ApiTemplateMatrixUpdateOrCreate
 from api.models_for_api.models_response import (ApiTemplateMatrixBaseGet,

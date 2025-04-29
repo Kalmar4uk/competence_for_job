@@ -3,17 +3,17 @@ from api.exceptions.error_404 import CompanyNotFound, UserNotFound
 from api.exceptions.error_422 import (EmployeeDir, EmployeeInCompany,
                                       UniqueNameCompany)
 from api.models_for_api.base_model import ApiUser
-from api.models_for_api.model_request import (ApiCompanyUpdateEmployees,
-                                              ApiCompanyUpdate,
+from api.models_for_api.model_request import (ApiCompanyUpdate,
                                               ApiCompanyUpdateDirector,
+                                              ApiCompanyUpdateEmployees,
                                               CompanyRegistration)
 from api.models_for_api.models_response import (ApiCompanyBaseGet,
                                                 ApiCompanyPagination)
 from api.permissions import (dir_group, get_current_user,
                              get_current_user_is_director_or_admin)
+from api.routers.routers import router_companies
 from api.routers.utils import (added_employees_in_company,
                                delete_employees_with_company)
-from api.routers.routers import router_companies
 from companies.models import Company, OldCompanyEmployee
 from django.db.models import Q, QuerySet
 from django.db.utils import IntegrityError
