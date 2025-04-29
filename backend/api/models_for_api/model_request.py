@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field, field_validator
+from matrix.constants import AREA_OF_APPLICATION
 
 
 class UserUpdate(BaseModel):
@@ -106,5 +107,19 @@ class ApiMatrixCompeted(BaseModel):
         if value != "Завершена":
             raise ValueError(
                 f"Некорректный статус для матрицы - {value}"
+            )
+        return value
+
+
+class ApiSkillsCreate(BaseModel):
+    area_of_application: str = Field(examples=["Hard skill"])
+    skill: str = Field(examples=["Включать компьютер"])
+
+    @field_validator("area_of_application")
+    @classmethod
+    def check_status(cls, value: str) -> str:
+        if value not in AREA_OF_APPLICATION:
+            raise ValueError(
+                f"Некорректный тип навыка - {value}"
             )
         return value

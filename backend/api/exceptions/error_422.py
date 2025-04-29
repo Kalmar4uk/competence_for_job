@@ -58,3 +58,11 @@ class BadSkillInRequest(HTTPException):
                 f"отсутствовали в исходной матрице {skills}"
             )
         )
+
+
+class SkillAlreadyExists(HTTPException):
+    def __init__(self, name: str):
+        super().__init__(
+            status_code=422,
+            detail=f"Навык '{name}' уже есть"
+        )

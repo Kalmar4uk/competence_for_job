@@ -1,14 +1,16 @@
 from companies.models import Company
 from django.conf import settings
 from django.db import models
-from matrix.constants import CHOICES, NAME_FOR_TASK_MATRIX
+from matrix.constants import CHOICES_AREA_OF_APPLICATION, CHOICES_STATE_MATRIX, NAME_FOR_TASK_MATRIX
 from matrix.validators import (validation_check_status, validation_max_number,
                                validation_template_grade)
 
 
 class Skill(models.Model):
     area_of_application = models.CharField(
-        "Область", max_length=11
+        "Область",
+        max_length=11,
+        choices=CHOICES_AREA_OF_APPLICATION
     )
     skill = models.CharField("Навык", max_length=150)
 
@@ -62,7 +64,7 @@ class Matrix(models.Model):
         "Статус",
         max_length=10,
         default="Новая",
-        choices=CHOICES,
+        choices=CHOICES_STATE_MATRIX,
         validators=[validation_check_status]
     )
     skills = models.ManyToManyField(
@@ -81,6 +83,11 @@ class Matrix(models.Model):
     )
     completed_at = models.DateTimeField(
         "Дата завершения",
+        null=True,
+        blank=True
+    )
+    deadline = models.DateTimeField(
+        "Дедлайн",
         null=True,
         blank=True
     )

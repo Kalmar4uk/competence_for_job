@@ -1,7 +1,7 @@
-from api.routers import companies, matrix, template_matrix, tokens, users
+from api.routers import companies, matrix, template_matrix, tokens, users, skills, grade
 from api.routers.routers import (router_companies, router_matrix,
                                  router_template_matrix, router_token,
-                                 router_users, tags_metadata)
+                                 router_users, tags_metadata, router_skills, router_grades)
 from dotenv import load_dotenv
 from fastapi import FastAPI
 
@@ -23,6 +23,8 @@ fastapi_competencies.include_router(router_users)
 fastapi_competencies.include_router(router_companies)
 fastapi_competencies.include_router(router_template_matrix)
 fastapi_competencies.include_router(router_matrix)
+fastapi_competencies.include_router(router_skills)
+fastapi_competencies.include_router(router_grades)
 
 
 @fastapi_competencies.get("/")

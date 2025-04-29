@@ -1,5 +1,4 @@
 from admin_auto_filters.filters import AutocompleteFilter
-from companies.models import Company
 from core.models import MyDjangoQLSearchMixin
 from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin

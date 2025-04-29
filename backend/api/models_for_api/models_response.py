@@ -47,6 +47,11 @@ class ApiTemplateMatrixPaginator(ApiBasePagination):
     result: list[ApiTemplateMatrixBaseGet]
 
 
+class ApiSkillsPaginator(ApiBasePagination):
+    """Модель пагинации навыков"""
+    result: list[ApiSkills]
+
+
 class ApiSkillsAndGradesForMatrix(ApiSkills):
     """Модель навыка с добавленной оценкой"""
     grade: ApiGrades
