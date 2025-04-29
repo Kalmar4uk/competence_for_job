@@ -1,7 +1,8 @@
 from companies.models import Company
 from django.conf import settings
 from django.db import models
-from matrix.constants import CHOICES_AREA_OF_APPLICATION, CHOICES_STATE_MATRIX, NAME_FOR_TASK_MATRIX
+from matrix.constants import (CHOICES_AREA_OF_APPLICATION,
+                              CHOICES_STATE_MATRIX, NAME_FOR_TASK_MATRIX)
 from matrix.validators import (validation_check_status, validation_max_number,
                                validation_template_grade)
 

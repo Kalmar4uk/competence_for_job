@@ -1,15 +1,15 @@
-from api.routers.routers import router_skills
-from api.models_for_api.base_model import ApiSkills
-from api.models_for_api.models_response import ApiSkillsPaginator
-from api.models_for_api.model_request import ApiSkillsCreate
-from fastapi import Depends, Query
-from users.models import User
-from matrix.models import Skill
-from api.permissions import get_current_user
-from django.shortcuts import get_object_or_404
-from django.http.response import Http404
 from api.exceptions.error_404 import SkillNotFound
 from api.exceptions.error_422 import SkillAlreadyExists
+from api.models_for_api.base_model import ApiSkills
+from api.models_for_api.model_request import ApiSkillsCreate
+from api.models_for_api.models_response import ApiSkillsPaginator
+from api.permissions import get_current_user
+from api.routers.routers import router_skills
+from django.http.response import Http404
+from django.shortcuts import get_object_or_404
+from fastapi import Depends, Query
+from matrix.models import Skill
+from users.models import User
 
 
 @router_skills.get("/", response_model=ApiSkillsPaginator)

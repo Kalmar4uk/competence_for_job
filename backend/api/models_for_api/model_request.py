@@ -1,5 +1,5 @@
-from pydantic import BaseModel, Field, field_validator
 from matrix.constants import AREA_OF_APPLICATION
+from pydantic import BaseModel, Field, field_validator
 
 
 class UserUpdate(BaseModel):
