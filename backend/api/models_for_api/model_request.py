@@ -1,5 +1,6 @@
 from matrix.constants import AREA_OF_APPLICATION
 from pydantic import BaseModel, Field, field_validator
+from datetime import datetime
 
 
 class UserUpdate(BaseModel):
@@ -59,6 +60,7 @@ class ApiMatrixCreate(BaseModel):
     name: str | None = Field(default=None, examples=["Назначенная матрица"])
     employee: list[int] = Field(examples=[[1, 2, 3]])
     template_matrix: int = Field(examples=[1])
+    deadline: datetime | None = None
 
 
 class ApiMatrixInWorkStatus(BaseModel):

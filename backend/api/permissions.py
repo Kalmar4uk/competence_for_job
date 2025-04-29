@@ -49,7 +49,6 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
 
 
 def get_current_user_is_director_or_admin(
-        company_id: int,
         current_user: User = Depends(get_current_user)
 ) -> User:
     """Проверка прав директора у сотрудника"""
