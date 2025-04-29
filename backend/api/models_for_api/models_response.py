@@ -1,7 +1,6 @@
 from datetime import datetime
 
-from api.core.base_from_django_model import (ApiCompanyFromDjangoModel,
-                                             ApiTemplateMatrixFromDjangoModel)
+from api.core.base_from_django_model import ApiCompanyFromDjangoModel
 from api.models_for_api.base_model import (ApiBasePagination, ApiCompany,
                                            ApiGrades, ApiMatrix, ApiSkills,
                                            ApiTemplateMatrix, ApiUser)

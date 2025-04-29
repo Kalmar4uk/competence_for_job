@@ -1,6 +1,3 @@
-from api.exceptions.error_403 import NotRights
-from api.exceptions.error_404 import MatrixNotFound, UserNotFound
-from api.exceptions.error_422 import EmployeeInCompany
 from api.models_for_api.base_model import ApiGrades, ApiTemplateMatrix, ApiUser
 from api.models_for_api.models_response import (ApiMatrixForResponse,
                                                 ApiSkillsAndGradesForMatrix)

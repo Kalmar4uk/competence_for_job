@@ -1,28 +1,22 @@
 from api.exceptions.error_400 import NotValidStatusMatrix
-from api.exceptions.error_404 import (MatrixNotFound,
-                                      TemplateMatrixNotFound,
+from api.exceptions.error_404 import (MatrixNotFound, TemplateMatrixNotFound,
                                       UserNotFound)
 from api.exceptions.error_422 import BadSkillInRequest, DoesNotMatchCountSkill
 from api.models_for_api.model_request import (ApiMatrixCompeted,
                                               ApiMatrixCreate,
-                                              ApiMatrixInWorkStatus
-                                              )
+                                              ApiMatrixInWorkStatus)
 from api.models_for_api.models_response import (
-    ApiMatrixForResponse, ApiMatrixForResponseWithStatusAndLastUpdateFields,
-)
+    ApiMatrixForResponse, ApiMatrixForResponseWithStatusAndLastUpdateFields)
 from api.permissions import (check_matrix_user, get_current_user,
                              get_current_user_is_director_or_admin)
 from api.routers.routers import router_matrix
-from api.routers.utils import result_matrix_list, result_matrix
+from api.routers.utils import result_matrix, result_matrix_list
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from fastapi import Depends
-from matrix.models import (GradeSkillMatrix,
-                           Matrix,
-                           Skill,
-                           TemplateMatrix,
-                           GradeSkill)
+from matrix.models import (GradeSkill, GradeSkillMatrix, Matrix, Skill,
+                           TemplateMatrix)
 from users.models import User
 
 

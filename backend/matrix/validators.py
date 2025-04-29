@@ -1,5 +1,5 @@
 from django.core.exceptions import ValidationError
-from matrix.constants import TEMPLATE_GRADE, STATUSES_MATRIX
+from matrix.constants import STATUSES_MATRIX, TEMPLATE_GRADE
 
 
 def validation_check_status(data):

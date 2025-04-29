@@ -1,7 +1,4 @@
-from datetime import datetime
-
-from api.models_for_api.models_response import ApiSkillsAndGradesForMatrix
-from pydantic import BaseModel, Field, ValidationError, field_validator
+from pydantic import BaseModel, Field, field_validator
 
 
 class UserUpdate(BaseModel):
