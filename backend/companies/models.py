@@ -42,7 +42,7 @@ class LegalDetailsCompany(models.Model):
         verbose_name_plural = "Юридические данные"
 
     def __str__(self):
-        return f"Юридические данные компании {self.company.company.name}"
+        return f"Юридические данные компании {self.company.name}"
 
 
 class OldCompanyEmployee(models.Model):

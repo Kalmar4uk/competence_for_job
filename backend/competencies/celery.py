@@ -9,12 +9,8 @@ app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks()
 
 app.conf.beat_schedule = {
-    'generate-matrix-first-monday': {
-        'task': 'matrix.tasks.generate_matrix_for_user',
-        'schedule': crontab(day_of_week='mon', day_of_month='1-7', hour=9, minute=45),
-    },
-    'generate-matrix-third-monday': {
-        'task': 'matrix.tasks.generate_matrix_for_user',
-        'schedule': crontab(day_of_week='mon', day_of_month='15-21', hour=9, minute=45),
-    },
+    "status_matrix_to_expired": {
+        "task": "matrix.tasks.change_matrix_status_to_expired",
+        "schedule": crontab(hour=21, minute=00)
+    }
 }
