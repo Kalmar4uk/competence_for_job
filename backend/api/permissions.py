@@ -64,6 +64,7 @@ def check_matrix_user(
         matrix_id: int,
         current_user: User = Depends(get_current_user)
 ):
+    """Проверка прав на отработку матрицы"""
     try:
         current_user.matrix.get(id=matrix_id)
     except ObjectDoesNotExist:
