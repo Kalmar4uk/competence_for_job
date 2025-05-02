@@ -3,4 +3,4 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install -r requirements.txt --no-cache-dir
 COPY . .
-CMD ["uvicorn", "competencies.asgi:application", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "python manage.py collectstatic && uvicorn competencies.asgi:application --host 0.0.0.0 --port 8000"]
