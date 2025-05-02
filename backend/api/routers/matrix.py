@@ -2,8 +2,7 @@ from api.exceptions.error_400 import NotValidStatusMatrix
 from api.exceptions.error_404 import (MatrixNotFound, TemplateMatrixNotFound,
                                       UserNotFound)
 from api.exceptions.error_422 import (BadSkillInRequest,
-                                      DoesNotMatchCountSkill,
-                                      SmallDeadline)
+                                      DoesNotMatchCountSkill)
 from api.models_for_api.model_request import (ApiMatrixCompeted,
                                               ApiMatrixCreate,
                                               ApiMatrixInWorkStatus,
@@ -144,11 +143,7 @@ def create_matrix(
             template_matrix=template_matrix,
             user=employee
         )
-        if deadline := from_data.deadline:
-            if deadline <= timezone.now():
-                raise SmallDeadline()
-            else:
-                matrix.deadline = deadline
+        matrix.deadline = from_data.deadline
         matrix.skills.set(skills)
         matrices.append(matrix)
 

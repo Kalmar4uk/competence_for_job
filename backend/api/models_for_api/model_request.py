@@ -1,25 +1,62 @@
+import re
+
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+from django.utils import timezone
 from matrix.constants import AREA_OF_APPLICATION
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from datetime import datetime
+from users.models import User
 
 
 class UserUpdate(BaseModel):
     """Модель обновления юзера"""
-    email: str = Field(examples=["olezha.korotky@mail.ru"])
+    email: str = Field(
+        examples=["olezha.korotky@mail.ru"]
+    )
     first_name: str = Field(examples=["Олежа"])
     last_name: str = Field(examples=["Короткий"])
     middle_name: str | None = Field(default=None, examples=["Длиннович"])
+
+    @field_validator("email")
+    def check_email(cls, value: str):
+        if not re.search(r"^[\w.]+@[\w]+\.+(ru|com)$", value):
+            raise ValueError("Некорректный Email")
+        if User.objects.filter(email=value).exists():
+            raise ValueError("Email уже используется")
+        return value
 
 
 class UserRegistration(UserUpdate):
     """Модель для регистрации юзера"""
     password: str = Field(examples=["Aotydfsabfdsjk145"])
 
+    @field_validator("password")
+    def check_password(cls, value: str):
+        try:
+            validate_password(value)
+        except ValidationError as e:
+            raise ValueError("".join(e))
+        return value
+
 
 class UserSetPassword(BaseModel):
     """Модель для обновления пароля"""
     current_password: str = Field(examples=["Aotydfsabfdsjk145"])
     new_password: str = Field(examples=["Idfsfjdsfg091"])
+
+    @field_validator("new_password", mode="before")
+    def check_new_password(cls, value: str):
+        try:
+            validate_password(value)
+        except ValidationError as e:
+            raise ValueError("".join(e))
+
+    @model_validator(mode="after")
+    def check_coincidences_passwords(self):
+        if self.new_password == self.current_password:
+            raise ValueError("Новый и старый пароли совпадают")
+        return self
 
 
 class CompanyRegistration(BaseModel):
@@ -62,13 +99,21 @@ class ApiMatrixCreate(BaseModel):
     template_matrix: int = Field(examples=[1])
     deadline: datetime | None = None
 
+    @field_validator("deadline")
+    def check_deadline(cls, value: datetime):
+        if value <= timezone.now():
+            raise ValueError(
+                "Дата дедлайна меньше или равна текущей дате, "
+                "необходимо выставить минимум t+1"
+            )
+        return value
+
 
 class ApiMatrixInWorkStatus(BaseModel):
     """Модель обновления статуса"""
     status: str = Field(examples=["В процессе"])
 
     @field_validator("status")
-    @classmethod
     def check_status(cls, value: str) -> str:
         if value != "В процессе":
             raise ValueError(
@@ -82,7 +127,6 @@ class ApiGradeForMatrixCompeted(BaseModel):
     evaluation_number: int = Field(examples=[1])
 
     @field_validator("evaluation_number")
-    @classmethod
     def check_min_max_number(cls, value: int) -> int:
         if value < 0 or value > 5:
             raise ValueError(
@@ -104,7 +148,6 @@ class ApiMatrixCompeted(BaseModel):
     skills: list[ApiSkillForMatrixCompleted]
 
     @field_validator("status")
-    @classmethod
     def check_status(cls, value: str) -> str:
         if value != "Завершена":
             raise ValueError(
@@ -119,7 +162,6 @@ class ApiSkillsCreate(BaseModel):
     skill: str = Field(examples=["Включать компьютер"])
 
     @field_validator("area_of_application")
-    @classmethod
     def check_status(cls, value: str) -> str:
         if value not in AREA_OF_APPLICATION:
             raise ValueError(
