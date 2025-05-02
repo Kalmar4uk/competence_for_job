@@ -125,3 +125,11 @@ class ApiSkillsCreate(BaseModel):
                 f"Некорректный тип навыка - {value}"
             )
         return value
+
+
+class ApiMatrixRevision(BaseModel):
+    comment: str = Field(examples=[
+        "Необходимо отработать повторно, есть сомнения, "
+        "что ты на экспертном уровне знаешь как включить ПК"
+        ], max_length=100
+    )

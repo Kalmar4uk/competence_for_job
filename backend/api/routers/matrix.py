@@ -4,9 +4,13 @@ from api.exceptions.error_404 import (MatrixNotFound, TemplateMatrixNotFound,
 from api.exceptions.error_422 import BadSkillInRequest, DoesNotMatchCountSkill, SmallDeadline
 from api.models_for_api.model_request import (ApiMatrixCompeted,
                                               ApiMatrixCreate,
-                                              ApiMatrixInWorkStatus)
+                                              ApiMatrixInWorkStatus,
+                                              ApiMatrixRevision)
 from api.models_for_api.models_response import (
-    ApiMatrixForResponse, ApiMatrixForResponseWithStatusAndLastUpdateFields)
+    ApiMatrixForResponse,
+    ApiMatrixForResponseWithStatusAndLastUpdateFields,
+    ApiMatrixForResponseRevision
+)
 from api.permissions import (check_matrix_user, get_current_user,
                              get_current_user_is_director_or_admin)
 from api.routers.routers import router_matrix
@@ -14,6 +18,7 @@ from api.routers.utils import result_matrix, result_matrix_list
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from datetime import timedelta
 from fastapi import Depends
 from matrix.models import (GradeSkill, GradeSkillMatrix, Matrix, Skill,
                            TemplateMatrix)
@@ -193,4 +198,28 @@ def completed_matrix(
 
     return result_matrix(matrix=matrix)
 
-# Добавить периодическую таску для оперевода в Просроченные матрицы у которых истек Дедлайн
+
+@router_matrix.patch(
+        "/{matrix_id}/revision",
+        response_model=ApiMatrixForResponseRevision
+    )
+def revision_for_matrix(
+    matrix_id: int,
+    from_data: ApiMatrixRevision,
+    current_user: User = Depends(get_current_user)
+):
+    """Возврат матрицы на доработку"""
+    try:
+        matrix = get_object_or_404(Matrix, id=matrix_id)
+    except Http404:
+        raise MatrixNotFound(matrix_id=matrix_id)
+
+    matrix.status = "В процессе"
+    matrix.last_update_status = timezone.now()
+    matrix.completed_at = None
+    matrix.deadline = timezone.now() + timedelta(days=5)
+    base_matrix_for_respose = result_matrix(matrix=matrix)
+    return ApiMatrixForResponseRevision(
+        **base_matrix_for_respose.model_dump(),
+        comment=from_data.comment
+    )

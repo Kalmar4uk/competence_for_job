@@ -62,6 +62,15 @@ class ApiMatrixForResponse(ApiMatrix):
     skills: list[ApiSkillsAndGradesForMatrix]
 
 
+class ApiMatrixForResponseRevision(ApiMatrixForResponse):
+    """Модель матрицы с комментарием для возвратных"""
+    comment: str = Field(examples=[
+        "Необходимо отработать повторно, есть сомнения, "
+        "что ты на экспертном уровне знаешь как включить ПК"
+        ], max_length=100
+    )
+
+
 class ApiMatrixForResponseWithStatusAndLastUpdateFields(BaseModel):
     """Модель матрицы с новым статусои и датой изменения (только эти поля)"""
     status: str = Field(examples=["В процессе"])
