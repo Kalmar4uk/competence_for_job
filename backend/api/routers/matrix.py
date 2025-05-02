@@ -192,3 +192,5 @@ def completed_matrix(
     matrix.save()
 
     return result_matrix(matrix=matrix)
+
+# Добавить периодическую таску для оперевода в Просроченные матрицы у которых истек Дедлайн
