@@ -15,6 +15,7 @@ django-admin-autocomplete-filter==0.7.1
 django-admin-rangefilter==0.13.2
 django-celery-results==2.5.1
 django-filter==23.1
+django-redis==5.4.0
 django_debug_toolbar==3.8.1
 djangoql==0.18.1
 fastapi==0.115.12
@@ -24,6 +25,7 @@ isort==5.13.2
 kombu==5.5.2
 ply==3.11
 prompt_toolkit==3.0.50
+psycopg2==2.9.10
 pydantic==2.11.3
 pydantic_core==2.33.1
 PyJWT==2.10.1
