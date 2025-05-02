@@ -1,9 +1,5 @@
-import re
-
-from api.exceptions.error_400 import NotValidNewPassword
 from api.exceptions.error_401 import NotValidPassowod
 from api.exceptions.error_404 import UserNotFound
-from api.exceptions.error_422 import NotValidEmail, UniqueEmailEmployee
 from api.models_for_api.base_model import ApiUser
 from api.models_for_api.model_request import (UserRegistration,
                                               UserSetPassword, UserUpdate)
@@ -12,11 +8,9 @@ from api.models_for_api.models_response import (ApiCompanyForUser,
                                                 ApiUserResponse)
 from api.permissions import get_current_user
 from api.routers.routers import router_users
-from django.contrib.auth.password_validation import validate_password
-from django.core.exceptions import ValidationError
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
-from fastapi import Depends, HTTPException, Query, status
+from fastapi import Depends, Query
 from users.models import User
 
 
@@ -94,23 +88,10 @@ def get_user(
         "/registration",
         response_model=ApiUser,
         status_code=201,
-        responses={422: {}, 401: {}, 400: {}}
+        responses={401: {}, 400: {}}
     )
 def registration_user(from_data: UserRegistration):
     """Регистрация пользователя"""
-    try:
-        validate_password(from_data.password)
-    except ValidationError as error:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(error)
-        )
-    if User.objects.filter(email=from_data.email).exists():
-        raise UniqueEmailEmployee()
-
-    if not re.search(r"^[\w.]+@[\w]+\.+(ru|com)$", from_data.email):
-        raise NotValidEmail()
-
     user_data: dict[str, str] = from_data.model_dump()
     password: str = user_data.pop("password")
     new_user = User.objects.create(**user_data)
@@ -149,11 +130,5 @@ def set_password(
     """Обновление пароля пользователя"""
     if not current_user.check_password(from_data.current_password):
         raise NotValidPassowod()
-    if from_data.current_password == from_data.new_password:
-        raise NotValidNewPassword()
-    try:
-        validate_password(from_data.new_password)
-    except ValidationError as error:
-        raise NotValidNewPassword(error=error)
     current_user.set_password(from_data.new_password)
     current_user.save()

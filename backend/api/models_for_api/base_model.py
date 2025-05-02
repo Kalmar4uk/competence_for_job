@@ -5,7 +5,7 @@ from api.core.base_from_django_model import (ApiBaseModelIfFieldsMatch,
                                              ApiMatrixFromDjangoModel,
                                              ApiTemplateMatrixFromDjangoModel,
                                              ApiUserFromDjangoModel)
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class ApiUser(ApiUserFromDjangoModel):
@@ -42,6 +42,14 @@ class ApiGrades(ApiBaseModelIfFieldsMatch):
     id: int = Field(examples=[1])
     grade: str = Field(examples=["Basic"])
     evaluation_number: int = Field(examples=[1])
+
+    @field_validator("evaluation_number")
+    def check_min_max_number(cls, value: int) -> int:
+        if value < 0 or value > 5:
+            raise ValueError(
+                "Значение оценки меньше 0 или больше 5"
+            )
+        return value
 
 
 class ApiBasePagination(BaseModel):

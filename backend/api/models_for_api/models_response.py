@@ -16,6 +16,7 @@ class ApiCompanyBaseGet(ApiCompany):
 
 
 class ApiCompanyForUser(ApiCompanyFromDjangoModel):
+    """Модель компании для ответа с юзером"""
     id: int = Field(examples=[1])
     name: str = Field(examples=["Абракадабра"])
 
@@ -62,7 +63,21 @@ class ApiMatrixForResponse(ApiMatrix):
     skills: list[ApiSkillsAndGradesForMatrix]
 
 
+class ApiMatrixForResponseRevision(ApiMatrixForResponse):
+    """Модель матрицы с комментарием для возвратных"""
+    comment: str = Field(examples=[
+        "Необходимо отработать повторно, есть сомнения, "
+        "что ты на экспертном уровне знаешь как включить ПК"
+        ], max_length=100
+    )
+
+
 class ApiMatrixForResponseWithStatusAndLastUpdateFields(BaseModel):
     """Модель матрицы с новым статусои и датой изменения (только эти поля)"""
     status: str = Field(examples=["В процессе"])
     last_update_status: datetime
+
+
+class ApiMatrixPaginator(ApiBasePagination):
+    """Модель пагинации матриц"""
+    result: list[ApiMatrixForResponse]
