@@ -16,6 +16,7 @@ class ApiCompanyBaseGet(ApiCompany):
 
 
 class ApiCompanyForUser(ApiCompanyFromDjangoModel):
+    """Модель компании для ответа с юзером"""
     id: int = Field(examples=[1])
     name: str = Field(examples=["Абракадабра"])
 
@@ -75,3 +76,8 @@ class ApiMatrixForResponseWithStatusAndLastUpdateFields(BaseModel):
     """Модель матрицы с новым статусои и датой изменения (только эти поля)"""
     status: str = Field(examples=["В процессе"])
     last_update_status: datetime
+
+
+class ApiMatrixPaginator(ApiBasePagination):
+    """Модель пагинации матриц"""
+    result: list[ApiMatrixForResponse]

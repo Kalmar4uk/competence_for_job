@@ -1,7 +1,9 @@
 from api.exceptions.error_400 import NotValidStatusMatrix
 from api.exceptions.error_404 import (MatrixNotFound, TemplateMatrixNotFound,
                                       UserNotFound)
-from api.exceptions.error_422 import BadSkillInRequest, DoesNotMatchCountSkill, SmallDeadline
+from api.exceptions.error_422 import (BadSkillInRequest,
+                                      DoesNotMatchCountSkill,
+                                      SmallDeadline)
 from api.models_for_api.model_request import (ApiMatrixCompeted,
                                               ApiMatrixCreate,
                                               ApiMatrixInWorkStatus,
@@ -9,7 +11,8 @@ from api.models_for_api.model_request import (ApiMatrixCompeted,
 from api.models_for_api.models_response import (
     ApiMatrixForResponse,
     ApiMatrixForResponseWithStatusAndLastUpdateFields,
-    ApiMatrixForResponseRevision
+    ApiMatrixForResponseRevision,
+    ApiMatrixPaginator
 )
 from api.permissions import (check_matrix_user, get_current_user,
                              get_current_user_is_director_or_admin)
@@ -18,26 +21,69 @@ from api.routers.utils import result_matrix, result_matrix_list
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.db.models import Q
 from datetime import timedelta
-from fastapi import Depends
+from fastapi import Depends, Query
 from matrix.models import (GradeSkill, GradeSkillMatrix, Matrix, Skill,
                            TemplateMatrix)
+from matrix.constants import STATUSES_MATRIX
 from users.models import User
 
 
 @router_matrix.get(
         "/by_company",
-        response_model=list[ApiMatrixForResponse],
+        response_model=ApiMatrixPaginator,
         responses={401: {}, 403: {}})
 def get_matrix_list_by_company(
+    page: int = Query(
+        1,
+        description="Номер страницы"
+    ),
+    limit: int = Query(
+        10,
+        description="Указать кол-во матриц если требуется"
+    ),
+    employee: int | None = Query(
+        None,
+        description="Указать id сотрудника"
+    ),
+    status: str = Query(
+        "all",
+        description=(
+            "Указать статус матриц (Новая, В процессе, Просрочена, Завершена)"
+        )
+    ),
     current_user: User = Depends(get_current_user_is_director_or_admin)
 ):
     """
     Выводит все матрицы сотрудников по компании директора
     который отправляет запрос
     """
-    matrices = Matrix.objects.filter(user__company=current_user.company)
-    return result_matrix_list(matrices=matrices)
+    if employee:
+        matrices = Matrix.objects.filter(
+            Q(user__company=current_user.company) & Q(user=employee)
+        )
+    else:
+        matrices = Matrix.objects.filter(user__company=current_user.company)
+
+    if (form_state := status.capitalize()) in STATUSES_MATRIX:
+        matrices = matrices.filter(status=form_state)
+
+    offset: int = (page - 1) * limit
+
+    count: int = matrices.count()
+    matrices_data = matrices[offset:offset+limit]
+    result_matrix = result_matrix_list(matrices=matrices_data)
+
+    next: int | None = page + 1 if offset + limit < count else None
+    previous: int | None = page - 1 if page > 1 else None
+
+    return ApiMatrixPaginator(
+        count=count,
+        next=next,
+        previous=previous,
+        result=result_matrix
+    )
 
 
 @router_matrix.get(

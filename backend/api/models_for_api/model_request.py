@@ -114,6 +114,7 @@ class ApiMatrixCompeted(BaseModel):
 
 
 class ApiSkillsCreate(BaseModel):
+    """Модель создания навыков"""
     area_of_application: str = Field(examples=["Hard skill"])
     skill: str = Field(examples=["Включать компьютер"])
 
@@ -128,6 +129,7 @@ class ApiSkillsCreate(BaseModel):
 
 
 class ApiMatrixRevision(BaseModel):
+    """Модель возвращения матрицы на доработку"""
     comment: str = Field(examples=[
         "Необходимо отработать повторно, есть сомнения, "
         "что ты на экспертном уровне знаешь как включить ПК"
